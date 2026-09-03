@@ -12,12 +12,15 @@ export default function Terminal() {
   ]);
   const [matrixMode, setMatrixMode] = useState(false);
 
-  const bottomRef = useRef(null);
+  const terminalBodyRef = useRef(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (terminalBodyRef.current) {
+      terminalBodyRef.current.scrollTop = terminalBodyRef.current.scrollHeight;
+    }
   }, [history]);
+
 
   const executeCommand = (cmdText) => {
     const raw = cmdText.trim();
@@ -183,6 +186,7 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
 
           {/* Terminal Screen & Logs */}
           <div 
+            ref={terminalBodyRef}
             onClick={() => inputRef.current?.focus()}
             className="p-5 font-mono text-xs sm:text-sm min-h-[320px] max-h-[440px] overflow-y-auto space-y-3 cursor-text"
           >
@@ -207,8 +211,8 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
                 )}
               </div>
             ))}
-            <div ref={bottomRef} />
           </div>
+
 
           {/* Terminal Prompt Input */}
           <div className="px-4 py-3 bg-[#0d0f14] border-t border-white/5 flex items-center gap-2 font-mono text-xs sm:text-sm">

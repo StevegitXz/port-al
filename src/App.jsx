@@ -11,6 +11,14 @@ import Footer from './components/Footer';
 
 export default function App() {
   useEffect(() => {
+    // Prevent browser from restoring scroll position to bottom or previous state on reload
+    if (typeof window !== 'undefined') {
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'manual';
+      }
+      window.scrollTo(0, 0);
+    }
+
     // Initialize buttery smooth scrolling via Lenis
     const lenis = new Lenis({
       duration: 1.2,
@@ -18,6 +26,8 @@ export default function App() {
       smoothWheel: true,
       touchMultiplier: 1.5,
     });
+
+    lenis.scrollTo(0, { immediate: true });
 
     function raf(time) {
       lenis.raf(time);
@@ -31,6 +41,7 @@ export default function App() {
       lenis.destroy();
     };
   }, []);
+
 
   return (
     <div className="relative min-h-screen bg-[#09090b] text-zinc-100 selection:bg-[#f4a7b9]/25 selection:text-[#f4a7b9]">
