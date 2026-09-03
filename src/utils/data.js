@@ -7,8 +7,9 @@ export const PERSONAL_INFO = {
   nickname: "Steve",
   handle: "StevegitXz",
   github: "https://github.com/StevegitXz",
-  email: "estevaoemanuel.farias@gmail.com", // contato principal
+  email: "estevaoemanuel470@gmail.com", // contato principal
   location: "Rio Branco, Acre, Brasil",
+
   timezone: "America/Rio_Branco", // UTC-5
   status: "Disponível para Estágios & Projetos",
   institution: "Instituto Federal do Acre (IFAC) - Campus Rio Branco",
