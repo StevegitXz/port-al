@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { ExternalLink, Cpu, Layers, Sparkles, Gamepad2, ArrowUpRight, Search } from 'lucide-react';
+import { ExternalLink, Cpu, Layers, Sparkles, Gamepad2, ArrowUpRight, Search, BookOpen } from 'lucide-react';
 import GithubIcon from './GithubIcon';
 import { PROJECTS } from '../utils/data';
 import { sound } from '../utils/sound';
 import ProjectModal from './ProjectModal';
+
 
 
 export default function Projects() {
@@ -152,21 +153,38 @@ export default function Projects() {
                     <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </button>
 
-                  <a
-                    href={proj.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => sound.playClick()}
-                    className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800 text-zinc-400 hover:text-white hover:border-[#f4a7b9]/40 transition-colors"
-                    title="Acessar no GitHub"
-                  >
-                    <GithubIcon className="w-4 h-4" />
-                  </a>
+                  <div className="flex items-center gap-2">
+                    {proj.articleUrl && (
+                      <a
+                        href={proj.articleUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => sound.playClick()}
+                        className="px-2.5 py-1.5 rounded-lg bg-amber-400/10 border border-amber-400/30 text-amber-300 hover:text-white hover:border-amber-400/60 transition-colors text-xs font-mono flex items-center gap-1.5"
+                        title="Ler Artigo Publicado no SOL/SBC"
+                      >
+                        <BookOpen className="w-3.5 h-3.5" />
+                        <span className="text-[11px] font-semibold">Artigo SBC</span>
+                      </a>
+                    )}
+
+                    <a
+                      href={proj.github}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => sound.playClick()}
+                      className="p-2 rounded-lg bg-zinc-900/80 border border-zinc-800 text-zinc-400 hover:text-white hover:border-[#f4a7b9]/40 transition-colors"
+                      title="Acessar no GitHub"
+                    >
+                      <GithubIcon className="w-4 h-4" />
+                    </a>
+                  </div>
 
                 </div>
               </div>
             </div>
           ))}
+
         </div>
       </div>
 

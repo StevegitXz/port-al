@@ -81,14 +81,15 @@ export const PROJECTS = [
     description: "Sistema de automação e irrigação inteligente projetado para o contexto da Amazônia Ocidental. Artigo científico apresentado no 16º WCAMA / 45º Congresso da Sociedade Brasileira de Computação (CSBC 2025 em Maceió).",
     fullDescription: "O MARIOT é uma solução completa de Internet das Coisas (IoT) desenvolvida com firmware em C++ e microcontrolador ESP8266. Integrado a circuitos com relés e sensores analógicos/digitais de umidade e temperatura, o protótipo viabiliza controle inteligente e programado de bombas d'água e monitoramento ambiental, mitigando o estresse hídrico e otimizando recursos no ambiente amazônico.",
     techs: ["C++", "Arduino IDE", "ESP8266", "Relés & Sensores", "IoT", "CSBC/WCAMA"],
-    github: "https://github.com/StevegitXz",
+    github: "https://github.com/PauloS5/EcoWatchAI",
+    articleUrl: "https://sol.sbc.org.br/index.php/wcama/article/view/36087",
     metrics: [
       { label: "Evento", val: "45º CSBC / 16º WCAMA" },
       { label: "Local", val: "Maceió - AL" },
       { label: "Hardware", val: "ESP8266 + Sensores" }
     ],
     highlights: [
-      "Trabalho publicado nos Anais de Congresso Nacional da SBC",
+      "Trabalho publicado nos Anais de Congresso Nacional da SBC (SOL SBC)",
       "Firmware em C++ com gerenciamento de sensores em tempo real",
       "Aplicação direta em automação sustentável na Amazônia Ocidental"
     ]
@@ -103,7 +104,7 @@ export const PROJECTS = [
     description: "Plataforma web educacional moderna criada para apoiar as atividades de estudo, compartilhamento de materiais didáticos e dinamização da monitoria de Sociologia no IFAC.",
     fullDescription: "Desenvolvida para sanar a dispersão de materiais de estudo entre os alunos, a Socio-Plat centraliza resumos, flashcards, cronogramas de monitoria e discussões temáticas. Conta com interface reativa de alta fluidez em React e Tailwind CSS, deploy automatizado na Vercel e integração com APIs Node.js.",
     techs: ["React", "Tailwind CSS", "JavaScript", "Vercel", "Node.js"],
-    github: "https://github.com/StevegitXz",
+    github: "https://github.com/StevegitXz/sociologia-app",
     metrics: [
       { label: "Ambiente", val: "Vercel Cloud" },
       { label: "Público", val: "Discentes IFAC" },
@@ -125,7 +126,7 @@ export const PROJECTS = [
     description: "Sistema web completo desenvolvido para cadastro, organização, filtragem e ampla divulgação de eventos culturais, acadêmicos e corporativos da região Norte.",
     fullDescription: "Construído sobre o clássico e robusto padrão arquitetural MVC (Model-View-Controller) com Node.js e Express, o sistema integra autenticação segura de organizadores, rotas protegidas, validação de requisições e persistência em banco de dados relacional MySQL, estilizado dinamicamente com Tailwind CSS.",
     techs: ["Node.js", "Express", "MySQL", "JavaScript", "Tailwind CSS", "MVC"],
-    github: "https://github.com/StevegitXz",
+    github: "https://github.com/StevegitXz/Norte-Eventos",
     metrics: [
       { label: "Arquitetura", val: "MVC Modular" },
       { label: "Banco", val: "MySQL Relacional" },
@@ -147,7 +148,7 @@ export const PROJECTS = [
     description: "Plataforma interativa gamificada com minijogos dinâmicos e mecânicas visuais envolventes para reforço no aprendizado de matemática no ensino médio.",
     fullDescription: "O Decifra transforma teoremas e equações em desafios interativos estilo arcade. Utilizando manipuladores de estado modernos em JavaScript vanilla e HTML5 com Tailwind CSS, oferece pontuação em tempo real, fases progressivas e feedback sonoro e visual para estimular o engajamento dos estudantes.",
     techs: ["HTML5", "Tailwind CSS", "JavaScript", "Gamificação", "CSS Animations"],
-    github: "https://github.com/StevegitXz",
+    github: "https://github.com/PedroL-Melo/DECIFRA",
     metrics: [
       { label: "Gênero", val: "Puzzle & EdTech" },
       { label: "Stack", val: "Pure JS + Tailwind" },
@@ -159,6 +160,7 @@ export const PROJECTS = [
       "Design acessível com animações suaves e micro-interações estimulantes"
     ]
   }
+
 ];
 
 export const ARSENAL_SKILLS = [
@@ -216,8 +218,11 @@ export const TIMELINE = [
     type: "Pesquisa & Publicação",
     tag: "CONGRESSO NACIONAL",
     description: "Apresentação e publicação do trabalho 'MARIOT: Automação na Amazônia Ocidental' no 16º Workshop de Computação Aplicada à Gestão do Meio Ambiente e Recursos Naturais (WCAMA) no âmbito do 45º Congresso da SBC.",
-    details: "Artigo científico em coautoria tratando de sistemas embarcados e sensores IoT aplicados ao bioma amazônico."
+    details: "Artigo científico em coautoria tratando de sistemas embarcados e sensores IoT aplicados ao bioma amazônico.",
+    link: "https://sol.sbc.org.br/index.php/wcama/article/view/36087",
+    linkLabel: "Ler Artigo no Portal SOL / SBC"
   },
+
   {
     period: "2025",
     title: "Co-coordenação & Tutoria: Projeto Learn.with(us)",

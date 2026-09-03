@@ -78,13 +78,31 @@ export default function Timeline() {
                   {item.description}
                 </p>
 
-                {/* Details Footer */}
-                {item.details && (
-                  <div className="pt-2.5 border-t border-white/5 flex items-center gap-2 text-xs font-mono text-zinc-500">
-                    <span className="text-zinc-600">›</span>
-                    <span>{item.details}</span>
+                {/* Details and Link Footer */}
+                {(item.details || item.link) && (
+                  <div className="pt-2.5 border-t border-white/5 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+                    {item.details && (
+                      <div className="flex items-center gap-1.5 text-zinc-500">
+                        <span className="text-zinc-600">›</span>
+                        <span>{item.details}</span>
+                      </div>
+                    )}
+                    {item.link && (
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => sound.playClick()}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-400/10 border border-amber-400/30 text-amber-300 hover:text-white hover:border-amber-400/60 transition-colors text-xs font-mono font-semibold"
+                      >
+                        <BookOpen className="w-3.5 h-3.5" />
+                        <span>{item.linkLabel || 'Ler Artigo'}</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </a>
+                    )}
                   </div>
                 )}
+
               </div>
             </div>
           ))}

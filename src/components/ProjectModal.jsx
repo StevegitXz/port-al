@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import { X, ExternalLink, CheckCircle2, Cpu, Calendar, Tag, ShieldCheck } from 'lucide-react';
+import { X, ExternalLink, CheckCircle2, Cpu, Calendar, Tag, ShieldCheck, BookOpen } from 'lucide-react';
 import GithubIcon from './GithubIcon';
 import { sound } from '../utils/sound';
+
 
 
 export default function ProjectModal({ project, onClose }) {
@@ -124,7 +125,21 @@ export default function ProjectModal({ project, onClose }) {
             // StevegitXz • Open Source
           </span>
 
-          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+          <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
+            {project.articleUrl && (
+              <a
+                href={project.articleUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => sound.playClick()}
+                className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-amber-400/15 border border-amber-400/40 text-amber-300 font-mono font-bold text-xs hover:bg-amber-400/25 transition-colors shadow-[0_0_15px_rgba(251,191,36,0.15)]"
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Artigo SOL/SBC</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
+
             <a
               href={project.github}
               target="_blank"
@@ -136,6 +151,7 @@ export default function ProjectModal({ project, onClose }) {
               <span>Ver Repositório</span>
               <ExternalLink className="w-3 h-3" />
             </a>
+
 
 
             <button
