@@ -1,6 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 
-export default function SakuraCanvas() {
+export default function SakuraCanvas({
+  count,
+  className = 'pointer-events-none absolute inset-0 z-0 h-full w-full',
+  style = { opacity: 0.85 },
+  bounded = false,
+}) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -9,8 +14,22 @@ export default function SakuraCanvas() {
     const ctx = canvas.getContext('2d');
     let animationFrameId;
 
-    let width = (canvas.width = window.innerWidth);
-    let height = (canvas.height = window.innerHeight);
+    const getDimensions = () => {
+      if (bounded && canvas.parentElement) {
+        return {
+          w: canvas.parentElement.clientWidth || canvas.offsetWidth || window.innerWidth,
+          h: canvas.parentElement.clientHeight || canvas.offsetHeight || window.innerHeight,
+        };
+      }
+      return {
+        w: window.innerWidth,
+        h: window.innerHeight,
+      };
+    };
+
+    let { w: width, h: height } = getDimensions();
+    canvas.width = width;
+    canvas.height = height;
 
     // Mouse coordinates and velocity
     const mouse = { x: -1000, y: -1000, vx: 0, vy: 0, lastX: 0, lastY: 0 };
@@ -36,13 +55,21 @@ export default function SakuraCanvas() {
     window.addEventListener('mouseleave', handleMouseLeave);
 
     const handleResize = () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+      const dims = getDimensions();
+      width = canvas.width = dims.w;
+      height = canvas.height = dims.h;
     };
     window.addEventListener('resize', handleResize);
 
-    // Number of petals adjusted for screen size
-    const petalCount = Math.min(Math.floor(width / 28), 48);
+    const resizeObserver = window.ResizeObserver && bounded && canvas.parentElement
+      ? new ResizeObserver(handleResize)
+      : null;
+    if (resizeObserver && canvas.parentElement) {
+      resizeObserver.observe(canvas.parentElement);
+    }
+
+    // Number of petals adjusted for screen/container size
+    const petalCount = count || Math.min(Math.floor(width / 28), 48);
 
     class Petal {
       constructor() {
@@ -129,7 +156,6 @@ export default function SakuraCanvas() {
 
         c.restore();
       }
-
     }
 
     const petals = Array.from({ length: petalCount }, () => new Petal());
@@ -152,14 +178,17 @@ export default function SakuraCanvas() {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('resize', handleResize);
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      }
     };
-  }, []);
+  }, [bounded, count]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none absolute inset-0 z-0 h-full w-full"
-      style={{ opacity: 0.85 }}
+      className={className}
+      style={style}
     />
   );
 }

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Calendar, BookOpen, ExternalLink, ZoomIn, ZoomOut, RotateCcw, Move, Compass, Sparkles } from 'lucide-react';
 import { TIMELINE } from '../utils/data';
 import { sound } from '../utils/sound';
+import SakuraCanvas from './SakuraCanvas';
 
 export default function SakuraTreeTimeline() {
   // Chronological tree levels from roots to crown:
@@ -364,6 +365,14 @@ export default function SakuraTreeTimeline() {
         {/* Ethereal Morning Mist Bands Rising from Lake */}
         <div className="absolute bottom-16 left-0 right-0 h-36 bg-gradient-to-t from-white via-white/80 to-transparent blur-md"></div>
       </div>
+
+      {/* FALLING SAKURA PETALS OVERLAY (Over scenic tree & Mount Fuji viewport) */}
+      <SakuraCanvas
+        bounded
+        count={42}
+        className="pointer-events-none absolute inset-0 z-15 h-full w-full"
+        style={{ opacity: 0.95 }}
+      />
 
       {/* ========================================================================= */}
       {/* 2. THE SAKURA TREE INTERACTIVE CANVASES WITH FREE ZOOM & DRAG/PAN ENGINE */}
