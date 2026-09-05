@@ -208,134 +208,216 @@ export default function SakuraTreeTimeline() {
       {/* ========================================================================= */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden select-none">
         {/* Morning Dawn Sky Radiant Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#e0f2fe]/40 via-[#fce7f3]/35 to-[#fafbfc] opacity-95"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#e0f2fe]/50 via-[#fce7f3]/40 to-[#fafbfc] opacity-95"></div>
 
-        {/* Japanese Rising Sun (Asahi) with soft atmospheric rings */}
-        <div className="absolute top-8 left-[18%] -translate-x-1/2 w-72 h-72 rounded-full bg-gradient-to-tr from-rose-400/20 via-amber-200/25 to-transparent blur-2xl"></div>
-        <div className="absolute top-16 left-[18%] -translate-x-1/2 w-32 h-32 rounded-full bg-rose-400/25 blur-xl"></div>
-        <div className="absolute top-20 left-[18%] -translate-x-1/2 w-16 h-16 rounded-full bg-rose-500/30 blur-sm"></div>
+        {/* Diamond Dawn Sun (Hinode) Glowing Behind Mount Fuji's Shoulder */}
+        <div className="absolute top-12 left-[58%] -translate-x-1/2 w-80 h-80 rounded-full bg-gradient-to-tr from-rose-500/25 via-amber-200/35 to-transparent blur-3xl"></div>
+        <div className="absolute top-20 left-[58%] -translate-x-1/2 w-36 h-36 rounded-full bg-gradient-to-br from-rose-500/40 via-amber-300/30 to-transparent blur-xl"></div>
+        <div className="absolute top-24 left-[58%] -translate-x-1/2 w-20 h-20 rounded-full bg-rose-500/40 blur-md"></div>
 
         {/* Stylized Floating Japanese Kasumi / Kumo Clouds */}
-        <div className="absolute top-12 left-0 right-0 h-40 opacity-40">
+        <div className="absolute top-10 left-0 right-0 h-44 opacity-45 pointer-events-none">
           <svg viewBox="0 0 1200 200" className="w-full h-full" fill="none">
             <path
-              d="M 50 80 Q 90 60 140 80 Q 180 60 230 80 L 320 80 Q 350 95 320 110 L 90 110 Q 50 100 50 80 Z"
+              d="M 60 70 Q 110 45 170 70 Q 220 45 280 70 L 380 70 Q 420 90 380 110 L 110 110 Q 60 95 60 70 Z"
               fill="#ffffff"
-              opacity="0.8"
+              opacity="0.85"
             />
             <path
-              d="M 750 40 Q 790 20 840 40 Q 890 20 950 40 L 1050 40 Q 1080 55 1050 70 L 800 70 Q 750 60 750 40 Z"
+              d="M 820 35 Q 870 15 930 35 Q 990 15 1060 35 L 1140 35 Q 1170 55 1140 70 L 890 70 Q 820 60 820 35 Z"
               fill="#ffffff"
-              opacity="0.75"
+              opacity="0.8"
             />
           </svg>
         </div>
 
         {/* Migrating Japanese Cranes (Tsuru) Silhouette Flock in the Dawn Sky */}
-        <div className="absolute top-14 right-[25%] opacity-35 filter blur-[0.4px]">
-          <svg viewBox="0 0 180 80" className="w-36 h-auto" fill="#475569">
-            {/* Lead Crane */}
+        <div className="absolute top-16 right-[22%] opacity-45 filter blur-[0.3px]">
+          <svg viewBox="0 0 180 80" className="w-40 h-auto" fill="#334155">
             <path d="M 40 20 Q 50 15 60 22 Q 45 28 35 25 Q 25 18 15 22 Q 30 18 40 20 Z" />
-            {/* Follower 1 */}
             <path d="M 80 32 Q 88 28 96 34 Q 84 38 76 36 Q 68 30 60 34 Q 72 30 80 32 Z" />
-            {/* Follower 2 */}
             <path d="M 120 45 Q 127 41 134 47 Q 123 50 116 48 Q 109 43 102 47 Q 112 43 120 45 Z" />
-            {/* Follower 3 */}
             <path d="M 150 58 Q 155 55 160 59 Q 152 62 147 60 Q 142 56 137 59 Q 144 56 150 58 Z" />
           </svg>
         </div>
 
-        {/* HIGH-FIDELITY MOUNT FUJI & SURROUNDING LANDSCAPE (Soft Depth-of-Field Blur) */}
+        {/* HIGH-FIDELITY MONUMENTAL MOUNT FUJI & LAKE SCENERY */}
         <div
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 w-[850px] sm:w-[1150px] transition-transform duration-700 ease-out filter blur-[2px] opacity-35"
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 w-[980px] sm:w-[1320px] transition-transform duration-700 ease-out opacity-90 filter blur-[0.5px] drop-shadow-[0_20px_40px_rgba(15,23,42,0.12)]"
           style={{
             transform: `translateX(calc(-50% + ${pan.x * 0.08}px)) translateY(${pan.y * 0.08}px) scale(${1 + (zoom - 1) * 0.06})`,
           }}
         >
-          <svg viewBox="0 0 1200 500" className="w-full h-auto" fill="none">
+          <svg viewBox="0 0 1200 520" className="w-full h-auto" fill="none">
             <defs>
-              {/* Sunlit Flank of Mount Fuji */}
-              <linearGradient id="fujiLightFlank" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#cbd5e1" stopOpacity="0.85" />
-                <stop offset="50%" stopColor="#94a3b8" stopOpacity="0.65" />
-                <stop offset="100%" stopColor="#64748b" stopOpacity="0.3" />
+              {/* Eastern Sunlit Volcanic Flank */}
+              <linearGradient id="fujiEastSunlit" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#64748b" />
+                <stop offset="40%" stopColor="#475569" />
+                <stop offset="100%" stopColor="#334155" />
               </linearGradient>
 
-              {/* Shaded Ravine Flank of Mount Fuji */}
-              <linearGradient id="fujiShadowFlank" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#94a3b8" stopOpacity="0.85" />
-                <stop offset="60%" stopColor="#64748b" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="#475569" stopOpacity="0.25" />
+              {/* Western Deep Twilight Shadow Flank */}
+              <linearGradient id="fujiWestShadow" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#334155" />
+                <stop offset="50%" stopColor="#1e293b" />
+                <stop offset="100%" stopColor="#0f172a" />
               </linearGradient>
 
-              {/* Pure Snow Cap with Natural Albedo */}
-              <linearGradient id="fujiSnowCap" x1="50%" y1="0%" x2="50%" y2="100%">
-                <stop offset="0%" stopColor="#ffffff" stopOpacity="0.98" />
-                <stop offset="60%" stopColor="#f8fafc" stopOpacity="0.9" />
-                <stop offset="100%" stopColor="#e2e8f0" stopOpacity="0.6" />
+              {/* Pure Snow Cap Highlight */}
+              <linearGradient id="snowHighlightGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity="1" />
+                <stop offset="60%" stopColor="#f8fafc" stopOpacity="0.98" />
+                <stop offset="100%" stopColor="#e2e8f0" stopOpacity="0.88" />
               </linearGradient>
 
-              {/* Misty Foothills Gradient */}
-              <linearGradient id="foothillGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#94a3b8" stopOpacity="0.4" />
-                <stop offset="100%" stopColor="#cbd5e1" stopOpacity="0.05" />
+              {/* Shaded Glacial Ravines Snow */}
+              <linearGradient id="snowShadowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#e2e8f0" />
+                <stop offset="50%" stopColor="#cbd5e1" />
+                <stop offset="100%" stopColor="#94a3b8" />
+              </linearGradient>
+
+              {/* Lake Water Surface Gradient */}
+              <linearGradient id="lakeWaterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#cbd5e1" stopOpacity="0.5" />
+                <stop offset="40%" stopColor="#e2e8f0" stopOpacity="0.75" />
+                <stop offset="100%" stopColor="#f8fafc" stopOpacity="0.95" />
+              </linearGradient>
+
+              {/* Kasumi Mist Ribbon Gradient */}
+              <linearGradient id="kasumiMistGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+                <stop offset="25%" stopColor="#ffffff" stopOpacity="0.85" />
+                <stop offset="75%" stopColor="#ffffff" stopOpacity="0.85" />
+                <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
               </linearGradient>
             </defs>
 
-            {/* 1. Mount Fuji Base & Volcano Slopes */}
-            {/* Shaded Western Slope */}
+            {/* 1. DISTANT MOUNTAIN RANGES (Hakone / Southern Alps Ridge) */}
             <path
-              d="M 600 130 C 650 130 680 150 730 200 L 1120 480 L 600 480 Z"
-              fill="url(#fujiShadowFlank)"
-            />
-            {/* Sunlit Eastern Slope */}
-            <path
-              d="M 80 480 L 470 200 C 520 150 550 130 600 130 L 600 480 Z"
-              fill="url(#fujiLightFlank)"
-            />
-
-            {/* 2. Jagged Stratovolcano Snow Cap with Glacial Ravines */}
-            <path
-              d="M 500 170 
-                 C 520 150 545 130 600 130 
-                 C 655 130 680 150 700 170 
-                 L 725 215 
-                 C 705 205 690 225 675 210 
-                 C 660 190 645 230 625 215 
-                 C 605 195 595 220 575 205 
-                 C 555 190 540 225 520 210 
-                 C 505 195 490 220 475 215 Z"
-              fill="url(#fujiSnowCap)"
-            />
-            {/* Deep Snow Ravine Tongues flowing down slopes */}
-            <path d="M 545 205 L 530 270 L 540 275 L 555 208 Z" fill="#ffffff" opacity="0.65" />
-            <path d="M 590 215 L 585 295 L 595 300 L 605 212 Z" fill="#ffffff" opacity="0.75" />
-            <path d="M 645 210 L 655 280 L 645 285 L 635 215 Z" fill="#ffffff" opacity="0.6" />
-
-            {/* 3. Layered Midground Foothills (Hakone / Yamanashi Ridges) */}
-            <path
-              d="M 0 460 Q 200 370 420 410 Q 640 450 860 380 Q 1040 330 1200 420 L 1200 500 L 0 500 Z"
-              fill="url(#foothillGrad)"
+              d="M 0 420 Q 200 350 400 380 Q 560 410 700 370 Q 920 320 1200 410 L 1200 520 L 0 520 Z"
+              fill="#94a3b8"
+              opacity="0.35"
             />
             <path
-              d="M 0 430 Q 300 360 600 420 Q 900 480 1200 390 L 1200 500 L 0 500 Z"
+              d="M 0 440 Q 280 380 520 425 Q 780 470 1020 395 L 1200 440 L 1200 520 L 0 520 Z"
               fill="#cbd5e1"
-              opacity="0.3"
+              opacity="0.5"
             />
 
-            {/* 4. Cultural Landscape Silhouettes in the Distance */}
+            {/* 2. THE MAJESTIC STRATOVOLCANO CONE OF MOUNT FUJI */}
+            {/* Western Face (Midnight Shadow) */}
+            <path
+              d="M 600 104 C 645 104 675 125 710 170 C 765 240 825 325 905 385 C 970 435 1050 455 1120 465 L 600 465 Z"
+              fill="url(#fujiWestShadow)"
+            />
+            {/* Eastern Face (Sunlit Basalt) */}
+            <path
+              d="M 80 465 C 150 455 230 435 295 385 C 375 325 435 240 490 170 C 525 125 555 104 600 104 L 600 465 Z"
+              fill="url(#fujiEastSunlit)"
+            />
+
+            {/* Geological Volcanic Ridge Facets (Giving Authentic 3D Volume) */}
+            <path d="M 600 104 L 590 260 L 575 380 L 565 465 L 600 465 Z" fill="#1e293b" opacity="0.3" />
+            <path d="M 600 104 L 620 260 L 640 380 L 655 465 L 600 465 Z" fill="#0f172a" opacity="0.4" />
+            <path d="M 525 125 L 470 250 L 415 370 L 350 465 Z" stroke="#64748b" strokeWidth="1.5" opacity="0.25" />
+            <path d="M 675 125 L 730 250 L 785 370 L 850 465 Z" stroke="#0f172a" strokeWidth="1.5" opacity="0.3" />
+
+            {/* 3. ICONIC SNOW CAP (YUKIGESHO) WITH CASPER GLACIAL VALLEYS */}
+            {/* Base Snow Cap Shield */}
+            <path
+              d="M 480 185 
+                 C 515 135 545 104 565 98 
+                 C 585 94 615 94 635 98 
+                 C 655 104 685 135 720 185
+                 L 745 225
+                 C 725 215 710 245 690 220
+                 C 670 195 655 270 635 240
+                 C 615 210 600 315 585 275
+                 C 570 235 555 285 535 245
+                 C 515 205 500 240 480 215
+                 Z"
+              fill="url(#snowHighlightGrad)"
+            />
+
+            {/* Radial Glacial Snow Chutes Cutting Down the Rock Valleys */}
+            {/* Chute 1 (Left flank) */}
+            <path d="M 495 195 L 470 245 L 482 250 L 505 200 Z" fill="#ffffff" opacity="0.9" />
+            {/* Chute 2 (Inner left) */}
+            <path d="M 525 220 L 510 280 L 522 285 L 535 225 Z" fill="#ffffff" opacity="0.95" />
+            {/* Chute 3 (Deep Western Osawa Valley - Famous Great Ravine) */}
+            <path d="M 560 235 L 550 325 L 565 330 L 575 240 Z" fill="#ffffff" />
+            <path d="M 550 325 L 545 355 L 555 358 L 560 327 Z" fill="#ffffff" opacity="0.8" />
+            {/* Chute 4 (Deep Center Spine) */}
+            <path d="M 590 245 L 595 340 L 608 342 L 602 248 Z" fill="url(#snowHighlightGrad)" />
+            {/* Chute 5 (Inner right) */}
+            <path d="M 625 230 L 638 300 L 648 297 L 635 225 Z" fill="url(#snowShadowGrad)" />
+            {/* Chute 6 (Outer right) */}
+            <path d="M 665 205 L 685 265 L 695 260 L 675 200 Z" fill="url(#snowShadowGrad)" />
+
+            {/* Summit Crater Rim (Ken-ga-mine Highest Peak & Caldera Depression) */}
+            <path
+              d="M 555 100 
+                 Q 570 93 585 94 
+                 Q 600 99 615 99 
+                 Q 630 94 645 100 
+                 L 645 108 
+                 Q 630 102 615 106 
+                 Q 600 106 585 101 
+                 Q 570 100 555 106 Z"
+              fill="#ffffff"
+            />
+            {/* Crater Interior Shadow Rim */}
+            <ellipse cx="600" cy="102" rx="42" ry="4" fill="#64748b" opacity="0.45" />
+
+            {/* 4. KASUMI MIST BANDS (Traditional Japanese Floating Ribbon Mist) */}
+            <path
+              d="M 150 360 Q 350 340 550 360 Q 750 380 950 360 L 1050 360 Q 950 385 750 375 Q 550 395 350 375 Q 150 385 150 360 Z"
+              fill="url(#kasumiMistGrad)"
+            />
+            <path
+              d="M 300 410 Q 500 395 700 410 Q 900 425 1100 410 L 1150 410 Q 900 435 700 420 Q 500 435 300 420 Z"
+              fill="url(#kasumiMistGrad)"
+            />
+
+            {/* 5. LAKE KAWAGUCHI WATER SURFACE & SAKASA-FUJI (INVERTED REFLECTION) */}
+            <rect x="0" y="445" width="1200" height="75" fill="url(#lakeWaterGrad)" />
+
+            {/* Inverted Shimmering Reflection of Mount Fuji in Calm Water */}
+            <g opacity="0.28" transform="translate(0, 930) scale(1, -0.45)">
+              <path
+                d="M 600 104 C 645 104 675 125 710 170 C 765 240 825 325 905 385 C 970 435 1050 455 1120 465 L 80 465 C 150 455 230 435 295 385 C 375 325 435 240 490 170 C 525 125 555 104 600 104 Z"
+                fill="#475569"
+              />
+              <path
+                d="M 480 185 C 515 135 545 104 565 98 C 585 94 615 94 635 98 C 655 104 685 135 720 185 L 745 225 L 480 225 Z"
+                fill="#ffffff"
+              />
+            </g>
+
+            {/* Horizontal Water Ripple Lines on the Lake */}
+            <line x1="180" y1="455" x2="380" y2="455" stroke="#ffffff" strokeWidth="1.2" opacity="0.75" />
+            <line x1="420" y1="462" x2="680" y2="462" stroke="#ffffff" strokeWidth="1.5" opacity="0.85" />
+            <line x1="720" y1="458" x2="960" y2="458" stroke="#ffffff" strokeWidth="1.2" opacity="0.7" />
+            <line x1="280" y1="472" x2="520" y2="472" stroke="#ffffff" strokeWidth="1.2" opacity="0.6" />
+            <line x1="560" y1="478" x2="840" y2="478" stroke="#ffffff" strokeWidth="1.5" opacity="0.8" />
+            <line x1="120" y1="488" x2="420" y2="488" stroke="#ffffff" strokeWidth="1" opacity="0.5" />
+            <line x1="680" y1="492" x2="1020" y2="492" stroke="#ffffff" strokeWidth="1.2" opacity="0.65" />
+
+            {/* 6. CULTURAL LANDMARKS IN THE FOREGROUND SHORELINE */}
             {/* Chureito Style 5-Tier Pagoda on Left Ridge */}
-            <g transform="translate(180, 360) scale(0.65)" opacity="0.6" fill="#475569">
+            <g transform="translate(180, 365) scale(0.7)" opacity="0.75" fill="#1e293b">
               {/* Spire */}
-              <rect x="23" y="0" width="2" height="18" />
+              <rect x="23" y="0" width="2" height="18" fill="#475569" />
               {/* Tier 5 */}
-              <polygon points="24,18 8,24 40,24" />
+              <polygon points="24,18 7,24 41,24" />
               <rect x="18" y="24" width="12" height="6" />
               {/* Tier 4 */}
-              <polygon points="24,30 5,37 43,37" />
+              <polygon points="24,30 4,37 44,37" />
               <rect x="17" y="37" width="14" height="6" />
               {/* Tier 3 */}
-              <polygon points="24,43 2,51 46,51" />
+              <polygon points="24,43 1,51 47,51" />
               <rect x="16" y="51" width="16" height="7" />
               {/* Tier 2 */}
               <polygon points="24,58 0,67 48,67" />
@@ -344,26 +426,32 @@ export default function SakuraTreeTimeline() {
               <rect x="12" y="75" width="24" height="15" />
             </g>
 
-            {/* Distant Torii Gate in the Shore Mist */}
-            <g transform="translate(880, 395) scale(0.7)" opacity="0.5" fill="#475569">
-              <rect x="2" y="5" width="46" height="4" rx="1" />
-              <rect x="6" y="12" width="38" height="3" />
-              <rect x="12" y="5" width="4" height="35" />
-              <rect x="34" y="5" width="4" height="35" />
+            {/* Traditional Vermillion Torii Gate on Shore Mist */}
+            <g transform="translate(930, 395) scale(0.85)" opacity="0.85">
+              {/* Upper Kasagi lintel */}
+              <path d="M 0 5 Q 25 1 50 5 L 48 9 Q 25 5 2 9 Z" fill="#e11d48" />
+              {/* Tie beam Shimaki */}
+              <rect x="5" y="13" width="40" height="3" fill="#e11d48" />
+              {/* Left Pillar */}
+              <rect x="12" y="6" width="4.5" height="38" rx="1" fill="#be123c" />
+              {/* Right Pillar */}
+              <rect x="33.5" y="6" width="4.5" height="38" rx="1" fill="#be123c" />
+              {/* Center Plaque Gakuzuka */}
+              <rect x="23" y="9" width="4" height="5" fill="#1e293b" />
             </g>
 
-            {/* Distant Japanese Pine Groves (Matsu) on Foothill Ridges */}
-            <g opacity="0.45" fill="#64748b">
-              <path d="M 320 410 Q 325 395 330 410 Q 335 390 342 410 Q 350 400 355 410 Z" />
-              <path d="M 360 415 Q 365 398 372 415 Q 378 395 385 415 Z" />
-              <path d="M 720 425 Q 726 405 734 425 Q 740 408 748 425 Z" />
-              <path d="M 755 430 Q 762 412 770 430 Q 778 415 785 430 Z" />
+            {/* Japanese Shore Pines (Matsu) Groves with Characteristic Curved Crowns */}
+            <g opacity="0.65" fill="#334155">
+              <path d="M 280 435 Q 285 415 292 435 Q 298 410 306 435 Q 314 418 322 435 Z" />
+              <path d="M 330 440 Q 336 422 344 440 Q 350 416 358 440 Z" />
+              <path d="M 820 440 Q 826 418 834 440 Q 840 422 848 440 Z" />
+              <path d="M 865 442 Q 872 425 880 442 Q 888 428 895 442 Z" />
             </g>
           </svg>
         </div>
 
-        {/* Ethereal Morning Mist Bands Rising from Lake */}
-        <div className="absolute bottom-16 left-0 right-0 h-36 bg-gradient-to-t from-white via-white/80 to-transparent blur-md"></div>
+        {/* Ethereal Morning Mist Bands Rising from Lake Shore */}
+        <div className="absolute bottom-14 left-0 right-0 h-32 bg-gradient-to-t from-white via-white/80 to-transparent blur-md"></div>
       </div>
 
       {/* FALLING SAKURA PETALS OVERLAY (Over scenic tree & Mount Fuji viewport) */}
