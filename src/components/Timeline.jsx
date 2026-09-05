@@ -2,6 +2,7 @@ import React from 'react';
 import { Calendar, Award, BookOpen, GraduationCap, Sparkles, CheckCircle2, ChevronRight } from 'lucide-react';
 import { TIMELINE } from '../utils/data';
 import { sound } from '../utils/sound';
+import SakuraTreeTimeline from './SakuraTreeTimeline';
 
 export default function Timeline() {
   const getBadgeStyle = (tag) => {
@@ -66,17 +67,35 @@ export default function Timeline() {
 
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="flex flex-col items-start mb-16">
+        <div className="flex flex-col items-start mb-12">
           <div className="flex items-center gap-2 text-xs font-mono text-rose-600 tracking-widest uppercase mb-2 font-semibold">
             <span className="inline-block w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
             <span>// 04. TRAJETÓRIA & CONQUISTAS</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase text-zinc-950 font-['Space_Grotesk'] tracking-tight">
-            Marcos Acadêmicos & Científicos
+            Árvore da Trajetória & Conquistas
           </h2>
           <p className="text-zinc-600 text-sm sm:text-base max-w-2xl mt-2 font-normal">
-            Histórico cronológico registrado no CNPq com pesquisas, projetos de extensão comunitária, tutoria discente e distinções.
+            Uma linha do tempo viva: das raízes acadêmicas no IFAC ao ápice com artigo publicado no Congresso Nacional (CSBC 2025). Clique nos ramos para aproximar a árvore.
           </p>
+        </div>
+
+        {/* INTERACTIVE SAKURA TREE HERO EXPERIENCE */}
+        <div className="mb-20">
+          <SakuraTreeTimeline />
+        </div>
+
+        {/* Section Subtitle for Bento Grid */}
+        <div className="flex items-center justify-between border-b border-zinc-200/80 pb-4 mb-10">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-rose-500" />
+            <span className="text-xs font-mono font-bold tracking-wider text-zinc-700 uppercase">
+              Registro Editorial Detalhado // CNPq & Lattes
+            </span>
+          </div>
+          <span className="text-xs font-mono text-zinc-400">
+            [ 05 MARCOS ACADÊMICOS ]
+          </span>
         </div>
 
         {/* FEATURED MILESTONE 01: CSBC 2025 CONGRESSO NACIONAL */}

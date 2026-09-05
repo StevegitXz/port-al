@@ -2,6 +2,7 @@ import React from 'react';
 import { Layout, Server, Cpu, Terminal, CheckCircle2, ShieldCheck, Zap } from 'lucide-react';
 import { ARSENAL_SKILLS } from '../utils/data';
 import { sound } from '../utils/sound';
+import CircuitTraces from './effects/CircuitTraces';
 
 export default function Arsenal() {
   const getCategoryIcon = (category) => {
@@ -18,7 +19,10 @@ export default function Arsenal() {
   };
 
   return (
-    <section id="arsenal" className="relative py-24 px-4 bg-[#fafbfc] border-t border-zinc-200/80">
+    <section id="arsenal" className="relative py-24 px-4 bg-[#fafbfc] border-t border-zinc-200/80 overflow-hidden">
+      {/* PCB Circuit Traces & Electron Pulses */}
+      <CircuitTraces />
+
       {/* Ambient background glow */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-rose-100/40 blur-[150px] rounded-full"></div>
 

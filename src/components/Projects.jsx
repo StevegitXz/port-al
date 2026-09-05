@@ -105,7 +105,7 @@ export default function Projects() {
   };
 
   return (
-    <section id="projects" className="relative py-24 px-4 bg-[#fafbfc] border-t border-zinc-200/80">
+    <section id="projects" className="relative py-24 px-4 bg-[#fafbfc] bg-asanoha border-t border-zinc-200/80">
       {/* Background ambient lighting */}
       <div className="pointer-events-none absolute top-1/3 right-0 w-[450px] h-[450px] bg-rose-400/5 blur-[140px] rounded-full"></div>
       <div className="pointer-events-none absolute bottom-10 left-10 w-[350px] h-[350px] bg-emerald-400/5 blur-[120px] rounded-full"></div>
@@ -158,7 +158,7 @@ export default function Projects() {
               <div
                 key={proj.id}
                 onMouseEnter={() => sound.playHover()}
-                className={`group relative rounded-3xl glass-panel bg-white/95 border border-zinc-200/80 hover:border-rose-300 shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 overflow-hidden ${config.colSpan} ${config.offset}`}
+                className={`group relative rounded-3xl glass-panel bg-white/95 holo-shimmer border border-zinc-200/80 hover:border-rose-300 shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 overflow-hidden ${config.colSpan} ${config.offset}`}
               >
                 {/* Soft ambient corner glow on hover */}
                 <div className={`pointer-events-none absolute -top-16 -right-16 w-44 h-44 ${config.accentGlow} rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500`}></div>

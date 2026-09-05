@@ -3,6 +3,7 @@ import { Terminal as TerminalIcon, Sparkles, Send, CornerDownLeft, RefreshCw } f
 import { PERSONAL_INFO, PROJECTS } from '../utils/data';
 import { sound } from '../utils/sound';
 import { achievementManager } from '../utils/achievements';
+import CyberRain from './effects/CyberRain';
 
 export default function Terminal() {
   const [input, setInput] = useState('');
@@ -158,7 +159,10 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
   ];
 
   return (
-    <section id="terminal" className="relative py-24 px-4 bg-[#fafbfc] border-t border-zinc-200/80">
+    <section id="terminal" className="relative py-24 px-4 bg-[#fafbfc] border-t border-zinc-200/80 overflow-hidden">
+      {/* Subtle Japanese Katakana Cyber Rain */}
+      <CyberRain />
+
       {/* Ambient background glow */}
       <div className="pointer-events-none absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-rose-200/20 blur-[150px] rounded-full"></div>
 

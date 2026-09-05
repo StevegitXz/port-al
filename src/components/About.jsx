@@ -2,10 +2,14 @@ import React from 'react';
 import { BookOpen, GraduationCap, Cpu, Layers, Sparkles, Award, Compass, HeartHandshake } from 'lucide-react';
 import { PERSONAL_INFO, PHILOSOPHY_PILLARS } from '../utils/data';
 import { sound } from '../utils/sound';
+import ZenRipples from './effects/ZenRipples';
 
 export default function About() {
   return (
-    <section id="about" className="relative py-24 px-4 bg-[#fafbfc] border-t border-zinc-200/80">
+    <section id="about" className="relative py-24 px-4 bg-[#fafbfc] border-t border-zinc-200/80 overflow-hidden">
+      {/* Zen Water Ripples & Ink dust background */}
+      <ZenRipples />
+
       {/* Subtle background glow */}
       <div className="pointer-events-none absolute top-1/2 left-0 -translate-y-1/2 w-96 h-96 bg-rose-400/5 blur-[120px] rounded-full"></div>
 
