@@ -145,114 +145,187 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
     }
   };
 
-  const quickChips = ['help', 'bio', 'projects', 'mariot', 'skills', 'contact', 'zen', 'clear'];
+  const commandList = [
+    { cmd: 'help', desc: 'Lista geral de comandos' },
+    { cmd: 'bio', desc: 'Resumo acadêmico & CNPq' },
+    { cmd: 'projects', desc: 'Inventário de projetos' },
+    { cmd: 'mariot', desc: 'Artigo CSBC 2025' },
+    { cmd: 'skills', desc: 'Pilha tecnológica' },
+    { cmd: 'contact', desc: 'E-mail e repositórios' },
+    { cmd: 'zen', desc: 'Filosofia Cyber-Zen' },
+    { cmd: 'matrix', desc: 'Alternar visual Matrix' },
+    { cmd: 'clear', desc: 'Limpar console' },
+  ];
 
   return (
     <section id="terminal" className="relative py-24 px-4 bg-[#fafbfc] border-t border-zinc-200/80">
-      <div className="max-w-4xl mx-auto">
+      {/* Ambient background glow */}
+      <div className="pointer-events-none absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-rose-200/20 blur-[150px] rounded-full"></div>
+
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col items-start mb-10">
-          <div className="flex items-center gap-2 text-xs font-mono text-rose-600 tracking-widest uppercase mb-2">
+        <div className="flex flex-col items-start mb-16">
+          <div className="flex items-center gap-2 text-xs font-mono text-rose-600 tracking-widest uppercase mb-2 font-semibold">
             <span className="inline-block w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
             <span>// 05. TERMINAL DE ACESSO DIRETO</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-black uppercase text-zinc-950 font-['Space_Grotesk'] tracking-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase text-zinc-950 font-['Space_Grotesk'] tracking-tight">
             Console Interativo
           </h2>
-          <p className="text-zinc-600 text-xs sm:text-sm mt-1">
-            Consulte o sistema diretamente pela linha de comando em tempo real.
+          <p className="text-zinc-600 text-sm sm:text-base max-w-2xl mt-2 font-normal">
+            Estação de linha de comando com emulação interativa, comandos customizados e acesso direto à base do sistema.
           </p>
         </div>
 
-        {/* Terminal Window */}
-        <div className={`rounded-2xl border ${matrixMode ? 'border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)]' : 'border-zinc-300/90 shadow-xl'} bg-[#0c0e14] overflow-hidden transition-all duration-300`}>
-          {/* Terminal Title Bar */}
-          <div className="flex items-center justify-between px-4 py-3 bg-[#161922] border-b border-zinc-800">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-rose-500/90"></span>
-              <span className="w-3 h-3 rounded-full bg-amber-400/90"></span>
-              <span className="w-3 h-3 rounded-full bg-emerald-500/90"></span>
-              <span className="ml-2 text-xs font-mono text-zinc-400 hidden sm:inline">
-                steve@neo-tokyo-ifac:~ (zsh)
-              </span>
-            </div>
+        {/* Bento Workstation Layout: 12 Columns */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Main Console Window (8 Columns) */}
+          <div className="lg:col-span-8">
+            <div className={`rounded-3xl border ${matrixMode ? 'border-emerald-500/60 shadow-[0_0_40px_rgba(16,185,129,0.2)]' : 'border-zinc-300/90 shadow-2xl'} bg-[#0c0e14] overflow-hidden transition-all duration-300`}>
+              {/* Terminal Title Bar */}
+              <div className="flex items-center justify-between px-5 py-3.5 bg-[#161922] border-b border-zinc-800">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-rose-500/90"></span>
+                  <span className="w-3 h-3 rounded-full bg-amber-400/90"></span>
+                  <span className="w-3 h-3 rounded-full bg-emerald-500/90"></span>
+                  <span className="ml-2.5 text-xs font-mono text-zinc-400 hidden sm:inline">
+                    steve@neo-tokyo-ifac:~ (zsh)
+                  </span>
+                </div>
 
-            <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-400">
-              <span>UTF-8</span>
-              <span>•</span>
-              <span className={matrixMode ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
-                {matrixMode ? 'MATRIX: ON' : 'CYBER-ZEN'}
-              </span>
-            </div>
-          </div>
-
-          {/* Terminal Screen & Logs */}
-          <div 
-            ref={terminalBodyRef}
-            onClick={() => inputRef.current?.focus()}
-            className="p-5 font-mono text-xs sm:text-sm min-h-[320px] max-h-[440px] overflow-y-auto space-y-3 cursor-text text-zinc-200"
-          >
-            {history.map((line, idx) => (
-              <div key={idx} className="leading-relaxed">
-                {line.type === 'sys' && (
-                  <span className="text-zinc-500">// {line.text}</span>
-                )}
-                {line.type === 'info' && (
-                  <span className="text-rose-400 font-medium">{line.text}</span>
-                )}
-                {line.type === 'cmd' && (
-                  <span className="text-zinc-100 font-semibold">{line.text}</span>
-                )}
-                {line.type === 'res' && (
-                  <pre className={`whitespace-pre-wrap ${matrixMode ? 'text-emerald-400' : 'text-zinc-200'}`}>
-                    {line.text}
-                  </pre>
-                )}
-                {line.type === 'err' && (
-                  <span className="text-red-400">{line.text}</span>
-                )}
+                <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-400">
+                  <span>UTF-8</span>
+                  <span>•</span>
+                  <span className={matrixMode ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                    {matrixMode ? 'MATRIX: ON' : 'CYBER-ZEN'}
+                  </span>
+                </div>
               </div>
-            ))}
+
+              {/* Terminal Screen & Logs */}
+              <div 
+                ref={terminalBodyRef}
+                onClick={() => inputRef.current?.focus()}
+                className="p-6 font-mono text-xs sm:text-sm min-h-[350px] max-h-[460px] overflow-y-auto space-y-3 cursor-text text-zinc-200"
+              >
+                {history.map((line, idx) => (
+                  <div key={idx} className="leading-relaxed">
+                    {line.type === 'sys' && (
+                      <span className="text-zinc-500">// {line.text}</span>
+                    )}
+                    {line.type === 'info' && (
+                      <span className="text-rose-400 font-medium">{line.text}</span>
+                    )}
+                    {line.type === 'cmd' && (
+                      <span className="text-zinc-100 font-semibold">{line.text}</span>
+                    )}
+                    {line.type === 'res' && (
+                      <pre className={`whitespace-pre-wrap ${matrixMode ? 'text-emerald-400' : 'text-zinc-200'}`}>
+                        {line.text}
+                      </pre>
+                    )}
+                    {line.type === 'err' && (
+                      <span className="text-red-400">{line.text}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Terminal Prompt Input */}
+              <div className="px-5 py-3.5 bg-[#11141c] border-t border-zinc-800 flex items-center gap-2.5 font-mono text-xs sm:text-sm">
+                <span className={matrixMode ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                  steve@ifac:~$
+                </span>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="digite um comando (ex: help)..."
+                  className="flex-1 bg-transparent text-white outline-none placeholder-zinc-500 font-mono text-xs sm:text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => executeCommand(input)}
+                  className="p-1.5 rounded-xl bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
+                  title="Executar comando"
+                >
+                  <CornerDownLeft className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
           </div>
 
-          {/* Terminal Prompt Input */}
-          <div className="px-4 py-3 bg-[#11141c] border-t border-zinc-800 flex items-center gap-2 font-mono text-xs sm:text-sm">
-            <span className={matrixMode ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
-              steve@ifac:~$
-            </span>
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="digite um comando (ex: help)..."
-              className="flex-1 bg-transparent text-white outline-none placeholder-zinc-500 font-mono text-xs sm:text-sm"
-            />
-            <button
-              type="button"
-              onClick={() => executeCommand(input)}
-              className="p-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
-              title="Executar comando"
-            >
-              <CornerDownLeft className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
+          {/* Telemetry & Command Palette Sidebar (4 Columns) */}
+          <div className="lg:col-span-4 space-y-6">
+            {/* Live Node Telemetry Card */}
+            <div className="p-6 rounded-3xl glass-panel bg-white/95 border border-zinc-200/80 shadow-xs space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                  <span className="text-xs font-mono font-bold text-zinc-900 uppercase tracking-wider">
+                    Telemetria do Nó
+                  </span>
+                </div>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
+                  ESTÁVEL
+                </span>
+              </div>
 
-        {/* Quick Command Chips */}
-        <div className="flex flex-wrap items-center gap-2 mt-4">
-          <span className="text-xs font-mono text-zinc-500">Atalhos rápidos:</span>
-          {quickChips.map((chip) => (
-            <button
-              key={chip}
-              type="button"
-              onClick={() => executeCommand(chip)}
-              className="px-2.5 py-1 rounded-lg bg-white border border-zinc-200 text-xs font-mono text-zinc-700 hover:text-rose-600 hover:border-rose-300 shadow-2xs hover:shadow-xs transition-colors"
-            >
-              {chip}
-            </button>
-          ))}
+              <div className="space-y-2.5 font-mono text-xs">
+                <div className="flex justify-between py-1 border-b border-zinc-50">
+                  <span className="text-zinc-500">Servidor:</span>
+                  <span className="text-zinc-800 font-semibold">IFAC Campus Rio Branco</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-zinc-50">
+                  <span className="text-zinc-500">Fuso Horário:</span>
+                  <span className="text-zinc-800">UTC-5 (Acre)</span>
+                </div>
+                <div className="flex justify-between py-1 border-b border-zinc-50">
+                  <span className="text-zinc-500">Núcleo:</span>
+                  <span className="text-rose-600 font-semibold">v4.19-Zen (C++ / JS)</span>
+                </div>
+                <div className="flex justify-between py-1">
+                  <span className="text-zinc-500">Sessão:</span>
+                  <span className="text-zinc-800">Visitante Anônimo</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Command Palette Card */}
+            <div className="p-6 rounded-3xl glass-panel bg-white/95 border border-zinc-200/80 shadow-xs space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+                <span className="text-xs font-mono font-bold text-zinc-900 uppercase tracking-wider">
+                  Paleta de Comandos
+                </span>
+                <span className="text-[10px] font-mono text-zinc-400">
+                  CLIQUE P/ EXECUTAR
+                </span>
+              </div>
+
+              <div className="space-y-2">
+                {commandList.map((item) => (
+                  <button
+                    key={item.cmd}
+                    type="button"
+                    onClick={() => executeCommand(item.cmd)}
+                    onMouseEnter={() => sound.playHover()}
+                    className="w-full p-2.5 rounded-xl bg-zinc-50 hover:bg-rose-50/60 border border-zinc-200/70 hover:border-rose-300 flex items-center justify-between text-left transition-all group shadow-2xs"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono font-bold text-rose-600 group-hover:text-rose-700">
+                        ${item.cmd}
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-mono text-zinc-500 group-hover:text-zinc-700">
+                      {item.desc}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -140,24 +140,49 @@ export default function Hero() {
           </a>
         </div>
 
-        {/* Quick HUD Metrics Bar */}
-        <div className="w-full max-w-4xl grid grid-cols-2 md:grid-cols-4 gap-3 p-3 rounded-2xl glass-panel bg-white/80 border border-zinc-200/80 shadow-sm">
-          {METRICS.map((item, idx) => (
-            <div 
-              key={idx}
-              className="p-3.5 rounded-xl bg-white border border-zinc-200/60 flex flex-col items-center justify-center text-center hover:border-rose-300 shadow-xs transition-colors"
-            >
-              <div className="text-2xl sm:text-3xl font-black font-['Space_Grotesk'] text-rose-600">
-                {item.value}
+        {/* Dispersed Constellation Metrics */}
+        <div className="w-full max-w-5xl grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pt-4 mb-10">
+          {METRICS.map((item, idx) => {
+            const offsets = [
+              'lg:-translate-y-2 hover:translate-y-[-12px]',
+              'lg:translate-y-3 hover:translate-y-[0px]',
+              'lg:-translate-y-1 hover:translate-y-[-8px]',
+              'lg:translate-y-4 hover:translate-y-[4px]'
+            ];
+            const tags = ['// SYS_SOFTWARE', '// SBC_ACADEMIC', '// IFAC_TUTORING', '// TECH_HOURS'];
+
+            return (
+              <div 
+                key={idx}
+                onMouseEnter={() => sound.playHover()}
+                className={`group relative p-5 sm:p-6 rounded-3xl glass-panel bg-white/95 border border-zinc-200/80 hover:border-rose-300 flex flex-col justify-between text-left shadow-xs hover:shadow-xl transition-all duration-300 ${offsets[idx] || ''} overflow-hidden`}
+              >
+                {/* Micro accent glow */}
+                <div className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 bg-rose-200/20 rounded-full blur-xl group-hover:scale-125 transition-transform duration-300"></div>
+
+                <div>
+                  <div className="flex items-center justify-between gap-1 mb-2">
+                    <span className="text-[10px] font-mono text-rose-600 font-semibold tracking-wider">
+                      {tags[idx] || '// METRIC'}
+                    </span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500/80 animate-pulse"></span>
+                  </div>
+                  <div className="text-3xl sm:text-4xl font-black font-['Space_Grotesk'] text-zinc-950 group-hover:text-rose-600 transition-colors">
+                    {item.value}
+                  </div>
+                </div>
+
+                <div className="mt-3 pt-2.5 border-t border-zinc-100">
+                  <div className="text-xs font-bold text-zinc-800 leading-tight">
+                    {item.label}
+                  </div>
+                  <div className="text-[11px] font-mono text-zinc-500 mt-0.5">
+                    {item.detail}
+                  </div>
+                </div>
               </div>
-              <div className="text-xs font-semibold text-zinc-800 mt-1">
-                {item.label}
-              </div>
-              <div className="text-[10px] font-mono text-zinc-500 mt-0.5">
-                {item.detail}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

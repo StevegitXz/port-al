@@ -119,49 +119,105 @@ export default function About() {
           </div>
         </div>
 
-        {/* 4 Pillars Grid (Cyber-Zen Cards) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-          {PHILOSOPHY_PILLARS.map((pillar) => (
-            <div
-              key={pillar.id}
-              onMouseEnter={() => sound.playHover()}
-              className="group p-5 rounded-2xl glass-panel bg-white/90 border border-zinc-200/80 hover:border-rose-300 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between hover:-translate-y-1 relative overflow-hidden"
-            >
-              {/* Vertical Japanese Kanji background */}
-              <div 
-                aria-hidden="true"
-                className="absolute right-3 top-3 text-4xl font-bold text-zinc-900/[0.04] group-hover:text-rose-500/15 transition-colors pointer-events-none font-mono"
+        {/* 4 Pillars Bento-Editorial Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-6">
+          {PHILOSOPHY_PILLARS.map((pillar) => {
+            const configs = {
+              fullstack: {
+                colSpan: 'lg:col-span-7 xl:col-span-8',
+                offset: '',
+                numTag: '№ 01 // ENGENHARIA WEB',
+                glow: 'bg-rose-300/15',
+                isWide: true,
+              },
+              iot: {
+                colSpan: 'lg:col-span-5 xl:col-span-4',
+                offset: 'lg:translate-y-8',
+                numTag: '№ 02 // EMBARCADOS & IOT',
+                glow: 'bg-emerald-300/15',
+                isWide: false,
+              },
+              academic: {
+                colSpan: 'lg:col-span-5 xl:col-span-4',
+                offset: 'lg:-translate-y-2',
+                numTag: '№ 03 // LIDERANÇA & PESQUISA',
+                glow: 'bg-amber-300/15',
+                isWide: false,
+              },
+              zen: {
+                colSpan: 'lg:col-span-7 xl:col-span-8',
+                offset: 'lg:translate-y-5',
+                numTag: '№ 04 // HARMONIA CYBER-ZEN',
+                glow: 'bg-purple-300/15',
+                isWide: true,
+              }
+            };
+            const config = configs[pillar.id] || {
+              colSpan: 'lg:col-span-6',
+              offset: '',
+              numTag: '// PILAR',
+              glow: 'bg-rose-300/10',
+              isWide: false
+            };
+
+            return (
+              <div
+                key={pillar.id}
+                onMouseEnter={() => sound.playHover()}
+                className={`group relative rounded-3xl glass-panel bg-white/95 border border-zinc-200/80 hover:border-rose-300 shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 overflow-hidden flex flex-col justify-between ${config.colSpan} ${config.offset}`}
               >
-                {pillar.kanji}
-              </div>
+                {/* Soft ambient corner glow on hover */}
+                <div className={`pointer-events-none absolute -top-16 -right-16 w-44 h-44 ${config.glow} rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500`}></div>
 
-              <div>
-                <div className="text-xs font-mono text-rose-600 uppercase tracking-wider mb-1 font-semibold">
-                  // {pillar.kanji}
+                {/* Vertical Japanese Kanji Watermark */}
+                <div 
+                  aria-hidden="true"
+                  className="absolute right-6 top-5 text-6xl sm:text-7xl font-bold text-zinc-900/[0.035] group-hover:text-rose-500/10 transition-colors pointer-events-none font-mono select-none"
+                >
+                  {pillar.kanji}
                 </div>
-                <h3 className="text-base font-bold text-zinc-900 group-hover:text-rose-600 transition-colors mb-1 font-['Space_Grotesk']">
-                  {pillar.title}
-                </h3>
-                <p className="text-xs font-mono text-zinc-500 mb-3">
-                  {pillar.subtitle}
-                </p>
-                <p className="text-xs text-zinc-600 leading-relaxed mb-4">
-                  {pillar.desc}
-                </p>
-              </div>
 
-              <div className="flex flex-wrap gap-1.5 pt-3 border-t border-zinc-100">
-                {pillar.techs.map((t, idx) => (
-                  <span
-                    key={idx}
-                    className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-100 text-zinc-700 border border-zinc-200 group-hover:border-rose-200"
-                  >
-                    {t}
-                  </span>
-                ))}
+                <div className="p-7 sm:p-8 relative z-10 flex flex-col justify-between h-full">
+                  <div>
+                    {/* Top Metadata */}
+                    <div className="flex items-center justify-between gap-2 mb-4">
+                      <span className="text-[11px] font-mono text-rose-600 font-bold tracking-wider">
+                        {config.numTag}
+                      </span>
+                      <span className="text-xs font-mono text-zinc-400">
+                        {pillar.kanji}
+                      </span>
+                    </div>
+
+                    {/* Title & Subtitle */}
+                    <h3 className="text-xl sm:text-2xl font-black text-zinc-950 group-hover:text-rose-600 transition-colors mb-1 font-['Space_Grotesk'] tracking-tight">
+                      {pillar.title}
+                    </h3>
+                    <p className="text-xs font-mono text-zinc-500 mb-4">
+                      // {pillar.subtitle}
+                    </p>
+
+                    {/* Description */}
+                    <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed mb-6 font-normal">
+                      {pillar.desc}
+                    </p>
+                  </div>
+
+                  {/* Tech/Tag Pills */}
+                  <div className="flex flex-wrap gap-1.5 pt-4 border-t border-zinc-100">
+                    {pillar.techs.map((t, idx) => (
+                      <span
+                        key={idx}
+                        className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200/80 group-hover:border-rose-200"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

@@ -37,55 +37,111 @@ export default function Arsenal() {
           </p>
         </div>
 
-        {/* 4 Pillars Matrix Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          {ARSENAL_SKILLS.map((group, groupIdx) => (
-            <div
-              key={groupIdx}
-              onMouseEnter={() => sound.playHover()}
-              className="rounded-2xl glass-panel bg-white/90 p-6 sm:p-7 border border-zinc-200/80 shadow-xs hover:border-rose-300 hover:shadow-md transition-all duration-300"
-            >
-              {/* Category Header */}
-              <div className="flex items-center gap-3 pb-4 mb-5 border-b border-zinc-100">
-                <div className="p-2 rounded-xl bg-zinc-50 border border-zinc-200/80">
-                  {getCategoryIcon(group.category)}
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-zinc-900 font-['Space_Grotesk']">
-                    {group.category}
-                  </h3>
-                  <span className="text-xs font-mono text-zinc-400">
-                    // Nível de Prática & Domínio
-                  </span>
-                </div>
-              </div>
+        {/* 4 Pillars Bento-Editorial Matrix Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-16">
+          {ARSENAL_SKILLS.map((group, groupIdx) => {
+            const configs = [
+              {
+                colSpan: 'lg:col-span-7 xl:col-span-8',
+                offset: '',
+                kanji: '画面',
+                numTag: '№ 01 // INTERFACE & EXPERIÊNCIA',
+                glow: 'bg-rose-300/15',
+                barGradient: 'bg-gradient-to-r from-zinc-400 via-rose-500 to-rose-400',
+              },
+              {
+                colSpan: 'lg:col-span-5 xl:col-span-4',
+                offset: 'lg:translate-y-8',
+                kanji: '装置',
+                numTag: '№ 02 // HARDWARE & IOT',
+                glow: 'bg-emerald-300/15',
+                barGradient: 'bg-gradient-to-r from-zinc-400 via-emerald-500 to-emerald-400',
+              },
+              {
+                colSpan: 'lg:col-span-5 xl:col-span-4',
+                offset: 'lg:-translate-y-2',
+                kanji: '基盤',
+                numTag: '№ 03 // APIS & BANCO RELACIONAL',
+                glow: 'bg-cyan-300/15',
+                barGradient: 'bg-gradient-to-r from-zinc-400 via-cyan-500 to-cyan-400',
+              },
+              {
+                colSpan: 'lg:col-span-7 xl:col-span-8',
+                offset: 'lg:translate-y-4',
+                kanji: '道具',
+                numTag: '№ 04 // DEVOPS & FERRAMENTAS',
+                glow: 'bg-amber-300/15',
+                barGradient: 'bg-gradient-to-r from-zinc-400 via-amber-500 to-amber-400',
+              },
+            ];
+            const config = configs[groupIdx] || configs[0];
 
-              {/* Skills List */}
-              <div className="space-y-4">
-                {group.skills.map((skill, sIdx) => (
-                  <div key={sIdx} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs font-mono">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-zinc-800">{skill.name}</span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-zinc-200/80">
-                          {skill.badge}
-                        </span>
+            return (
+              <div
+                key={groupIdx}
+                onMouseEnter={() => sound.playHover()}
+                className={`group relative rounded-3xl glass-panel bg-white/95 p-7 sm:p-8 border border-zinc-200/80 hover:border-rose-300 shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 overflow-hidden ${config.colSpan} ${config.offset}`}
+              >
+                {/* Soft ambient corner glow on hover */}
+                <div className={`pointer-events-none absolute -top-16 -right-16 w-44 h-44 ${config.glow} rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500`}></div>
+
+                {/* Vertical Japanese Kanji Watermark */}
+                <div
+                  aria-hidden="true"
+                  className="absolute right-6 top-5 text-6xl sm:text-7xl font-bold text-zinc-900/[0.035] group-hover:text-rose-500/10 transition-colors pointer-events-none font-mono select-none"
+                >
+                  {config.kanji}
+                </div>
+
+                <div className="relative z-10">
+                  {/* Category Header */}
+                  <div className="flex items-center justify-between pb-4 mb-5 border-b border-zinc-100">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 rounded-2xl bg-zinc-50 border border-zinc-200/80 shadow-2xs">
+                        {getCategoryIcon(group.category)}
                       </div>
-                      <span className="text-rose-600 font-semibold">{skill.status}</span>
+                      <div>
+                        <span className="text-[11px] font-mono text-rose-600 font-bold tracking-wider block">
+                          {config.numTag}
+                        </span>
+                        <h3 className="text-lg font-bold text-zinc-900 font-['Space_Grotesk']">
+                          {group.category}
+                        </h3>
+                      </div>
                     </div>
-
-                    {/* Progress Bar */}
-                    <div className="h-1.5 w-full rounded-full bg-zinc-100 border border-zinc-200/60 overflow-hidden relative">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-zinc-400 via-rose-500 to-emerald-500 transition-all duration-700"
-                        style={{ width: `${skill.level}%` }}
-                      ></div>
-                    </div>
+                    <span className="text-xs font-mono text-zinc-400 hidden sm:inline">
+                      {config.kanji}
+                    </span>
                   </div>
-                ))}
+
+                  {/* Skills List */}
+                  <div className="space-y-4">
+                    {group.skills.map((skill, sIdx) => (
+                      <div key={sIdx} className="space-y-1.5">
+                        <div className="flex items-center justify-between text-xs font-mono">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-zinc-800">{skill.name}</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-zinc-200/80">
+                              {skill.badge}
+                            </span>
+                          </div>
+                          <span className="text-rose-600 font-semibold">{skill.status}</span>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="h-2 w-full rounded-full bg-zinc-100 border border-zinc-200/60 overflow-hidden relative">
+                          <div
+                            className={`h-full rounded-full ${config.barGradient} transition-all duration-700`}
+                            style={{ width: `${skill.level}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Highlight Banner: Full-Stack + Hardware Hybrid */}
