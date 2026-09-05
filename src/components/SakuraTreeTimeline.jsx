@@ -202,7 +202,21 @@ export default function SakuraTreeTimeline() {
   };
 
   return (
-    <div className="relative w-full overflow-hidden rounded-3xl border border-zinc-200/90 shadow-2xl bg-gradient-to-b from-[#f8fafc] via-[#fff1f2]/30 to-[#fafbfc]">
+    <div className="relative w-full min-h-[780px] lg:min-h-[860px] h-[92vh] max-h-[1020px] overflow-hidden select-none bg-gradient-to-b from-[#e0f2fe]/40 via-[#fce7f3]/30 to-[#fafbfc] border-b border-zinc-200/80">
+      {/* FLOATING SECTION HEADER (Top Left of the Scenic Sky) */}
+      <div className="absolute top-6 left-6 sm:left-10 lg:left-14 z-30 max-w-xl pointer-events-auto">
+        <div className="flex items-center gap-2 text-xs font-mono text-rose-600 tracking-widest uppercase mb-1.5 font-semibold">
+          <span className="inline-block w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+          <span>// 04. TRAJETÓRIA & CONQUISTAS</span>
+        </div>
+        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase text-zinc-950 font-['Space_Grotesk'] tracking-tight drop-shadow-2xs">
+          Árvore da Trajetória & Conquistas
+        </h2>
+        <p className="text-zinc-600 text-xs sm:text-sm mt-1 max-w-md hidden md:block">
+          Uma linha do tempo viva das raízes ao ápice (CSBC 2025). Role o mouse para zoom livre ou arraste para explorar qualquer ramo.
+        </p>
+      </div>
+
       {/* ========================================================================= */}
       {/* 1. CINEMATIC SCENIC BACKGROUND: DETAILED MOUNT FUJI, DAWN & MIST (Soft DoF) */}
       {/* ========================================================================= */}
@@ -463,89 +477,89 @@ export default function SakuraTreeTimeline() {
       />
 
       {/* ========================================================================= */}
-      {/* 2. THE SAKURA TREE INTERACTIVE CANVASES WITH FREE ZOOM & DRAG/PAN ENGINE */}
       {/* ========================================================================= */}
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 min-h-[640px] items-stretch">
-        {/* Left / Tree Visual Viewport (7 Columns on lg) */}
-        <div
-          ref={treeViewportRef}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          className={`lg:col-span-7 relative flex items-center justify-center p-4 sm:p-8 min-h-[420px] lg:min-h-[640px] overflow-hidden select-none ${
-            isDragging ? 'cursor-grabbing' : 'cursor-grab'
-          }`}
+      {/* 2. THE SAKURA TREE INTERACTIVE PANORAMIC STAGE WITH FREE ZOOM & DRAG/PAN */}
+      {/* ========================================================================= */}
+      {/* FLOATING ZOOM & PAN HUD CONTROLS (Top Right alongside HUD) */}
+      <div className="absolute top-6 right-4 sm:right-8 lg:right-[480px] xl:right-[520px] z-30 flex items-center gap-1.5 p-1.5 rounded-2xl bg-white/90 backdrop-blur-md border border-zinc-200/90 shadow-md">
+        {/* Zoom Out Button */}
+        <button
+          type="button"
+          onClick={handleZoomOut}
+          title="Diminuir Zoom (-)"
+          className="w-8 h-8 rounded-xl flex items-center justify-center text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition-colors"
         >
-          {/* FLOATING ZOOM & PAN HUD CONTROLS (Top Right of Tree Canvas) */}
-          <div className="absolute top-4 right-4 z-30 flex items-center gap-1.5 p-1.5 rounded-2xl bg-white/90 backdrop-blur-md border border-zinc-200/90 shadow-md">
-            {/* Zoom Out Button */}
-            <button
-              type="button"
-              onClick={handleZoomOut}
-              title="Diminuir Zoom (-)"
-              className="w-8 h-8 rounded-xl flex items-center justify-center text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition-colors"
-            >
-              <ZoomOut className="w-4 h-4" />
-            </button>
+          <ZoomOut className="w-4 h-4" />
+        </button>
 
-            {/* Current Zoom Percentage Indicator */}
-            <span className="font-mono text-[11px] font-bold px-1.5 text-zinc-600 min-w-[48px] text-center">
-              {Math.round(zoom * 100)}%
+        {/* Current Zoom Percentage Indicator */}
+        <span className="font-mono text-[11px] font-bold px-1.5 text-zinc-600 min-w-[48px] text-center">
+          {Math.round(zoom * 100)}%
+        </span>
+
+        {/* Zoom In Button */}
+        <button
+          type="button"
+          onClick={handleZoomIn}
+          title="Aumentar Zoom (+)"
+          className="w-8 h-8 rounded-xl flex items-center justify-center text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition-colors"
+        >
+          <ZoomIn className="w-4 h-4" />
+        </button>
+
+        {/* Reset View Button */}
+        <button
+          type="button"
+          onClick={handleResetView}
+          title="Redefinir Enquadramento"
+          className="w-8 h-8 rounded-xl flex items-center justify-center text-zinc-500 hover:text-rose-600 hover:bg-rose-50 transition-colors ml-1 border-l border-zinc-200"
+        >
+          <RotateCcw className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      {/* ACTIVE MODE STATUS PILL (Top Left below section title) */}
+      <div className="absolute top-28 sm:top-24 left-6 sm:left-10 lg:left-14 z-30 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/90 shadow-xs text-xs font-mono">
+        {isFreeMode ? (
+          <>
+            <Move className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
+            <span className="text-emerald-800 font-semibold">
+              Modo Livre // Arraste & Scroll
             </span>
+          </>
+        ) : (
+          <>
+            <Compass className="w-3.5 h-3.5 text-rose-500" />
+            <span className="text-zinc-700">
+              Foco: <strong className="text-rose-600">{activeConfig.levelName}</strong>
+            </span>
+          </>
+        )}
+      </div>
 
-            {/* Zoom In Button */}
-            <button
-              type="button"
-              onClick={handleZoomIn}
-              title="Aumentar Zoom (+)"
-              className="w-8 h-8 rounded-xl flex items-center justify-center text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100 transition-colors"
-            >
-              <ZoomIn className="w-4 h-4" />
-            </button>
+      {/* HELPFUL INTERACTION HINT (Bottom Left of Canvas) */}
+      <div className="absolute bottom-6 left-6 sm:left-10 lg:left-14 z-30 hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/85 backdrop-blur-md border border-zinc-200/70 text-[11px] font-mono text-zinc-600 pointer-events-none shadow-xs">
+        <Sparkles className="w-3.5 h-3.5 text-rose-500" />
+        <span>Role o mouse para zoom livre ou arraste para explorar qualquer ramo da árvore</span>
+      </div>
 
-            {/* Reset View Button */}
-            <button
-              type="button"
-              onClick={handleResetView}
-              title="Redefinir Enquadramento"
-              className="w-8 h-8 rounded-xl flex items-center justify-center text-zinc-500 hover:text-rose-600 hover:bg-rose-50 transition-colors ml-1 border-l border-zinc-200"
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* ACTIVE MODE STATUS PILL (Top Left of Tree Canvas) */}
-          <div className="absolute top-4 left-4 z-30 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/90 shadow-xs text-xs font-mono">
-            {isFreeMode ? (
-              <>
-                <Move className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
-                <span className="text-emerald-800 font-semibold">
-                  Modo Livre // Arraste & Scroll
-                </span>
-              </>
-            ) : (
-              <>
-                <Compass className="w-3.5 h-3.5 text-rose-500" />
-                <span className="text-zinc-700">
-                  Foco: <strong className="text-rose-600">{activeConfig.levelName}</strong>
-                </span>
-              </>
-            )}
-          </div>
-
-          {/* HELPFUL INTERACTION HINT (Bottom Left of Tree Canvas) */}
-          <div className="absolute bottom-4 left-4 z-30 hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 backdrop-blur-sm border border-zinc-200/60 text-[10px] font-mono text-zinc-500 pointer-events-none">
-            <Sparkles className="w-3 h-3 text-rose-400" />
-            <span>Role o mouse para zoom livre ou arraste para explorar qualquer ramo</span>
-          </div>
-
-          {/* 3. ZOOMABLE & DRAGGABLE TREE CONTAINER */}
-          <div
-            className="relative w-full max-w-[540px] aspect-[4/5] will-change-transform"
+      {/* FULL-STAGE TREE VIEWPORT (Occupies whole canvas width & height) */}
+      <div
+        ref={treeViewportRef}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className={`absolute inset-0 z-10 flex items-center justify-center lg:justify-start lg:pl-[10%] xl:pl-[14%] overflow-hidden select-none ${
+          isDragging ? 'cursor-grabbing' : 'cursor-grab'
+        }`}
+      >
+        {/* 3. ZOOMABLE & DRAGGABLE TREE CONTAINER */}
+        <div
+          className="relative w-full max-w-[560px] aspect-[4/5] will-change-transform"
             style={{
               transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
               transformOrigin: '50% 50%',
@@ -710,8 +724,8 @@ export default function SakuraTreeTimeline() {
           </div>
         </div>
 
-        {/* Right / Milestone Card & Branch Timeline Controls (5 Columns on lg) */}
-        <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between border-t lg:border-t-0 lg:border-l border-zinc-200/80 bg-white/95 backdrop-blur-md relative z-20">
+      {/* 3. FLOATING FROSTED-GLASS MILESTONE HUD TABLET (Docked on Desktop Right) */}
+      <div className="absolute right-4 sm:right-8 lg:right-12 bottom-6 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 z-30 w-[calc(100%-2rem)] sm:w-[420px] xl:w-[450px] max-h-[75vh] sm:max-h-[85vh] overflow-y-auto rounded-3xl bg-white/85 backdrop-blur-xl border border-white/80 shadow-2xl p-6 sm:p-7 flex flex-col justify-between transition-all duration-300">
           <div>
             {/* Step Navigation Pill Strip */}
             <div className="flex items-center justify-between gap-2 pb-4 mb-6 border-b border-zinc-100">
@@ -836,7 +850,6 @@ export default function SakuraTreeTimeline() {
             </button>
           </div>
         </div>
-      </div>
     </div>
   );
 }

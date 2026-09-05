@@ -60,31 +60,18 @@ export default function Timeline() {
   };
 
   return (
-    <section id="timeline" className="relative py-24 px-4 bg-[#fafbfc] border-t border-zinc-200/80">
+    <section id="timeline" className="relative bg-[#fafbfc] border-t border-zinc-200/80">
       {/* Background glow */}
       <div className="pointer-events-none absolute top-1/4 left-10 w-[450px] h-[450px] bg-emerald-100/30 blur-[140px] rounded-full"></div>
       <div className="pointer-events-none absolute bottom-1/4 right-10 w-[400px] h-[400px] bg-rose-100/30 blur-[140px] rounded-full"></div>
 
-      <div className="max-w-6xl mx-auto">
-        {/* Section Header */}
-        <div className="flex flex-col items-start mb-12">
-          <div className="flex items-center gap-2 text-xs font-mono text-rose-600 tracking-widest uppercase mb-2 font-semibold">
-            <span className="inline-block w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
-            <span>// 04. TRAJETÓRIA & CONQUISTAS</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase text-zinc-950 font-['Space_Grotesk'] tracking-tight">
-            Árvore da Trajetória & Conquistas
-          </h2>
-          <p className="text-zinc-600 text-sm sm:text-base max-w-2xl mt-2 font-normal">
-            Uma linha do tempo viva: das raízes acadêmicas no IFAC ao ápice com artigo publicado no Congresso Nacional (CSBC 2025). Clique nos ramos para aproximar a árvore.
-          </p>
-        </div>
+      {/* 1. IMMERSIVE FULL-BLEED SAKURA TREE & MOUNT FUJI PANORAMIC STAGE (100% SCREEN WIDTH) */}
+      <div className="w-full relative">
+        <SakuraTreeTimeline />
+      </div>
 
-        {/* INTERACTIVE SAKURA TREE HERO EXPERIENCE */}
-        <div className="mb-20">
-          <SakuraTreeTimeline />
-        </div>
-
+      {/* 2. DETAILED BENTO EDITORIAL SECTION (MAX-W-6XL CONTAINER BELOW) */}
+      <div className="max-w-6xl mx-auto px-4 py-20">
         {/* Section Subtitle for Bento Grid */}
         <div className="flex items-center justify-between border-b border-zinc-200/80 pb-4 mb-10">
           <div className="flex items-center gap-2">
