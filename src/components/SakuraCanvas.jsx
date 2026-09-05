@@ -57,10 +57,11 @@ export default function SakuraCanvas() {
         this.speedY = 0.8 + Math.random() * 1.5;
         this.rotation = Math.random() * Math.PI * 2;
         this.rotationSpeed = (Math.random() - 0.5) * 0.02;
-        this.opacity = 0.35 + Math.random() * 0.45;
+        this.opacity = 0.55 + Math.random() * 0.35;
         this.sway = Math.random() * Math.PI * 2;
         this.swaySpeed = 0.015 + Math.random() * 0.02;
-        this.petalColor = Math.random() > 0.3 ? '#f4a7b9' : '#e88ca3';
+        const colors = ['#f43f5e', '#fb7185', '#f472b6', '#fda4af'];
+        this.petalColor = colors[Math.floor(Math.random() * colors.length)];
       }
 
       update() {
@@ -102,6 +103,10 @@ export default function SakuraCanvas() {
         c.rotate(this.rotation);
         c.globalAlpha = this.opacity;
 
+        // Soft drop shadow for white paper contrast
+        c.shadowColor = 'rgba(244, 63, 94, 0.2)';
+        c.shadowBlur = 5;
+
         // Organic Sakura petal silhouette
         c.beginPath();
         c.fillStyle = this.petalColor;
@@ -115,7 +120,7 @@ export default function SakuraCanvas() {
         c.fill();
 
         // Subtle center vein
-        c.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        c.strokeStyle = 'rgba(255, 255, 255, 0.7)';
         c.lineWidth = 0.8;
         c.beginPath();
         c.moveTo(0, -h / 3);
@@ -124,6 +129,7 @@ export default function SakuraCanvas() {
 
         c.restore();
       }
+
     }
 
     const petals = Array.from({ length: petalCount }, () => new Petal());

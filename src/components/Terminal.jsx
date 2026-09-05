@@ -148,39 +148,39 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
   const quickChips = ['help', 'bio', 'projects', 'mariot', 'skills', 'contact', 'zen', 'clear'];
 
   return (
-    <section id="terminal" className="relative py-24 px-4 bg-[#09090b] border-t border-white/5">
+    <section id="terminal" className="relative py-24 px-4 bg-[#fafbfc] border-t border-zinc-200/80">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex flex-col items-start mb-10">
-          <div className="flex items-center gap-2 text-xs font-mono text-[#f4a7b9] tracking-widest uppercase mb-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-[#f4a7b9] animate-pulse"></span>
+          <div className="flex items-center gap-2 text-xs font-mono text-rose-600 tracking-widest uppercase mb-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
             <span>// 05. TERMINAL DE ACESSO DIRETO</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-black uppercase text-white font-['Space_Grotesk'] tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-black uppercase text-zinc-950 font-['Space_Grotesk'] tracking-tight">
             Console Interativo
           </h2>
-          <p className="text-zinc-400 text-xs sm:text-sm mt-1">
+          <p className="text-zinc-600 text-xs sm:text-sm mt-1">
             Consulte o sistema diretamente pela linha de comando em tempo real.
           </p>
         </div>
 
         {/* Terminal Window */}
-        <div className={`rounded-2xl border ${matrixMode ? 'border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)]' : 'border-[#f4a7b9]/25 shadow-2xl'} bg-[#0a0c10] overflow-hidden transition-all duration-300`}>
+        <div className={`rounded-2xl border ${matrixMode ? 'border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)]' : 'border-zinc-300/90 shadow-xl'} bg-[#0c0e14] overflow-hidden transition-all duration-300`}>
           {/* Terminal Title Bar */}
-          <div className="flex items-center justify-between px-4 py-3 bg-[#12141a] border-b border-white/5">
+          <div className="flex items-center justify-between px-4 py-3 bg-[#161922] border-b border-zinc-800">
             <div className="flex items-center gap-2">
-              <span className="w-3 h-3 rounded-full bg-red-500/80"></span>
-              <span className="w-3 h-3 rounded-full bg-amber-500/80"></span>
-              <span className="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+              <span className="w-3 h-3 rounded-full bg-rose-500/90"></span>
+              <span className="w-3 h-3 rounded-full bg-amber-400/90"></span>
+              <span className="w-3 h-3 rounded-full bg-emerald-500/90"></span>
               <span className="ml-2 text-xs font-mono text-zinc-400 hidden sm:inline">
                 steve@neo-tokyo-ifac:~ (zsh)
               </span>
             </div>
 
-            <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-500">
+            <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-400">
               <span>UTF-8</span>
               <span>•</span>
-              <span className={matrixMode ? 'text-emerald-400' : 'text-[#f4a7b9]'}>
+              <span className={matrixMode ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
                 {matrixMode ? 'MATRIX: ON' : 'CYBER-ZEN'}
               </span>
             </div>
@@ -190,7 +190,7 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
           <div 
             ref={terminalBodyRef}
             onClick={() => inputRef.current?.focus()}
-            className="p-5 font-mono text-xs sm:text-sm min-h-[320px] max-h-[440px] overflow-y-auto space-y-3 cursor-text"
+            className="p-5 font-mono text-xs sm:text-sm min-h-[320px] max-h-[440px] overflow-y-auto space-y-3 cursor-text text-zinc-200"
           >
             {history.map((line, idx) => (
               <div key={idx} className="leading-relaxed">
@@ -198,13 +198,13 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
                   <span className="text-zinc-500">// {line.text}</span>
                 )}
                 {line.type === 'info' && (
-                  <span className="text-[#f4a7b9] font-medium">{line.text}</span>
+                  <span className="text-rose-400 font-medium">{line.text}</span>
                 )}
                 {line.type === 'cmd' && (
-                  <span className="text-zinc-300 font-semibold">{line.text}</span>
+                  <span className="text-zinc-100 font-semibold">{line.text}</span>
                 )}
                 {line.type === 'res' && (
-                  <pre className={`whitespace-pre-wrap ${matrixMode ? 'text-emerald-400' : 'text-zinc-300'}`}>
+                  <pre className={`whitespace-pre-wrap ${matrixMode ? 'text-emerald-400' : 'text-zinc-200'}`}>
                     {line.text}
                   </pre>
                 )}
@@ -215,10 +215,9 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
             ))}
           </div>
 
-
           {/* Terminal Prompt Input */}
-          <div className="px-4 py-3 bg-[#0d0f14] border-t border-white/5 flex items-center gap-2 font-mono text-xs sm:text-sm">
-            <span className={matrixMode ? 'text-emerald-400 font-bold' : 'text-[#f4a7b9] font-bold'}>
+          <div className="px-4 py-3 bg-[#11141c] border-t border-zinc-800 flex items-center gap-2 font-mono text-xs sm:text-sm">
+            <span className={matrixMode ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
               steve@ifac:~$
             </span>
             <input
@@ -228,12 +227,12 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="digite um comando (ex: help)..."
-              className="flex-1 bg-transparent text-white outline-none placeholder-zinc-600 font-mono text-xs sm:text-sm"
+              className="flex-1 bg-transparent text-white outline-none placeholder-zinc-500 font-mono text-xs sm:text-sm"
             />
             <button
               type="button"
               onClick={() => executeCommand(input)}
-              className="p-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700"
+              className="p-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
               title="Executar comando"
             >
               <CornerDownLeft className="w-3.5 h-3.5" />
@@ -249,7 +248,7 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
               key={chip}
               type="button"
               onClick={() => executeCommand(chip)}
-              className="px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-400 hover:text-[#f4a7b9] hover:border-[#f4a7b9]/40 transition-colors"
+              className="px-2.5 py-1 rounded-lg bg-white border border-zinc-200 text-xs font-mono text-zinc-700 hover:text-rose-600 hover:border-rose-300 shadow-2xs hover:shadow-xs transition-colors"
             >
               {chip}
             </button>

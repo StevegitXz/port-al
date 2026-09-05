@@ -8,9 +8,7 @@ import Arsenal from './components/Arsenal';
 import Timeline from './components/Timeline';
 import Terminal from './components/Terminal';
 import Footer from './components/Footer';
-import CustomCursor from './components/CustomCursor';
 import Achievements from './components/Achievements';
-
 
 export default function App() {
   useEffect(() => {
@@ -45,12 +43,8 @@ export default function App() {
     };
   }, []);
 
-
   return (
-    <div className="relative min-h-screen bg-[#09090b] text-zinc-100 selection:bg-[#f4a7b9]/25 selection:text-[#f4a7b9]">
-      {/* Subtle CRT/Cyber scanline overlay */}
-      <div className="fixed inset-0 scanlines pointer-events-none z-30 opacity-30" />
-
+    <div className="relative min-h-screen bg-[#fafbfc] text-zinc-900 selection:bg-rose-100 selection:text-rose-700">
       {/* Main HUD Navigation Bar */}
       <Navbar />
 
@@ -77,9 +71,6 @@ export default function App() {
 
       {/* Dock Footer */}
       <Footer />
-
-      {/* Custom Fluid Cyber-Zen Cursor */}
-      <CustomCursor />
 
       {/* Gamified Achievements HUD */}
       <Achievements />

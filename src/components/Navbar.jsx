@@ -42,7 +42,7 @@ export default function Navbar() {
     <header 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-4 md:px-8 py-3 ${
         scrolled 
-          ? 'bg-[#09090b]/85 backdrop-blur-md border-b border-white/10 shadow-lg shadow-black/40' 
+          ? 'bg-white/85 backdrop-blur-md border-b border-zinc-200/80 shadow-sm' 
           : 'bg-transparent'
       }`}
     >
@@ -52,13 +52,13 @@ export default function Navbar() {
           href="#hero"
           onClick={() => sound.playClick()}
           onMouseEnter={() => sound.playHover()}
-          className="group flex items-center gap-2.5 font-mono text-sm tracking-wide text-zinc-100"
+          className="group flex items-center gap-2.5 font-mono text-sm tracking-wide text-zinc-900"
         >
-          <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#f4a7b9]/10 border border-[#f4a7b9]/30 text-[#f4a7b9] font-bold group-hover:border-[#f4a7b9] group-hover:shadow-[0_0_12px_rgba(244,167,185,0.4)] transition-all">
+          <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 font-bold group-hover:border-rose-400 group-hover:shadow-[0_0_12px_rgba(244,63,94,0.25)] transition-all">
             S
           </span>
           <div className="flex flex-col leading-tight">
-            <span className="font-bold tracking-tight text-white group-hover:text-[#f4a7b9] transition-colors">
+            <span className="font-bold tracking-tight text-zinc-900 group-hover:text-rose-600 transition-colors">
               {PERSONAL_INFO.handle}
             </span>
             <span className="text-[10px] text-zinc-500 font-mono">
@@ -68,16 +68,16 @@ export default function Navbar() {
         </a>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-1 bg-[#12141a]/70 border border-white/10 px-4 py-1.5 rounded-full backdrop-blur-md">
+        <nav className="hidden lg:flex items-center gap-1 bg-zinc-100/80 border border-zinc-200/80 px-4 py-1.5 rounded-full backdrop-blur-md">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
               onClick={() => sound.playClick()}
               onMouseEnter={() => sound.playHover()}
-              className="px-3 py-1 text-xs font-mono text-zinc-400 hover:text-[#f4a7b9] hover:bg-white/5 rounded-full transition-all"
+              className="px-3 py-1 text-xs font-mono text-zinc-600 hover:text-rose-600 hover:bg-white rounded-full transition-all"
             >
-              <span className="text-[#f4a7b9]/60 font-semibold">// </span>
+              <span className="text-rose-500/70 font-semibold">// </span>
               {link.label.split('. ')[1]}
             </a>
           ))}
@@ -86,12 +86,12 @@ export default function Navbar() {
         {/* Right Controls: Live Status, Audio SFX, GitHub */}
         <div className="flex items-center gap-2 md:gap-3">
           {/* Status Indicator */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/40 border border-emerald-500/30 text-[11px] font-mono text-emerald-400">
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] font-mono text-emerald-700">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
             </span>
-            <span className="tracking-wider uppercase">Online</span>
+            <span className="tracking-wider uppercase font-semibold">Online</span>
           </div>
 
           {/* Sound FX Toggle */}
@@ -99,10 +99,10 @@ export default function Navbar() {
             type="button"
             onClick={toggleSound}
             title={isMuted ? 'Ativar Efeitos Sonoros' : 'Silenciar Efeitos Sonoros'}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-mono transition-all ${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border text-xs font-mono transition-all shadow-xs ${
               isMuted
-                ? 'bg-zinc-900/80 border-zinc-800 text-zinc-500 hover:text-zinc-300'
-                : 'bg-[#f4a7b9]/10 border-[#f4a7b9]/30 text-[#f4a7b9] hover:border-[#f4a7b9] shadow-[0_0_10px_rgba(244,167,185,0.2)]'
+                ? 'bg-zinc-100 border-zinc-200 text-zinc-400 hover:text-zinc-600'
+                : 'bg-rose-50 border-rose-200 text-rose-600 hover:border-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.15)]'
             }`}
           >
             {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
@@ -117,11 +117,10 @@ export default function Navbar() {
             onClick={() => sound.playClick()}
             onMouseEnter={() => sound.playHover()}
             title="Acessar Perfil no GitHub"
-            className="flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-900/80 border border-zinc-700/60 text-zinc-300 hover:text-[#f4a7b9] hover:border-[#f4a7b9]/50 transition-all"
+            className="flex items-center justify-center w-8 h-8 rounded-lg bg-white border border-zinc-200 text-zinc-700 hover:text-rose-600 hover:border-rose-300 shadow-xs transition-all"
           >
             <GithubIcon className="w-4 h-4" />
           </a>
-
 
           {/* Mobile Menu Button */}
           <button
@@ -130,7 +129,7 @@ export default function Navbar() {
               sound.playClick();
               setMobileMenuOpen(!mobileMenuOpen);
             }}
-            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg bg-zinc-900/80 border border-zinc-800 text-zinc-300 hover:text-white"
+            className="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg bg-white border border-zinc-200 text-zinc-700 hover:text-zinc-950 shadow-xs"
           >
             {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
@@ -139,7 +138,7 @@ export default function Navbar() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden mt-3 rounded-2xl glass-panel p-4 border border-zinc-800 animate-in fade-in slide-in-from-top-2">
+        <div className="lg:hidden mt-3 rounded-2xl glass-panel p-4 border border-zinc-200/80 bg-white/95 shadow-xl animate-in fade-in slide-in-from-top-2">
           <div className="flex flex-col space-y-2">
             {navLinks.map((link) => (
               <a
@@ -149,16 +148,16 @@ export default function Navbar() {
                   sound.playClick();
                   setMobileMenuOpen(false);
                 }}
-                className="px-3 py-2 text-sm font-mono text-zinc-300 hover:text-[#f4a7b9] hover:bg-white/5 rounded-lg transition-colors flex items-center justify-between"
+                className="px-3 py-2 text-sm font-mono text-zinc-700 hover:text-rose-600 hover:bg-zinc-100/80 rounded-lg transition-colors flex items-center justify-between"
               >
                 <span>{link.label}</span>
-                <span className="text-zinc-600 text-xs">→</span>
+                <span className="text-zinc-400 text-xs">→</span>
               </a>
             ))}
-            <div className="pt-2 border-t border-zinc-800 flex items-center justify-between text-xs font-mono text-zinc-400">
+            <div className="pt-2 border-t border-zinc-200 flex items-center justify-between text-xs font-mono text-zinc-600">
               <span>Status Sistema</span>
-              <span className="text-emerald-400 flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              <span className="text-emerald-700 font-semibold flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                 ONLINE // IFAC
               </span>
             </div>
@@ -168,3 +167,4 @@ export default function Navbar() {
     </header>
   );
 }
+

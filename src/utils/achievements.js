@@ -10,7 +10,7 @@ export const ACHIEVEMENTS_LIST = [
   {
     id: 'iot_engineer',
     title: 'Engenheiro de Hardware',
-    desc: 'Interagiu com o microcontrolador ESP8266 e o relé do MARIOT.',
+    desc: 'Inspecionou os circuitos eletrônicos e microcontroladores do MARIOT.',
     icon: 'Cpu'
   },
   {
