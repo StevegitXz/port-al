@@ -3,7 +3,6 @@ import { Terminal as TerminalIcon, Sparkles, Send, CornerDownLeft, RefreshCw } f
 import { PERSONAL_INFO, PROJECTS } from '../utils/data';
 import { sound } from '../utils/sound';
 import { achievementManager } from '../utils/achievements';
-import CyberRain from './effects/CyberRain';
 
 export default function Terminal() {
   const [input, setInput] = useState('');
@@ -13,7 +12,6 @@ export default function Terminal() {
     { type: 'info', text: 'Digite "help" ou clique nos atalhos ao lado para interagir.' }
   ]);
   const [matrixMode, setMatrixMode] = useState(false);
-  const [crtMode, setCrtMode] = useState(true);
 
   const terminalBodyRef = useRef(null);
   const inputRef = useRef(null);
@@ -47,8 +45,7 @@ export default function Terminal() {
   • weather   - Telemetria meteorológica de Rio Branco (Amazônia)
   • game      - Desafio interativo Cyber-Zen & Hacker
   • sudo      - Solicitação de permissão de superusuário
-  • crt       - Alterna filtro visual de tubo CRT
-  • matrix    - Ativa/desativa chuva Matrix
+  • matrix    - Alterna tema visual Matrix Green
   • contact   - Informações de contato e repositório
   • lattes    - Dados cadastrados no CNPq
   • zen       - Pensamento de equilíbrio Cyber-Zen
@@ -132,14 +129,6 @@ Questão: Qual dos seguintes pinos do ESP-12F deve ser mantido em nível ALTO (H
         });
         break;
 
-      case 'crt':
-        setCrtMode((prev) => !prev);
-        newHistory.push({
-          type: 'res',
-          text: `[!] Filtro de scanlines CRT ${!crtMode ? 'ATIVADO' : 'DESATIVADO'}.`
-        });
-        break;
-
       case 'contact':
         newHistory.push({
           type: 'res',
@@ -166,10 +155,10 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
         break;
 
       case 'matrix':
-        setMatrixMode(!matrixMode);
+        setMatrixMode((prev) => !prev);
         newHistory.push({
           type: 'res',
-          text: `[!] Modo visual Matrix ${!matrixMode ? 'ATIVADO' : 'DESATIVADO'}.`
+          text: `[!] Tema visual Matrix ${!matrixMode ? 'ATIVADO (Green Phosphor)' : 'DESATIVADO (Cyber-Zen)'}.`
         });
         break;
 
@@ -205,18 +194,15 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
     { cmd: 'weather', desc: 'Telemetria Rio Branco' },
     { cmd: 'game', desc: 'Desafio hacker de IoT' },
     { cmd: 'sudo', desc: 'Modo superusuário root' },
-    { cmd: 'crt', desc: 'Alternar monitor CRT' },
-    { cmd: 'matrix', desc: 'Alternar chuva Matrix' },
+    { cmd: 'matrix', desc: 'Alternar tema Matrix' },
     { cmd: 'clear', desc: 'Limpar console' },
   ];
 
   return (
-    <section id="terminal" className="relative py-24 px-4 bg-[#fafbfc] border-t border-zinc-200/80 overflow-hidden">
-      {/* Subtle Japanese Katakana Cyber Rain */}
-      <CyberRain />
-
-      {/* Ambient background glow */}
-      <div className="pointer-events-none absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-rose-200/20 blur-[150px] rounded-full"></div>
+    <section id="terminal" className="relative py-24 px-4 bg-[#fafbfc] bg-cyber-grid border-t border-zinc-200/80 overflow-hidden">
+      {/* Ambient background glows */}
+      <div className="pointer-events-none absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-rose-200/25 blur-[150px] rounded-full"></div>
+      <div className="pointer-events-none absolute bottom-10 right-1/4 w-[400px] h-[400px] bg-emerald-200/20 blur-[140px] rounded-full"></div>
 
       <div className="max-w-6xl mx-auto">
         {/* Header */}
@@ -235,9 +221,9 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
 
         {/* Bento Workstation Layout: 12 Columns */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Main Console Window (8 Columns) */}
+          {/* Main Console Window (8 Columns) - Razor Sharp & Crisp */}
           <div className="lg:col-span-8">
-            <div className={`rounded-3xl border ${matrixMode ? 'border-emerald-500/60 shadow-[0_0_40px_rgba(16,185,129,0.2)]' : 'border-zinc-300/90 shadow-2xl'} bg-[#0c0e14] overflow-hidden transition-all duration-300 ${crtMode ? 'crt-scanlines' : ''}`}>
+            <div className={`rounded-3xl border ${matrixMode ? 'border-emerald-500/60 shadow-[0_0_50px_rgba(16,185,129,0.25)]' : 'border-zinc-300/90 shadow-2xl'} bg-[#0c0e14] overflow-hidden transition-all duration-300`}>
               {/* Terminal Title Bar */}
               <div className="flex items-center justify-between px-5 py-3.5 bg-[#161922] border-b border-zinc-800">
                 <div className="flex items-center gap-2">
@@ -254,21 +240,19 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
                     type="button"
                     onClick={() => {
                       sound.playClick();
-                      setCrtMode(!crtMode);
+                      setMatrixMode(!matrixMode);
                     }}
-                    className={`px-2 py-0.5 rounded text-[10px] font-mono border transition-all ${
-                      crtMode 
-                        ? 'bg-rose-500/20 text-rose-300 border-rose-500/40' 
-                        : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:text-white'
+                    className={`px-2.5 py-0.5 rounded-lg text-[10px] font-mono border transition-all ${
+                      matrixMode 
+                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50' 
+                        : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:text-white'
                     }`}
-                    title="Alternar filtro retrô CRT Scanlines"
+                    title="Alternar tema Matrix"
                   >
-                    CRT: {crtMode ? 'ON' : 'OFF'}
+                    TEMA: {matrixMode ? 'MATRIX' : 'CYBER-ZEN'}
                   </button>
                   <span>•</span>
-                  <span className={matrixMode ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
-                    {matrixMode ? 'MATRIX' : 'CYBER-ZEN'}
-                  </span>
+                  <span className="text-zinc-500">UTF-8</span>
                 </div>
               </div>
 
