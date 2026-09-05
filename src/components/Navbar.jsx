@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Volume2, VolumeX, Menu, X, Terminal, Cpu } from 'lucide-react';
 import GithubIcon from './GithubIcon';
 import { sound } from '../utils/sound';
+import { achievementManager } from '../utils/achievements';
 import { PERSONAL_INFO } from '../utils/data';
-
 
 export default function Navbar() {
   const [isMuted, setIsMuted] = useState(sound.isMuted());
@@ -24,8 +24,10 @@ export default function Navbar() {
     sound.setMuted(nextMute);
     if (!nextMute) {
       sound.playSuccess();
+      achievementManager.unlock('audio_master');
     }
   };
+
 
   const navLinks = [
     { label: '01. Início', href: '#hero' },

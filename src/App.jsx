@@ -8,6 +8,9 @@ import Arsenal from './components/Arsenal';
 import Timeline from './components/Timeline';
 import Terminal from './components/Terminal';
 import Footer from './components/Footer';
+import CustomCursor from './components/CustomCursor';
+import Achievements from './components/Achievements';
+
 
 export default function App() {
   useEffect(() => {
@@ -74,6 +77,13 @@ export default function App() {
 
       {/* Dock Footer */}
       <Footer />
+
+      {/* Custom Fluid Cyber-Zen Cursor */}
+      <CustomCursor />
+
+      {/* Gamified Achievements HUD */}
+      <Achievements />
     </div>
   );
 }
+

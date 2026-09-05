@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { ExternalLink, Cpu, Layers, Sparkles, Gamepad2, ArrowUpRight, Search, BookOpen } from 'lucide-react';
 import GithubIcon from './GithubIcon';
+import ScrambleText from './ScrambleText';
 import { PROJECTS } from '../utils/data';
 import { sound } from '../utils/sound';
 import ProjectModal from './ProjectModal';
+
 
 
 
@@ -94,6 +96,8 @@ export default function Projects() {
           {filteredProjects.map((proj) => (
             <div
               key={proj.id}
+              data-cursor="project"
+              data-cursor-text="VER"
               onMouseEnter={() => sound.playHover()}
               className="group relative rounded-2xl glass-panel p-6 sm:p-7 flex flex-col justify-between border border-white/10 hover:border-[#f4a7b9]/40 transition-all duration-300 hover:shadow-xl hover:shadow-[#f4a7b9]/5 hover:-translate-y-1.5"
             >
@@ -108,10 +112,14 @@ export default function Projects() {
                   </span>
                 </div>
 
-                {/* Title */}
-                <h3 className="text-xl sm:text-2xl font-black text-white group-hover:text-[#f4a7b9] transition-colors font-['Space_Grotesk'] mb-2.5">
-                  {proj.title}
-                </h3>
+                {/* Title with Cyber Scramble Effect */}
+                <div className="mb-2.5">
+                  <ScrambleText
+                    text={proj.title}
+                    as="h3"
+                    className="text-xl sm:text-2xl font-black text-white group-hover:text-[#f4a7b9] transition-colors font-['Space_Grotesk'] block"
+                  />
+                </div>
 
                 {/* Short Description */}
                 <p className="text-xs sm:text-sm text-zinc-400 leading-relaxed mb-6 font-normal">
@@ -142,16 +150,31 @@ export default function Projects() {
                   ))}
                 </div>
 
-                {/* Actions: Inspect Details & GitHub */}
-                <div className="flex items-center justify-between gap-3 pt-4 border-t border-white/5">
-                  <button
-                    type="button"
-                    onClick={() => handleOpenModal(proj)}
-                    className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-[#f4a7b9] hover:text-white transition-colors"
-                  >
-                    <span>[ INSPECIONAR SISTEMA ]</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                  </button>
+                {/* Actions: Inspect Details & GitHub & Simulator */}
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-white/5">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenModal(proj)}
+                      className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-[#f4a7b9] hover:text-white transition-colors"
+                    >
+                      <span>[ INSPECIONAR ]</span>
+                      <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    </button>
+
+                    {proj.id === 'mariot-iot' && (
+                      <button
+                        type="button"
+                        onClick={() => handleOpenModal(proj)}
+                        className="px-2.5 py-1 rounded-lg bg-emerald-400/10 border border-emerald-400/30 text-emerald-300 hover:text-white hover:border-emerald-400/60 transition-colors text-xs font-mono flex items-center gap-1.5"
+                        title="Abrir Simulador Interativo do ESP8266"
+                      >
+                        <Cpu className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                        <span className="text-[11px] font-semibold">Simulador IoT</span>
+                      </button>
+                    )}
+                  </div>
+
 
                   <div className="flex items-center gap-2">
                     {proj.articleUrl && (

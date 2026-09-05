@@ -1,13 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Terminal, Copy, Check, ArrowDown, ExternalLink, Sparkles, Code2 } from 'lucide-react';
 import SakuraCanvas from './SakuraCanvas';
+import ScrambleText from './ScrambleText';
 import { PERSONAL_INFO, METRICS } from '../utils/data';
 import { sound } from '../utils/sound';
+import { achievementManager } from '../utils/achievements';
 
 export default function Hero() {
   const [copied, setCopied] = useState(false);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      achievementManager.unlock('first_contact');
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleCopyEmail = async () => {
+
     try {
       await navigator.clipboard.writeText(PERSONAL_INFO.email);
       setCopied(true);
@@ -71,12 +81,16 @@ export default function Hero() {
           </span>
         </h1>
 
-        {/* Subtitle / Role */}
+        {/* Subtitle / Role with ScrambleText */}
         <p className="text-lg sm:text-2xl font-mono text-zinc-300 font-medium max-w-2xl mx-auto mb-5 tracking-tight">
           <span className="text-[#f4a7b9]">&lt;</span>
-          Full Stack Developer & Creative Technologist
+          <ScrambleText
+            text="Full Stack Developer & Creative Technologist"
+            className="text-zinc-200"
+          />
           <span className="text-[#f4a7b9]"> /&gt;</span>
         </p>
+
 
         {/* Bio summary paragraph */}
         <p className="text-sm sm:text-base text-zinc-400 max-w-2xl mx-auto mb-9 font-normal leading-relaxed">

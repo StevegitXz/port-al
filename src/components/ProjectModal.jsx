@@ -1,12 +1,16 @@
 import React, { useEffect } from 'react';
 import { X, ExternalLink, CheckCircle2, Cpu, Calendar, Tag, ShieldCheck, BookOpen } from 'lucide-react';
 import GithubIcon from './GithubIcon';
+import IoTSimulator from './IoTSimulator';
 import { sound } from '../utils/sound';
-
-
+import { achievementManager } from '../utils/achievements';
 
 export default function ProjectModal({ project, onClose }) {
   useEffect(() => {
+    if (project?.id === 'mariot-iot') {
+      achievementManager.unlock('sbc_scholar');
+    }
+
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         sound.playClick();
@@ -15,7 +19,8 @@ export default function ProjectModal({ project, onClose }) {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
+  }, [project, onClose]);
+
 
   if (!project) return null;
 
@@ -117,7 +122,15 @@ export default function ProjectModal({ project, onClose }) {
               ))}
             </div>
           </div>
+
+          {/* Interactive Hardware Simulator (Special for MARIOT IoT) */}
+          {project.id === 'mariot-iot' && (
+            <div className="pt-4 border-t border-white/10">
+              <IoTSimulator />
+            </div>
+          )}
         </div>
+
 
         {/* Modal Footer / CTAs */}
         <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-3">

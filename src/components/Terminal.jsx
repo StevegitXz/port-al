@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Terminal as TerminalIcon, Sparkles, Send, CornerDownLeft, RefreshCw } from 'lucide-react';
 import { PERSONAL_INFO, PROJECTS } from '../utils/data';
 import { sound } from '../utils/sound';
+import { achievementManager } from '../utils/achievements';
 
 export default function Terminal() {
   const [input, setInput] = useState('');
@@ -21,16 +22,17 @@ export default function Terminal() {
     }
   }, [history]);
 
-
   const executeCommand = (cmdText) => {
     const raw = cmdText.trim();
     if (!raw) return;
 
     sound.playTerminalKey();
+    achievementManager.unlock('terminal_hacker');
     const command = raw.toLowerCase();
 
     // Add command echo to history
     const newHistory = [...history, { type: 'cmd', text: `steve@ifac-node:~$ ${raw}` }];
+
 
     switch (command) {
       case 'help':
