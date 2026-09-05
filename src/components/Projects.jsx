@@ -6,6 +6,186 @@ import { PROJECTS } from '../utils/data';
 import { sound } from '../utils/sound';
 import ProjectModal from './ProjectModal';
 
+// 3D Perspective Tilt Bento Card for Projects
+function ProjectBentoCard({ proj, config, rarityColor, handleOpenModal }) {
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    setTilt({
+      x: -((y / (rect.height / 2)) * 7),
+      y: (x / (rect.width / 2)) * 7,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setTilt({ x: 0, y: 0 });
+  };
+
+  return (
+    <div
+      onMouseEnter={() => {
+        sound.playHover();
+        setIsHovered(true);
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        transform: isHovered
+          ? `perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale3d(1.015, 1.015, 1.015)`
+          : undefined,
+        transition: isHovered ? 'transform 80ms ease-out' : 'transform 400ms ease-out',
+      }}
+      className={`group relative rounded-3xl glass-panel bg-white/95 holo-shimmer border border-zinc-200/80 hover:border-rose-300 shadow-xs hover:shadow-2xl transition-all duration-300 overflow-hidden will-change-transform ${config.colSpan} ${config.offset}`}
+    >
+      {/* Soft ambient corner glow on hover */}
+      <div className={`pointer-events-none absolute -top-16 -right-16 w-48 h-48 ${config.accentGlow} rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500`}></div>
+
+      {/* Floating 3D Vertical Japanese Kanji Watermark */}
+      <div
+        aria-hidden="true"
+        style={{
+          transform: isHovered ? 'scale(1.1) translateZ(30px)' : 'scale(1)',
+          transition: 'transform 300ms ease-out, color 300ms ease',
+        }}
+        className="absolute right-6 top-5 text-6xl sm:text-7xl font-bold text-zinc-900/[0.035] group-hover:text-rose-500/15 transition-colors pointer-events-none font-mono select-none"
+      >
+        {config.kanji}
+      </div>
+
+      {/* Card Interior */}
+      <div className="p-7 sm:p-8 flex flex-col justify-between h-full relative z-10">
+        {/* Top Metadata Strip */}
+        <div>
+          <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-mono text-rose-600 font-bold tracking-wider flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                {config.numTag}
+              </span>
+              <span className="text-zinc-300">•</span>
+              <span className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full border uppercase tracking-wider font-bold ${rarityColor(proj.rarity)}`}>
+                {proj.badge}
+              </span>
+            </div>
+            <span className="text-xs font-mono text-zinc-400">
+              ANO {proj.year}
+            </span>
+          </div>
+
+          {/* WIDE CARD LAYOUT (e.g. MARIOT & DECIFRA) */}
+          {config.isWide ? (
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6 items-start">
+              {/* Left Side: Title & Description */}
+              <div className="md:col-span-7 space-y-3">
+                <ScrambleText
+                  text={proj.title}
+                  as="h3"
+                  className="text-2xl sm:text-3xl font-black text-zinc-950 group-hover:text-rose-600 transition-colors font-['Space_Grotesk'] tracking-tight block"
+                />
+                <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
+                  {proj.description}
+                </p>
+              </div>
+
+              {/* Right Side: Quick Spec Highlights Sub-Box */}
+              <div className="md:col-span-5 p-4 rounded-2xl bg-zinc-50/80 border border-zinc-200/70 space-y-2">
+                <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold block">
+                  // DESTAQUES DE ENGENHARIA
+                </span>
+                {proj.highlights.slice(0, 2).map((hl, idx) => (
+                  <div key={idx} className="flex items-start gap-2 text-xs font-mono text-zinc-700 leading-snug">
+                    <span className="text-rose-500 font-bold shrink-0">›</span>
+                    <span>{hl}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            /* COMPACT / VERTICAL CARD LAYOUT (e.g. SOCIO-PLAT & NORTE EVENTOS) */
+            <div className="mb-6 space-y-3">
+              <ScrambleText
+                text={proj.title}
+                as="h3"
+                className="text-xl sm:text-2xl font-black text-zinc-950 group-hover:text-rose-600 transition-colors font-['Space_Grotesk'] tracking-tight block"
+              />
+              <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
+                {proj.description}
+              </p>
+
+              {/* Quick Spec Highlights */}
+              <div className="space-y-1.5 py-3 border-y border-zinc-100">
+                {proj.highlights.slice(0, 2).map((hl, idx) => (
+                  <div key={idx} className="flex items-start gap-2 text-xs font-mono text-zinc-700 leading-snug">
+                    <span className="text-rose-500 font-bold shrink-0">›</span>
+                    <span className="line-clamp-1">{hl}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Strip: Tech Badges & Actions */}
+        <div className="pt-5 border-t border-zinc-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          {/* Tech Badges */}
+          <div className="flex flex-wrap gap-1.5">
+            {proj.techs.map((tech, idx) => (
+              <span
+                key={idx}
+                className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200/80 group-hover:border-rose-200/70"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2.5 self-end sm:self-auto shrink-0">
+            {proj.articleUrl && (
+              <a
+                href={proj.articleUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => sound.playClick()}
+                className="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 hover:bg-amber-100 hover:border-amber-300 transition-colors text-xs font-mono font-semibold flex items-center gap-1.5 shadow-2xs"
+                title="Ler Artigo Publicado no SOL/SBC"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-amber-700" />
+                <span>Artigo SBC</span>
+              </a>
+            )}
+
+            <a
+              href={proj.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => sound.playClick()}
+              className="p-2 rounded-xl bg-white border border-zinc-200 text-zinc-700 hover:text-zinc-950 hover:border-rose-300 shadow-2xs transition-colors"
+              title="Acessar no GitHub"
+            >
+              <GithubIcon className="w-4 h-4" />
+            </a>
+
+            <button
+              type="button"
+              onClick={() => handleOpenModal(proj)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 hover:text-rose-800 text-xs font-mono font-bold transition-all shadow-2xs"
+            >
+              <span>INSPECIONAR</span>
+              <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Projects() {
   const [filter, setFilter] = useState('ALL');
   const [selectedProject, setSelectedProject] = useState(null);
@@ -16,6 +196,14 @@ export default function Projects() {
     { id: 'IOT', label: 'Hardware & IoT' },
     { id: 'GAMES', label: 'Gamificação & EdTech' }
   ];
+
+  const getFilterCount = (filterId) => {
+    if (filterId === 'ALL') return PROJECTS.length;
+    if (filterId === 'FULLSTACK') return PROJECTS.filter((p) => p.category.includes('Full-Stack')).length;
+    if (filterId === 'IOT') return PROJECTS.filter((p) => p.category.includes('Hardware') || p.category.includes('IoT')).length;
+    if (filterId === 'GAMES') return PROJECTS.filter((p) => p.category.includes('Gamificação') || p.category.includes('EdTech')).length;
+    return 0;
+  };
 
   const filteredProjects = PROJECTS.filter((proj) => {
     if (filter === 'ALL') return true;
@@ -126,176 +314,56 @@ export default function Projects() {
             </p>
           </div>
 
-          {/* Filter Pills / Deck Filter */}
+          {/* Filter Pills / Deck Filter with Count Badges */}
           <div className="flex flex-wrap gap-1.5 p-1.5 rounded-2xl bg-zinc-100/90 border border-zinc-200 self-start md:self-end shadow-2xs">
-            {filters.map((f) => (
-              <button
-                key={f.id}
-                type="button"
-                onClick={() => {
-                  sound.playClick();
-                  setFilter(f.id);
-                }}
-                onMouseEnter={() => sound.playHover()}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-mono transition-all ${
-                  filter === f.id
-                    ? 'bg-white text-zinc-950 font-bold shadow-xs border border-zinc-200'
-                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-white/50'
-                }`}
-              >
-                {f.label}
-              </button>
-            ))}
+            {filters.map((f) => {
+              const count = getFilterCount(f.id);
+              const isSelected = filter === f.id;
+
+              return (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => {
+                    sound.playClick();
+                    setFilter(f.id);
+                  }}
+                  onMouseEnter={() => sound.playHover()}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-mono transition-all inline-flex items-center gap-2 ${
+                    isSelected
+                      ? 'bg-white text-zinc-950 font-bold shadow-xs border border-zinc-200'
+                      : 'text-zinc-600 hover:text-zinc-900 hover:bg-white/50'
+                  }`}
+                >
+                  <span>{f.label}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-md font-mono ${
+                      isSelected
+                        ? 'bg-rose-50 text-rose-600 border border-rose-200'
+                        : 'bg-zinc-200/70 text-zinc-500'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Asymmetrical Bento-Editorial Layout */}
+        {/* Asymmetrical Bento-Editorial Layout with 3D Tilt Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-12">
           {filteredProjects.map((proj) => {
             const config = getBentoConfig(proj.id, filteredProjects.length);
 
             return (
-              <div
+              <ProjectBentoCard
                 key={proj.id}
-                onMouseEnter={() => sound.playHover()}
-                className={`group relative rounded-3xl glass-panel bg-white/95 holo-shimmer border border-zinc-200/80 hover:border-rose-300 shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 overflow-hidden ${config.colSpan} ${config.offset}`}
-              >
-                {/* Soft ambient corner glow on hover */}
-                <div className={`pointer-events-none absolute -top-16 -right-16 w-44 h-44 ${config.accentGlow} rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500`}></div>
-
-                {/* Vertical Japanese Kanji Watermark */}
-                <div
-                  aria-hidden="true"
-                  className="absolute right-6 top-5 text-6xl sm:text-7xl font-bold text-zinc-900/[0.035] group-hover:text-rose-500/10 transition-colors pointer-events-none font-mono select-none"
-                >
-                  {config.kanji}
-                </div>
-
-                {/* Card Interior */}
-                <div className="p-7 sm:p-8 flex flex-col justify-between h-full relative z-10">
-                  {/* Top Metadata Strip */}
-                  <div>
-                    <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-mono text-rose-600 font-bold tracking-wider">
-                          {config.numTag}
-                        </span>
-                        <span className="text-zinc-300">•</span>
-                        <span className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full border uppercase tracking-wider font-bold ${rarityColor(proj.rarity)}`}>
-                          {proj.badge}
-                        </span>
-                      </div>
-                      <span className="text-xs font-mono text-zinc-400">
-                        ANO {proj.year}
-                      </span>
-                    </div>
-
-                    {/* WIDE CARD LAYOUT (e.g. MARIOT & DECIFRA) */}
-                    {config.isWide ? (
-                      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6 items-start">
-                        {/* Left Side: Title & Description */}
-                        <div className="md:col-span-7 space-y-3">
-                          <ScrambleText
-                            text={proj.title}
-                            as="h3"
-                            className="text-2xl sm:text-3xl font-black text-zinc-950 group-hover:text-rose-600 transition-colors font-['Space_Grotesk'] tracking-tight block"
-                          />
-                          <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
-                            {proj.description}
-                          </p>
-                        </div>
-
-                        {/* Right Side: Quick Spec Highlights Sub-Box */}
-                        <div className="md:col-span-5 p-4 rounded-2xl bg-zinc-50/80 border border-zinc-200/70 space-y-2">
-                          <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider font-semibold block">
-                            // DESTAQUES DE ENGENHARIA
-                          </span>
-                          {proj.highlights.slice(0, 2).map((hl, idx) => (
-                            <div key={idx} className="flex items-start gap-2 text-xs font-mono text-zinc-700 leading-snug">
-                              <span className="text-rose-500 font-bold shrink-0">›</span>
-                              <span>{hl}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ) : (
-                      /* COMPACT / VERTICAL CARD LAYOUT (e.g. SOCIO-PLAT & NORTE EVENTOS) */
-                      <div className="mb-6 space-y-3">
-                        <ScrambleText
-                          text={proj.title}
-                          as="h3"
-                          className="text-xl sm:text-2xl font-black text-zinc-950 group-hover:text-rose-600 transition-colors font-['Space_Grotesk'] tracking-tight block"
-                        />
-                        <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
-                          {proj.description}
-                        </p>
-
-                        {/* Quick Spec Highlights */}
-                        <div className="space-y-1.5 py-3 border-y border-zinc-100">
-                          {proj.highlights.slice(0, 2).map((hl, idx) => (
-                            <div key={idx} className="flex items-start gap-2 text-xs font-mono text-zinc-700 leading-snug">
-                              <span className="text-rose-500 font-bold shrink-0">›</span>
-                              <span className="line-clamp-1">{hl}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Bottom Strip: Tech Badges & Actions */}
-                  <div className="pt-5 border-t border-zinc-100/90 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    {/* Tech Badges */}
-                    <div className="flex flex-wrap gap-1.5">
-                      {proj.techs.map((tech, idx) => (
-                        <span
-                          key={idx}
-                          className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-zinc-100 text-zinc-700 border border-zinc-200/80"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex items-center gap-2.5 self-end sm:self-auto shrink-0">
-                      {proj.articleUrl && (
-                        <a
-                          href={proj.articleUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() => sound.playClick()}
-                          className="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 hover:bg-amber-100 hover:border-amber-300 transition-colors text-xs font-mono font-semibold flex items-center gap-1.5 shadow-2xs"
-                          title="Ler Artigo Publicado no SOL/SBC"
-                        >
-                          <BookOpen className="w-3.5 h-3.5 text-amber-700" />
-                          <span>Artigo SBC</span>
-                        </a>
-                      )}
-
-                      <a
-                        href={proj.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => sound.playClick()}
-                        className="p-2 rounded-xl bg-white border border-zinc-200 text-zinc-700 hover:text-zinc-950 hover:border-rose-300 shadow-2xs transition-colors"
-                        title="Acessar no GitHub"
-                      >
-                        <GithubIcon className="w-4 h-4" />
-                      </a>
-
-                      <button
-                        type="button"
-                        onClick={() => handleOpenModal(proj)}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 hover:bg-rose-100 hover:text-rose-800 text-xs font-mono font-bold transition-all shadow-2xs"
-                      >
-                        <span>INSPECIONAR</span>
-                        <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                proj={proj}
+                config={config}
+                rarityColor={rarityColor}
+                handleOpenModal={handleOpenModal}
+              />
             );
           })}
         </div>

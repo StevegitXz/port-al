@@ -141,3 +141,60 @@ body {
   background-size: 32px 32px;
 }
 
+/* Katana Slash Light Beam */
+.katana-slash-beam {
+  position: absolute;
+  top: -50%;
+  left: -120%;
+  width: 65%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 30%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(244, 63, 94, 0.8) 65%,
+    transparent 100%
+  );
+  transform: skewX(-35deg);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.katana-slashed .katana-slash-beam {
+  opacity: 1;
+  animation: katana-cut 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes katana-cut {
+  0% {
+    left: -120%;
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    left: 180%;
+    opacity: 0;
+  }
+}
+
+/* CRT Scanlines Retro Screen Filter */
+.crt-scanlines {
+  position: relative;
+  overflow: hidden;
+}
+
+.crt-scanlines::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.03));
+  z-index: 25;
+  background-size: 100% 3px, 6px 100%;
+  pointer-events: none;
+}
+
+

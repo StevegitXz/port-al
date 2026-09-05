@@ -258,6 +258,69 @@ class SoundManager {
       osc.stop(now + 0.015);
     } catch (err) {}
   }
+
+  // Fast resonant blade slash swish sound for hero title hover
+  playKatanaSlash() {
+    if (this.muted) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const bufferSize = Math.floor(this.ctx.sampleRate * 0.16);
+      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+
+      const noise = this.ctx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(3200, now);
+      filter.frequency.exponentialRampToValueAtTime(700, now + 0.15);
+      filter.Q.setValueAtTime(4.0, now);
+
+      const gain = this.ctx.createGain();
+      gain.gain.setValueAtTime(0.07, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      noise.start(now);
+      noise.stop(now + 0.16);
+    } catch (err) {}
+  }
+
+  // Satisfying mechanical keyboard switch click (thock) for terminal
+  playMechanicalKey() {
+    if (this.muted) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    try {
+      const now = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(1400 + Math.random() * 400, now);
+      osc.frequency.exponentialRampToValueAtTime(240, now + 0.035);
+
+      gain.gain.setValueAtTime(0.045, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.035);
+    } catch (err) {}
+  }
 }
 
 export const sound = new SoundManager();

@@ -4,6 +4,241 @@ import { ARSENAL_SKILLS } from '../utils/data';
 import { sound } from '../utils/sound';
 import CircuitTraces from './effects/CircuitTraces';
 
+// Interactive ESP8266 MCU Microchip Component
+function Esp8266McuCore({ hoveredCategory }) {
+  const [boosted, setBoosted] = React.useState(false);
+  const [packetCount, setPacketCount] = React.useState(1048);
+
+  const handleMcuClick = () => {
+    sound.playRelayClick(!boosted);
+    setBoosted((prev) => !prev);
+    setPacketCount((prev) => prev + Math.floor(Math.random() * 24 + 1));
+  };
+
+  return (
+    <div className="mb-14 p-6 sm:p-8 rounded-3xl glass-panel bg-white/95 border border-zinc-200/90 shadow-sm relative overflow-hidden group">
+      {/* Background ambient PCB glow */}
+      <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-44 bg-emerald-300/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-500"></div>
+
+      <div className="flex flex-col lg:flex-row items-center justify-between gap-8 relative z-10">
+        {/* Left Telemetry Info */}
+        <div className="space-y-3 text-left max-w-sm">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-emerald-50 border border-emerald-200 text-[10px] font-mono font-bold text-emerald-800">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            <span>HARDWARE EMBARCADO ATIVO</span>
+          </div>
+          <h3 className="text-xl sm:text-2xl font-black text-zinc-950 font-['Space_Grotesk'] tracking-tight">
+            Núcleo de Controle SoC ESP8266
+          </h3>
+          <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
+            Microcontrolador 32-bit Xtensa LX106 com Wi-Fi nativo 802.11 b/g/n, operando sensores de umidade, temperatura e acionamento de atuadores no projeto MARIOT.
+          </p>
+          <div className="flex items-center gap-3 pt-2 font-mono text-[11px] text-zinc-500">
+            <span>CLOCK: <strong className={boosted ? 'text-rose-600 font-bold' : 'text-zinc-900'}>{boosted ? '160 MHz (BOOST)' : '80 MHz'}</strong></span>
+            <span>•</span>
+            <span>PACOTES: <strong className="text-emerald-700 font-bold">{packetCount}</strong></span>
+          </div>
+        </div>
+
+        {/* Center: ESP8266 Physical Module Mockup */}
+        <div 
+          onClick={handleMcuClick}
+          onMouseEnter={() => sound.playHover()}
+          title="Clique para alternar clock / simular pulso de telemetria"
+          className="relative cursor-pointer select-none py-2 px-3 rounded-2xl bg-zinc-900 shadow-xl border border-zinc-700/80 transition-all duration-300 hover:scale-[1.03] active:scale-95"
+        >
+          {/* PCB Board Carrier */}
+          <div className="w-56 sm:w-64 bg-[#0e171e] rounded-xl p-4 border border-zinc-800 relative flex flex-col items-center">
+            {/* Serpentine PCB Antenna Pattern */}
+            <div className="w-full h-8 border-b border-zinc-700/70 mb-3 flex items-center justify-center gap-1.5 opacity-80">
+              <div className="h-4 w-1 bg-amber-400/90 rounded-xs"></div>
+              <div className="h-4 w-1.5 bg-amber-400/90 rounded-xs"></div>
+              <div className="h-4 w-3 border-t-2 border-r-2 border-amber-400/90"></div>
+              <div className="h-4 w-3 border-b-2 border-l-2 border-amber-400/90"></div>
+              <div className="h-4 w-3 border-t-2 border-r-2 border-amber-400/90"></div>
+              <div className="h-4 w-1 bg-amber-400/90 rounded-xs"></div>
+              <span className="text-[8px] font-mono text-amber-300/80 uppercase ml-2 tracking-widest">2.4GHz ANT</span>
+            </div>
+
+            {/* Left and Right Golden Castellated Solder Pads */}
+            <div className="absolute left-0 top-14 bottom-6 flex flex-col justify-between -translate-x-1/2">
+              {['RST', 'ADC', 'CH_PD', 'GPIO16', 'GPIO14', 'GPIO12', 'VCC'].map((p, i) => (
+                <div key={i} className="flex items-center gap-1">
+                  <div className="w-2.5 h-1.5 bg-amber-400 rounded-sm border border-amber-500 shadow-2xs"></div>
+                  <span className="text-[7px] font-mono text-zinc-500 -mr-1 hidden sm:inline">{p}</span>
+                </div>
+              ))}
+            </div>
+            <div className="absolute right-0 top-14 bottom-6 flex flex-col justify-between translate-x-1/2 items-end">
+              {['TXD', 'RXD', 'GPIO5', 'GPIO4', 'GPIO0', 'GPIO2', 'GND'].map((p, i) => (
+                <div key={i} className="flex items-center gap-1">
+                  <span className="text-[7px] font-mono text-zinc-500 -ml-1 hidden sm:inline">{p}</span>
+                  <div className="w-2.5 h-1.5 bg-amber-400 rounded-sm border border-amber-500 shadow-2xs"></div>
+                </div>
+              ))}
+            </div>
+
+            {/* Metallic RF Shield Casing */}
+            <div className="w-full bg-gradient-to-b from-zinc-200 via-zinc-300 to-zinc-400 rounded-lg p-3 text-zinc-900 shadow-inner border border-zinc-400/90 space-y-1 text-center">
+              <div className="flex items-center justify-between pb-1 border-b border-zinc-400/60">
+                <span className="text-[9px] font-mono font-black tracking-wider text-zinc-800">MODEL: ESP-12F</span>
+                <div className="flex items-center gap-1">
+                  <span className={`w-2 h-2 rounded-full ${boosted ? 'bg-rose-500 animate-ping' : 'bg-emerald-500 animate-pulse'}`}></span>
+                  <span className="text-[8px] font-mono font-bold text-zinc-700">{boosted ? '160M' : '80M'}</span>
+                </div>
+              </div>
+
+              <div className="py-2">
+                <div className="text-[11px] font-mono font-black tracking-widest text-zinc-900">
+                  ESP8266MOD
+                </div>
+                <div className="text-[8px] font-mono text-zinc-700 tracking-wider">
+                  XTENSA® 32-BIT LX106
+                </div>
+                <div className="text-[7px] font-mono text-zinc-600">
+                  VENDOR: IFAC LAB / SOL SBC
+                </div>
+              </div>
+
+              {/* Status LEDs & Micro traces */}
+              <div className="flex items-center justify-between pt-1 border-t border-zinc-400/60 text-[8px] font-mono">
+                <span className="flex items-center gap-1 text-zinc-800">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                  TX/RX
+                </span>
+                <span className="text-zinc-600 font-semibold">FCC ID: 2AHMR-ESP12F</span>
+              </div>
+            </div>
+
+            {/* Instruction Tip */}
+            <span className="text-[9px] font-mono text-zinc-500 mt-2.5 group-hover:text-emerald-400 transition-colors">
+              [ ⚡ CLIQUE PARA PULSAR ]
+            </span>
+          </div>
+        </div>
+
+        {/* Right Feature Highlights */}
+        <div className="space-y-2 text-left max-w-xs font-mono text-xs text-zinc-700">
+          <div className="p-2.5 rounded-xl bg-zinc-50 border border-zinc-200/80">
+            <span className="text-[10px] text-zinc-500 uppercase block font-semibold mb-0.5">// FIRMWARE & PROTOCOLO</span>
+            <span className="font-bold text-zinc-900">C++ / Arduino IDE / HTTP REST</span>
+          </div>
+          <div className="p-2.5 rounded-xl bg-zinc-50 border border-zinc-200/80">
+            <span className="text-[10px] text-zinc-500 uppercase block font-semibold mb-0.5">// SENSORES & ATUADORES</span>
+            <span className="font-bold text-zinc-900">Módulo Relé, DHT22, Higrômetro</span>
+          </div>
+          <div className="p-2.5 rounded-xl bg-zinc-50 border border-zinc-200/80">
+            <span className="text-[10px] text-zinc-500 uppercase block font-semibold mb-0.5">// PUBLICAÇÃO CIENTÍFICA</span>
+            <span className="font-bold text-emerald-700">Artigo Aceito no CSBC / WCAMA 2025</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 3D Perspective Tilt Card for Arsenal Skills
+function ArsenalMatrixCard({ group, config, getCategoryIcon }) {
+  const [tilt, setTilt] = React.useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = React.useState(false);
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    setTilt({
+      x: -((y / (rect.height / 2)) * 8),
+      y: (x / (rect.width / 2)) * 8,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setTilt({ x: 0, y: 0 });
+  };
+
+  return (
+    <div
+      onMouseEnter={() => {
+        sound.playHover();
+        setIsHovered(true);
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        transform: isHovered
+          ? `perspective(900px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale3d(1.015, 1.015, 1.015)`
+          : undefined,
+        transition: isHovered ? 'transform 80ms ease-out' : 'transform 400ms ease-out',
+      }}
+      className={`group relative rounded-3xl glass-panel bg-white/95 p-7 sm:p-8 border border-zinc-200/80 hover:border-rose-300 shadow-xs hover:shadow-2xl transition-all duration-300 overflow-hidden will-change-transform ${config.colSpan} ${config.offset}`}
+    >
+      {/* Soft ambient corner glow on hover */}
+      <div className={`pointer-events-none absolute -top-16 -right-16 w-48 h-48 ${config.glow} rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500`}></div>
+
+      {/* Floating 3D Japanese Kanji Watermark */}
+      <div
+        aria-hidden="true"
+        style={{
+          transform: isHovered ? 'scale(1.1) translateZ(30px)' : 'scale(1)',
+          transition: 'transform 300ms ease-out, color 300ms ease',
+        }}
+        className="absolute right-6 top-5 text-6xl sm:text-7xl font-bold text-zinc-900/[0.035] group-hover:text-rose-500/15 transition-colors pointer-events-none font-mono select-none"
+      >
+        {config.kanji}
+      </div>
+
+      <div className="relative z-10">
+        {/* Category Header */}
+        <div className="flex items-center justify-between pb-4 mb-5 border-b border-zinc-100">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-2xl bg-zinc-50 border border-zinc-200/80 shadow-2xs group-hover:border-rose-200 transition-colors">
+              {getCategoryIcon(group.category)}
+            </div>
+            <div>
+              <span className="text-[11px] font-mono text-rose-600 font-bold tracking-wider flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                {config.numTag}
+              </span>
+              <h3 className="text-lg font-bold text-zinc-900 font-['Space_Grotesk']">
+                {group.category}
+              </h3>
+            </div>
+          </div>
+          <span className="text-xs font-mono px-2 py-0.5 rounded bg-zinc-100/90 text-zinc-500 border border-zinc-200 font-semibold group-hover:text-rose-600 group-hover:border-rose-200 transition-colors hidden sm:inline">
+            {config.kanji}
+          </span>
+        </div>
+
+        {/* Skills List */}
+        <div className="space-y-4">
+          {group.skills.map((skill, sIdx) => (
+            <div key={sIdx} className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs font-mono">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-zinc-800">{skill.name}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-zinc-200/80">
+                    {skill.badge}
+                  </span>
+                </div>
+                <span className="text-rose-600 font-semibold">{skill.status}</span>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="h-2 w-full rounded-full bg-zinc-100 border border-zinc-200/60 overflow-hidden relative">
+                <div
+                  className={`h-full rounded-full ${config.barGradient} transition-all duration-700`}
+                  style={{ width: `${skill.level}%` }}
+                ></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Arsenal() {
   const getCategoryIcon = (category) => {
     switch (category) {
@@ -18,6 +253,41 @@ export default function Arsenal() {
     }
   };
 
+  const configs = [
+    {
+      colSpan: 'lg:col-span-7 xl:col-span-8',
+      offset: '',
+      kanji: '画面',
+      numTag: '№ 01 // INTERFACE & EXPERIÊNCIA',
+      glow: 'bg-rose-300/15',
+      barGradient: 'bg-gradient-to-r from-zinc-400 via-rose-500 to-rose-400',
+    },
+    {
+      colSpan: 'lg:col-span-5 xl:col-span-4',
+      offset: 'lg:translate-y-8',
+      kanji: '装置',
+      numTag: '№ 02 // HARDWARE & IOT',
+      glow: 'bg-emerald-300/15',
+      barGradient: 'bg-gradient-to-r from-zinc-400 via-emerald-500 to-emerald-400',
+    },
+    {
+      colSpan: 'lg:col-span-5 xl:col-span-4',
+      offset: 'lg:-translate-y-2',
+      kanji: '基盤',
+      numTag: '№ 03 // APIS & BANCO RELACIONAL',
+      glow: 'bg-cyan-300/15',
+      barGradient: 'bg-gradient-to-r from-zinc-400 via-cyan-500 to-cyan-400',
+    },
+    {
+      colSpan: 'lg:col-span-7 xl:col-span-8',
+      offset: 'lg:translate-y-4',
+      kanji: '道具',
+      numTag: '№ 04 // DEVOPS & FERRAMENTAS',
+      glow: 'bg-amber-300/15',
+      barGradient: 'bg-gradient-to-r from-zinc-400 via-amber-500 to-amber-400',
+    },
+  ];
+
   return (
     <section id="arsenal" className="relative py-24 px-4 bg-[#fafbfc] border-t border-zinc-200/80 overflow-hidden">
       {/* PCB Circuit Traces & Electron Pulses */}
@@ -28,8 +298,8 @@ export default function Arsenal() {
 
       <div className="max-w-6xl mx-auto">
         {/* Section Header */}
-        <div className="flex flex-col items-start mb-16">
-          <div className="flex items-center gap-2 text-xs font-mono text-rose-600 tracking-widest uppercase mb-2">
+        <div className="flex flex-col items-start mb-12">
+          <div className="flex items-center gap-2 text-xs font-mono text-rose-600 tracking-widest uppercase mb-2 font-semibold">
             <span className="inline-block w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
             <span>// 03. ARSENAL TECNOLÓGICO</span>
           </div>
@@ -41,109 +311,21 @@ export default function Arsenal() {
           </p>
         </div>
 
-        {/* 4 Pillars Bento-Editorial Matrix Grid */}
+        {/* Central Interactive ESP8266 MCU Microchip */}
+        <Esp8266McuCore />
+
+        {/* 4 Pillars Bento-Editorial Matrix Grid with 3D Tilt Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-16">
           {ARSENAL_SKILLS.map((group, groupIdx) => {
-            const configs = [
-              {
-                colSpan: 'lg:col-span-7 xl:col-span-8',
-                offset: '',
-                kanji: '画面',
-                numTag: '№ 01 // INTERFACE & EXPERIÊNCIA',
-                glow: 'bg-rose-300/15',
-                barGradient: 'bg-gradient-to-r from-zinc-400 via-rose-500 to-rose-400',
-              },
-              {
-                colSpan: 'lg:col-span-5 xl:col-span-4',
-                offset: 'lg:translate-y-8',
-                kanji: '装置',
-                numTag: '№ 02 // HARDWARE & IOT',
-                glow: 'bg-emerald-300/15',
-                barGradient: 'bg-gradient-to-r from-zinc-400 via-emerald-500 to-emerald-400',
-              },
-              {
-                colSpan: 'lg:col-span-5 xl:col-span-4',
-                offset: 'lg:-translate-y-2',
-                kanji: '基盤',
-                numTag: '№ 03 // APIS & BANCO RELACIONAL',
-                glow: 'bg-cyan-300/15',
-                barGradient: 'bg-gradient-to-r from-zinc-400 via-cyan-500 to-cyan-400',
-              },
-              {
-                colSpan: 'lg:col-span-7 xl:col-span-8',
-                offset: 'lg:translate-y-4',
-                kanji: '道具',
-                numTag: '№ 04 // DEVOPS & FERRAMENTAS',
-                glow: 'bg-amber-300/15',
-                barGradient: 'bg-gradient-to-r from-zinc-400 via-amber-500 to-amber-400',
-              },
-            ];
             const config = configs[groupIdx] || configs[0];
 
             return (
-              <div
+              <ArsenalMatrixCard
                 key={groupIdx}
-                onMouseEnter={() => sound.playHover()}
-                className={`group relative rounded-3xl glass-panel bg-white/95 p-7 sm:p-8 border border-zinc-200/80 hover:border-rose-300 shadow-xs hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 overflow-hidden ${config.colSpan} ${config.offset}`}
-              >
-                {/* Soft ambient corner glow on hover */}
-                <div className={`pointer-events-none absolute -top-16 -right-16 w-44 h-44 ${config.glow} rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500`}></div>
-
-                {/* Vertical Japanese Kanji Watermark */}
-                <div
-                  aria-hidden="true"
-                  className="absolute right-6 top-5 text-6xl sm:text-7xl font-bold text-zinc-900/[0.035] group-hover:text-rose-500/10 transition-colors pointer-events-none font-mono select-none"
-                >
-                  {config.kanji}
-                </div>
-
-                <div className="relative z-10">
-                  {/* Category Header */}
-                  <div className="flex items-center justify-between pb-4 mb-5 border-b border-zinc-100">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2.5 rounded-2xl bg-zinc-50 border border-zinc-200/80 shadow-2xs">
-                        {getCategoryIcon(group.category)}
-                      </div>
-                      <div>
-                        <span className="text-[11px] font-mono text-rose-600 font-bold tracking-wider block">
-                          {config.numTag}
-                        </span>
-                        <h3 className="text-lg font-bold text-zinc-900 font-['Space_Grotesk']">
-                          {group.category}
-                        </h3>
-                      </div>
-                    </div>
-                    <span className="text-xs font-mono text-zinc-400 hidden sm:inline">
-                      {config.kanji}
-                    </span>
-                  </div>
-
-                  {/* Skills List */}
-                  <div className="space-y-4">
-                    {group.skills.map((skill, sIdx) => (
-                      <div key={sIdx} className="space-y-1.5">
-                        <div className="flex items-center justify-between text-xs font-mono">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-zinc-800">{skill.name}</span>
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-zinc-200/80">
-                              {skill.badge}
-                            </span>
-                          </div>
-                          <span className="text-rose-600 font-semibold">{skill.status}</span>
-                        </div>
-
-                        {/* Progress Bar */}
-                        <div className="h-2 w-full rounded-full bg-zinc-100 border border-zinc-200/60 overflow-hidden relative">
-                          <div
-                            className={`h-full rounded-full ${config.barGradient} transition-all duration-700`}
-                            style={{ width: `${skill.level}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+                group={group}
+                config={config}
+                getCategoryIcon={getCategoryIcon}
+              />
             );
           })}
         </div>

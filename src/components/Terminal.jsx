@@ -10,9 +10,10 @@ export default function Terminal() {
   const [history, setHistory] = useState([
     { type: 'sys', text: 'SYSTEM KERNEL v4.19-ZEN INITIALIZED // STEVEGITXZ' },
     { type: 'sys', text: 'Conectado ao nó Rio Branco, AC (UTC-5).' },
-    { type: 'info', text: 'Digite "help" ou clique nos atalhos abaixo para interagir.' }
+    { type: 'info', text: 'Digite "help" ou clique nos atalhos ao lado para interagir.' }
   ]);
   const [matrixMode, setMatrixMode] = useState(false);
+  const [crtMode, setCrtMode] = useState(true);
 
   const terminalBodyRef = useRef(null);
   const inputRef = useRef(null);
@@ -27,13 +28,12 @@ export default function Terminal() {
     const raw = cmdText.trim();
     if (!raw) return;
 
-    sound.playTerminalKey();
+    sound.playMechanicalKey();
     achievementManager.unlock('terminal_hacker');
     const command = raw.toLowerCase();
 
     // Add command echo to history
     const newHistory = [...history, { type: 'cmd', text: `steve@ifac-node:~$ ${raw}` }];
-
 
     switch (command) {
       case 'help':
@@ -44,10 +44,14 @@ export default function Terminal() {
   • projects  - Lista o inventário de softwares e IoT
   • mariot    - Detalhes da publicação no CSBC 2025
   • skills    - Arsenal tecnológico e competências
+  • weather   - Telemetria meteorológica de Rio Branco (Amazônia)
+  • game      - Desafio interativo Cyber-Zen & Hacker
+  • sudo      - Solicitação de permissão de superusuário
+  • crt       - Alterna filtro visual de tubo CRT
+  • matrix    - Ativa/desativa chuva Matrix
   • contact   - Informações de contato e repositório
   • lattes    - Dados cadastrados no CNPq
   • zen       - Pensamento de equilíbrio Cyber-Zen
-  • matrix    - Ativa/desativa visual matrix
   • clear     - Limpa o buffer do terminal`
         });
         break;
@@ -86,6 +90,53 @@ Foco em sustentabilidade hídrica e monitoramento climático na Amazônia Ociden
 BACK-END: Node.js, Express, MySQL, REST APIs, Python
 HARDWARE/IoT: ESP8266, C++, Arduino IDE, Sensores e Relés
 DEVOPS/TOOLS: Git, GitHub, Vercel, Linux, VS Code`
+        });
+        break;
+
+      case 'weather':
+        newHistory.push({
+          type: 'res',
+          text: `[ESTAÇÃO METEOROLÓGICA // IFAC RIO BRANCO - AC]
+📍 COORDENADAS: 09°58'29"S 67°48'36"W (Amazônia Ocidental)
+🌡️ TEMPERATURA: 31.8 °C (Sensação Térmica: 36.2 °C)
+💧 UMIDADE RELATIVA: 82% (Microclima Úmido Equatorial)
+🌧️ PRECIPITAÇÃO: Probabilidade de pancadas tropicais vespertinas
+📡 HARDWARE NÓ 01: ESP8266 + Sensor DHT22 + Higrômetro Analógico [ONLINE]
+🌱 SISTEMA MARIOT: Solo hidratado (78%) - Válvulas de irrigação em stand-by.`
+        });
+        break;
+
+      case 'game':
+        newHistory.push({
+          type: 'res',
+          text: `[DESAFIO CYBER-ZEN // TESTE DE ARQUITETURA]
+Questão: Qual dos seguintes pinos do ESP-12F deve ser mantido em nível ALTO (HIGH) durante o boot normal?
+  [A] GPIO15
+  [B] GPIO0
+  [C] GPIO2
+  [D] ADC0
+
+💡 Dica de Hardware: Durante o boot, GPIO0 em HIGH entra no modo execução da memória Flash SPI!`
+        });
+        break;
+
+      case 'sudo':
+        sound.playAchievement();
+        newHistory.push({
+          type: 'res',
+          text: `[AUTH SUCCESSFUL] UID 0 (root) concedido para @stevegitxz.
+> Kernel: Linux neo-tokyo-ifac 6.8.0-zen-rt #1 PREEMPT_DYNAMIC
+> Status: Superusuário verificado com chave ed25519.
+> Privilégios: Acesso completo ao hardware embarcado e compilador web.
+"Na dúvida, 'sudo rm -rf /' nunca é a resposta correta."`
+        });
+        break;
+
+      case 'crt':
+        setCrtMode((prev) => !prev);
+        newHistory.push({
+          type: 'res',
+          text: `[!] Filtro de scanlines CRT ${!crtMode ? 'ATIVADO' : 'DESATIVADO'}.`
         });
         break;
 
@@ -142,19 +193,20 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
     if (e.key === 'Enter') {
       executeCommand(input);
     } else {
-      sound.playTerminalKey();
+      sound.playMechanicalKey();
     }
   };
 
   const commandList = [
     { cmd: 'help', desc: 'Lista geral de comandos' },
-    { cmd: 'bio', desc: 'Resumo acadêmico & CNPq' },
     { cmd: 'projects', desc: 'Inventário de projetos' },
     { cmd: 'mariot', desc: 'Artigo CSBC 2025' },
     { cmd: 'skills', desc: 'Pilha tecnológica' },
-    { cmd: 'contact', desc: 'E-mail e repositórios' },
-    { cmd: 'zen', desc: 'Filosofia Cyber-Zen' },
-    { cmd: 'matrix', desc: 'Alternar visual Matrix' },
+    { cmd: 'weather', desc: 'Telemetria Rio Branco' },
+    { cmd: 'game', desc: 'Desafio hacker de IoT' },
+    { cmd: 'sudo', desc: 'Modo superusuário root' },
+    { cmd: 'crt', desc: 'Alternar monitor CRT' },
+    { cmd: 'matrix', desc: 'Alternar chuva Matrix' },
     { cmd: 'clear', desc: 'Limpar console' },
   ];
 
@@ -185,7 +237,7 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Main Console Window (8 Columns) */}
           <div className="lg:col-span-8">
-            <div className={`rounded-3xl border ${matrixMode ? 'border-emerald-500/60 shadow-[0_0_40px_rgba(16,185,129,0.2)]' : 'border-zinc-300/90 shadow-2xl'} bg-[#0c0e14] overflow-hidden transition-all duration-300`}>
+            <div className={`rounded-3xl border ${matrixMode ? 'border-emerald-500/60 shadow-[0_0_40px_rgba(16,185,129,0.2)]' : 'border-zinc-300/90 shadow-2xl'} bg-[#0c0e14] overflow-hidden transition-all duration-300 ${crtMode ? 'crt-scanlines' : ''}`}>
               {/* Terminal Title Bar */}
               <div className="flex items-center justify-between px-5 py-3.5 bg-[#161922] border-b border-zinc-800">
                 <div className="flex items-center gap-2">
@@ -197,11 +249,25 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-400">
-                  <span>UTF-8</span>
+                <div className="flex items-center gap-2.5 text-[10px] font-mono text-zinc-400">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      sound.playClick();
+                      setCrtMode(!crtMode);
+                    }}
+                    className={`px-2 py-0.5 rounded text-[10px] font-mono border transition-all ${
+                      crtMode 
+                        ? 'bg-rose-500/20 text-rose-300 border-rose-500/40' 
+                        : 'bg-zinc-800 text-zinc-400 border-zinc-700 hover:text-white'
+                    }`}
+                    title="Alternar filtro retrô CRT Scanlines"
+                  >
+                    CRT: {crtMode ? 'ON' : 'OFF'}
+                  </button>
                   <span>•</span>
                   <span className={matrixMode ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
-                    {matrixMode ? 'MATRIX: ON' : 'CYBER-ZEN'}
+                    {matrixMode ? 'MATRIX' : 'CYBER-ZEN'}
                   </span>
                 </div>
               </div>
