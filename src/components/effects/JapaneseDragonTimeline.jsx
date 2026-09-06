@@ -16,9 +16,153 @@ function catmullRom(p0, p1, p2, p3, t) {
 }
 
 /**
- * High-Fidelity Japanese Imperial Dragon (Ryu / 龍) with Multi-Layer Z-Depth
+ * Draw Far Distant Mountain Summits (Shan Shui / Sansui-ga)
+ * Colossal misty mountain silhouettes rising in the far background
+ */
+function drawDistantMountainSummits(ctx, width, height) {
+  const peaks = [
+    { x: width * 0.12, peakY: height * 0.05, baseY: height * 0.40, w: width * 0.22 },
+    { x: width * 0.35, peakY: height * 0.11, baseY: height * 0.45, w: width * 0.24 },
+    { x: width * 0.65, peakY: height * 0.07, baseY: height * 0.48, w: width * 0.26 },
+    { x: width * 0.88, peakY: height * 0.04, baseY: height * 0.50, w: width * 0.20 },
+    { x: width * 0.50, peakY: height * 0.46, baseY: height * 0.80, w: width * 0.25 },
+    { x: width * 0.84, peakY: height * 0.60, baseY: height * 0.96, w: width * 0.22 },
+  ];
+
+  peaks.forEach((pk) => {
+    const grad = ctx.createLinearGradient(0, pk.peakY, 0, pk.baseY);
+    grad.addColorStop(0, 'rgba(148, 163, 184, 0.22)');
+    grad.addColorStop(0.4, 'rgba(203, 213, 225, 0.12)');
+    grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(pk.x, pk.peakY);
+    ctx.quadraticCurveTo(pk.x - pk.w * 0.3, pk.peakY + (pk.baseY - pk.peakY) * 0.45, pk.x - pk.w * 0.5, pk.baseY);
+    ctx.lineTo(pk.x + pk.w * 0.5, pk.baseY);
+    ctx.quadraticCurveTo(pk.x + pk.w * 0.3, pk.peakY + (pk.baseY - pk.peakY) * 0.45, pk.x, pk.peakY);
+    ctx.closePath();
+    ctx.fill();
+  });
+}
+
+/**
+ * Draw Midground Cinematic Karst Pinnacles with Rocky Crags & Cliffside Pines (Matsu)
+ * Steep, dramatic spires piercing through the sea of clouds (Huangshan / Zhangjiajie aesthetic)
+ */
+function drawKarstPinnacles(ctx, width, height, time) {
+  const pinnacles = [
+    { x: width * 0.08, peakY: height * 0.14, baseY: height * 0.55, w: width * 0.10, pines: [0.35, 0.50] },
+    { x: width * 0.22, peakY: height * 0.21, baseY: height * 0.50, w: width * 0.085, pines: [0.38] },
+    { x: width * 0.48, peakY: height * 0.25, baseY: height * 0.62, w: width * 0.09, pines: [0.42] },
+    { x: width * 0.80, peakY: height * 0.15, baseY: height * 0.56, w: width * 0.11, pines: [0.32, 0.48] },
+    { x: width * 0.94, peakY: height * 0.11, baseY: height * 0.58, w: width * 0.085, pines: [0.40] },
+    { x: width * 0.36, peakY: height * 0.58, baseY: height * 0.90, w: width * 0.095, pines: [0.72] },
+    { x: width * 0.86, peakY: height * 0.68, baseY: height * 0.98, w: width * 0.11, pines: [0.82] },
+    { x: width * 0.11, peakY: height * 0.66, baseY: height * 0.98, w: width * 0.10, pines: [0.80] },
+  ];
+
+  pinnacles.forEach((pin) => {
+    const { x, peakY, baseY, w: pW, pines } = pin;
+    const h = baseY - peakY;
+    const leftX = x - pW * 0.5;
+    const rightX = x + pW * 0.5;
+    const crestX = x - pW * 0.08;
+
+    // 1. Left Shadow Facet (Deep Indigo-Slate Ink)
+    const shadowGrad = ctx.createLinearGradient(0, peakY, 0, baseY);
+    shadowGrad.addColorStop(0, 'rgba(51, 65, 85, 0.32)');
+    shadowGrad.addColorStop(0.35, 'rgba(71, 85, 105, 0.24)');
+    shadowGrad.addColorStop(0.7, 'rgba(100, 116, 139, 0.12)');
+    shadowGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+    ctx.fillStyle = shadowGrad;
+    ctx.beginPath();
+    ctx.moveTo(x, peakY);
+    ctx.lineTo(leftX + pW * 0.25, peakY + h * 0.18);
+    ctx.lineTo(leftX + pW * 0.15, peakY + h * 0.35);
+    ctx.lineTo(leftX + pW * 0.05, peakY + h * 0.58);
+    ctx.lineTo(leftX, baseY);
+    ctx.lineTo(crestX, baseY);
+    ctx.lineTo(x, peakY);
+    ctx.closePath();
+    ctx.fill();
+
+    // 2. Right Sunlit Facet (Soft Washi Wash)
+    const sunGrad = ctx.createLinearGradient(0, peakY, 0, baseY);
+    sunGrad.addColorStop(0, 'rgba(148, 163, 184, 0.22)');
+    sunGrad.addColorStop(0.4, 'rgba(203, 213, 225, 0.14)');
+    sunGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+    ctx.fillStyle = sunGrad;
+    ctx.beginPath();
+    ctx.moveTo(x, peakY);
+    ctx.lineTo(rightX - pW * 0.20, peakY + h * 0.22);
+    ctx.lineTo(rightX - pW * 0.10, peakY + h * 0.42);
+    ctx.lineTo(rightX, peakY + h * 0.65);
+    ctx.lineTo(rightX - pW * 0.05, baseY);
+    ctx.lineTo(crestX, baseY);
+    ctx.lineTo(x, peakY);
+    ctx.closePath();
+    ctx.fill();
+
+    // 3. Central Ridge Spine (Calligraphic Ink Stroke)
+    ctx.strokeStyle = 'rgba(30, 41, 59, 0.32)';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    ctx.moveTo(x, peakY);
+    ctx.lineTo(crestX - 2, peakY + h * 0.32);
+    ctx.lineTo(crestX + 2, peakY + h * 0.62);
+    ctx.lineTo(crestX, baseY);
+    ctx.stroke();
+
+    // 4. Horizontal Geological Strata Fractures
+    ctx.strokeStyle = 'rgba(51, 65, 85, 0.22)';
+    ctx.lineWidth = 1.0;
+    for (let s = 1; s <= 3; s++) {
+      const sY = peakY + h * (s * 0.22);
+      ctx.beginPath();
+      ctx.moveTo(x - pW * 0.32, sY);
+      ctx.lineTo(x + pW * 0.28, sY + 3);
+      ctx.stroke();
+    }
+
+    // 5. Cliffside Pine Trees (Matsu)
+    pines.forEach((fraction, pIdx) => {
+      const pineY = peakY + h * fraction;
+      const isLeft = pIdx % 2 === 0;
+      const trunkStart = isLeft ? x - pW * 0.32 : x + pW * 0.28;
+      const dir = isLeft ? -1 : 1;
+      const trunkEnd = trunkStart + dir * 18;
+
+      // Gnarled Wooden Trunk
+      ctx.strokeStyle = 'rgba(30, 41, 59, 0.48)';
+      ctx.lineWidth = 2.0;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(trunkStart, pineY);
+      ctx.quadraticCurveTo(trunkStart + dir * 8, pineY - 4, trunkEnd, pineY - 2);
+      ctx.stroke();
+
+      // Dense Pine Needle Foliage Tufts
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.40)';
+      ctx.beginPath();
+      ctx.ellipse(trunkEnd, pineY - 3, 7.5, 3.2, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(6, 78, 59, 0.38)'; // Deep Jade accent
+      ctx.beginPath();
+      ctx.ellipse(trunkEnd + dir * 4, pineY - 5, 5.5, 2.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  });
+}
+
+/**
+ * High-Fidelity Japanese Imperial Dragon (Ryu / 龍) with Multi-Layer Z-Depth & Cinematic Mountains
  * - 2-Canvas Stacking Architecture:
- *   1. Background Canvas (z-0): Deep atmospheric Kasumi fog rivers and submerged dragon segments behind cards (z-10).
+ *   1. Background Canvas (z-0): Majestic jagged karst peaks (Sansui / 山水), deep rolling Kasumi fog rivers,
+ *      and submerged dragon segments behind cards (z-10).
  *   2. Foreground Canvas (z-20): Surfaced dragon segments, glowing amber eyes, golden whiskers,
  *      razor claws and mist soaring DIRECTLY OVER the cards with physical drop-shadow.
  * - Periodic Surfacing: Weaves in and out of the card layer dynamically and organically ("de vez em quando").
@@ -343,6 +487,15 @@ export default function JapaneseDragonTimeline({
 
       bgCtx.globalAlpha = opacity;
       fgCtx.globalAlpha = opacity;
+
+      // ====================================================
+      // LAYER 0: CINEMATIC JAGGED MOUNTAIN PINNACLES (SANSUI / 山水)
+      // Dramatic karst spires piercing through rolling sea of clouds
+      // ====================================================
+      bgCtx.save();
+      drawDistantMountainSummits(bgCtx, width, height);
+      drawKarstPinnacles(bgCtx, width, height, time);
+      bgCtx.restore();
 
       // ====================================================
       // LAYER 1: ATMOSPHERIC ROLLING KASUMI FOG BANKS (Always Background)
@@ -1185,7 +1338,7 @@ export default function JapaneseDragonTimeline({
       className="pointer-events-none absolute inset-0 w-full h-full select-none"
       aria-hidden="true"
     >
-      {/* Background Canvas: renders Kasumi fog and submerged dragon segments behind cards (z-0) */}
+      {/* Background Canvas: renders cinematic karst mountain pinnacles, Kasumi fog & submerged dragon behind cards (z-0) */}
       <canvas
         ref={bgCanvasRef}
         className="pointer-events-none absolute inset-0 z-0 w-full h-full block"
