@@ -3,6 +3,7 @@ import { Layout, Server, Cpu, Terminal, CheckCircle2, ShieldCheck, Zap } from 'l
 import { ARSENAL_SKILLS } from '../utils/data';
 import { sound } from '../utils/sound';
 import CircuitTraces from './effects/CircuitTraces';
+import Esp8266Canvas3D from './3d/Esp8266Canvas3D';
 
 // Interactive ESP8266 MCU Microchip Component
 function Esp8266McuCore({ hoveredCategory }) {
@@ -40,81 +41,9 @@ function Esp8266McuCore({ hoveredCategory }) {
           </div>
         </div>
 
-        {/* Center: ESP8266 Physical Module Mockup */}
-        <div 
-          onClick={handleMcuClick}
-          onMouseEnter={() => sound.playHover()}
-          title="Clique para alternar clock / simular pulso de telemetria"
-          className="relative cursor-pointer select-none py-2 px-3 rounded-2xl bg-zinc-900 shadow-xl border border-zinc-700/80 transition-all duration-300 hover:scale-[1.03] active:scale-95"
-        >
-          {/* PCB Board Carrier */}
-          <div className="w-56 sm:w-64 bg-[#0e171e] rounded-xl p-4 border border-zinc-800 relative flex flex-col items-center">
-            {/* Serpentine PCB Antenna Pattern */}
-            <div className="w-full h-8 border-b border-zinc-700/70 mb-3 flex items-center justify-center gap-1.5 opacity-80">
-              <div className="h-4 w-1 bg-amber-400/90 rounded-xs"></div>
-              <div className="h-4 w-1.5 bg-amber-400/90 rounded-xs"></div>
-              <div className="h-4 w-3 border-t-2 border-r-2 border-amber-400/90"></div>
-              <div className="h-4 w-3 border-b-2 border-l-2 border-amber-400/90"></div>
-              <div className="h-4 w-3 border-t-2 border-r-2 border-amber-400/90"></div>
-              <div className="h-4 w-1 bg-amber-400/90 rounded-xs"></div>
-              <span className="text-[8px] font-mono text-amber-300/80 uppercase ml-2 tracking-widest">2.4GHz ANT</span>
-            </div>
-
-            {/* Left and Right Golden Castellated Solder Pads */}
-            <div className="absolute left-0 top-14 bottom-6 flex flex-col justify-between -translate-x-1/2">
-              {['RST', 'ADC', 'CH_PD', 'GPIO16', 'GPIO14', 'GPIO12', 'VCC'].map((p, i) => (
-                <div key={i} className="flex items-center gap-1">
-                  <div className="w-2.5 h-1.5 bg-amber-400 rounded-sm border border-amber-500 shadow-2xs"></div>
-                  <span className="text-[7px] font-mono text-zinc-500 -mr-1 hidden sm:inline">{p}</span>
-                </div>
-              ))}
-            </div>
-            <div className="absolute right-0 top-14 bottom-6 flex flex-col justify-between translate-x-1/2 items-end">
-              {['TXD', 'RXD', 'GPIO5', 'GPIO4', 'GPIO0', 'GPIO2', 'GND'].map((p, i) => (
-                <div key={i} className="flex items-center gap-1">
-                  <span className="text-[7px] font-mono text-zinc-500 -ml-1 hidden sm:inline">{p}</span>
-                  <div className="w-2.5 h-1.5 bg-amber-400 rounded-sm border border-amber-500 shadow-2xs"></div>
-                </div>
-              ))}
-            </div>
-
-            {/* Metallic RF Shield Casing */}
-            <div className="w-full bg-gradient-to-b from-zinc-200 via-zinc-300 to-zinc-400 rounded-lg p-3 text-zinc-900 shadow-inner border border-zinc-400/90 space-y-1 text-center">
-              <div className="flex items-center justify-between pb-1 border-b border-zinc-400/60">
-                <span className="text-[9px] font-mono font-black tracking-wider text-zinc-800">MODEL: ESP-12F</span>
-                <div className="flex items-center gap-1">
-                  <span className={`w-2 h-2 rounded-full ${boosted ? 'bg-rose-500 animate-ping' : 'bg-emerald-500 animate-pulse'}`}></span>
-                  <span className="text-[8px] font-mono font-bold text-zinc-700">{boosted ? '160M' : '80M'}</span>
-                </div>
-              </div>
-
-              <div className="py-2">
-                <div className="text-[11px] font-mono font-black tracking-widest text-zinc-900">
-                  ESP8266MOD
-                </div>
-                <div className="text-[8px] font-mono text-zinc-700 tracking-wider">
-                  XTENSA® 32-BIT LX106
-                </div>
-                <div className="text-[7px] font-mono text-zinc-600">
-                  VENDOR: IFAC LAB / SOL SBC
-                </div>
-              </div>
-
-              {/* Status LEDs & Micro traces */}
-              <div className="flex items-center justify-between pt-1 border-t border-zinc-400/60 text-[8px] font-mono">
-                <span className="flex items-center gap-1 text-zinc-800">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                  TX/RX
-                </span>
-                <span className="text-zinc-600 font-semibold">FCC ID: 2AHMR-ESP12F</span>
-              </div>
-            </div>
-
-            {/* Instruction Tip */}
-            <span className="text-[9px] font-mono text-zinc-500 mt-2.5 group-hover:text-emerald-400 transition-colors">
-              [ ⚡ CLIQUE PARA PULSAR ]
-            </span>
-          </div>
+        {/* Center: Real-Time Interactive 3D ESP8266 Module (Three.js / WebGL) */}
+        <div className="w-full max-w-sm lg:max-w-md flex items-center justify-center">
+          <Esp8266Canvas3D boosted={boosted} onToggleBoost={handleMcuClick} />
         </div>
 
         {/* Right Feature Highlights */}
