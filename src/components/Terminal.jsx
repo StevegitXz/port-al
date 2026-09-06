@@ -3,8 +3,7 @@ import { Terminal as TerminalIcon, Sparkles, Send, CornerDownLeft, RefreshCw, Bo
 import { PERSONAL_INFO, PROJECTS } from '../utils/data';
 import { sound } from '../utils/sound';
 import { achievementManager } from '../utils/achievements';
-import RetroCrtMonitor3D from './3d/RetroCrtMonitor3D';
-import RetroKeyboard3D from './3d/RetroKeyboard3D';
+import RetroWorkstation3D from './3d/RetroWorkstation3D';
 
 export default function Terminal() {
   const [input, setInput] = useState('');
@@ -210,7 +209,7 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
       <div className="pointer-events-none absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-rose-200/25 blur-[150px] rounded-full"></div>
       <div className="pointer-events-none absolute bottom-10 right-1/4 w-[400px] h-[400px] bg-emerald-200/20 blur-[140px] rounded-full"></div>
 
-      <div className="max-w-7xl mx-auto">
+      <div className="w-full max-w-[1850px] mx-auto px-2 sm:px-6 lg:px-10 xl:px-14">
         {/* Header (Centered) */}
         <div className="flex flex-col items-center text-center mb-10">
           <div className="flex items-center gap-2 text-xs font-mono text-rose-600 tracking-widest uppercase mb-2 font-semibold">
@@ -279,34 +278,25 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
           </div>
         </div>
 
-        {/* Center Stage: 3D Workstation (Left = 3D Monitor + Keyboard at 30°; Right = Command Hub) OR Classic Window */}
+        {/* Center Stage: 3D Workstation (Left = Unified Boundless 3D Monitor + Keyboard at 30°; Right = Command Hub) OR Classic Window */}
         <div className="w-full">
           {viewMode === '3d' ? (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-              {/* LADO ESQUERDO: Estação Retrô 3D (Monitor CRT + Teclado Mecânico angulados em 30°) */}
-              <div className="w-full lg:col-span-7 flex flex-col items-center">
-                {/* 1. RETRO CRT BOX COMPUTER (O MONITOR DE CAIXA RETRÔ A 30°) */}
-                <RetroCrtMonitor3D
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-10 items-center">
+              {/* LADO ESQUERDO: Estação Retrô 3D Livre e Unificada (Monitor CRT + Teclado Mecânico angulados a ~27°) */}
+              <div className="w-full lg:col-span-7 xl:col-span-8 flex items-center justify-center">
+                <RetroWorkstation3D
                   history={history}
-                  input={input}
-                  matrixMode={matrixMode}
-                  defaultRotationY={0.48}
-                />
-
-                {/* 2. DEDICATED MECHANICAL KEYBOARD (100% VISIBLE KEYS & PHYSICAL CONTRACTION A 30°) */}
-                <RetroKeyboard3D
-                  keyboardRef={keyboardRef}
                   input={input}
                   setInput={setInput}
                   onExecuteCommand={executeCommand}
                   matrixMode={matrixMode}
-                  showInternalInput={false}
-                  defaultRotationY={0.48}
+                  keyboardRef={keyboardRef}
+                  defaultRotationY={0.46}
                 />
               </div>
 
               {/* LADO DIREITO: Hub de Controle, Digitação & Dicas de Comando */}
-              <div className="w-full lg:col-span-5 flex flex-col gap-5 pt-1">
+              <div className="w-full lg:col-span-5 xl:col-span-4 flex flex-col gap-5 pt-1">
                 {/* 1. Card de Entrada de Comandos (Prompt Principal) */}
                 <div className="p-5 sm:p-6 rounded-3xl bg-white/95 backdrop-blur-xl border border-zinc-200/90 shadow-xl transition-all">
                   <div className="flex items-center justify-between pb-3 mb-3 border-b border-zinc-100">
