@@ -3,63 +3,170 @@ import { Layout, Server, Cpu, Terminal, CheckCircle2, ShieldCheck, Zap } from 'l
 import { ARSENAL_SKILLS } from '../utils/data';
 import { sound } from '../utils/sound';
 import CircuitTraces from './effects/CircuitTraces';
-import Esp8266Canvas3D from './3d/Esp8266Canvas3D';
+import TechArtifactsCanvas3D from './3d/TechArtifactsCanvas3D';
 
-// Interactive ESP8266 MCU Microchip Component
-function Esp8266McuCore({ hoveredCategory }) {
+const ARTIFACT_TABS = [
+  { id: 'iot', label: 'IoT // ESP8266', icon: '⚡' },
+  { id: 'frontend', label: 'Front-End // React', icon: '⚛️' },
+  { id: 'backend', label: 'Back-End // SQL', icon: '🗄️' },
+  { id: 'devops', label: 'DevOps // Git', icon: '🐙' }
+];
+
+const ARTIFACT_DATA = {
+  iot: {
+    tag: 'HARDWARE EMBARCADO ATIVO',
+    tagColor: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+    title: 'Núcleo de Controle SoC ESP8266',
+    desc: 'Microcontrolador 32-bit Xtensa LX106 com Wi-Fi nativo 802.11 b/g/n, operando sensores de umidade, temperatura e acionamento de atuadores no projeto MARIOT.',
+    stat1Label: 'CLOCK',
+    stat1Val: (boosted) => (boosted ? '160 MHz (BOOST)' : '80 MHz'),
+    stat2Label: 'PACOTES',
+    stat2Val: (count) => `${count} TX/RX`,
+    highlights: [
+      { tag: '// FIRMWARE & PROTOCOLO', val: 'C++ / Arduino IDE / HTTP REST' },
+      { tag: '// SENSORES & ATUADORES', val: 'Módulo Relé, DHT22, Higrômetro' },
+      { tag: '// PUBLICAÇÃO CIENTÍFICA', val: 'Artigo Aceito no CSBC / WCAMA 2025' }
+    ]
+  },
+  frontend: {
+    tag: 'REATOR REATIVO // UI VIRTUAL DOM',
+    tagColor: 'bg-sky-50 border-sky-200 text-sky-800',
+    title: 'Átomo Reativo React 19 & UI',
+    desc: 'Arquitetura baseada em componentes funcionais puros, reconciliação ágil de Virtual DOM, estilização com Tailwind CSS e computação gráfica em Three.js.',
+    stat1Label: 'TAXA DE QUADROS',
+    stat1Val: (boosted) => (boosted ? '120 FPS (TURBO)' : '60 FPS (V-SYNC)'),
+    stat2Label: 'SISTEMA DE DESIGN',
+    stat2Val: () => 'Cyber-Zen Minimalist',
+    highlights: [
+      { tag: '// CORE FRAMEWORK', val: 'React 19 + Vite + Modern ES6' },
+      { tag: '// DESIGN & ESTILOS', val: 'Tailwind CSS v4 + Glassmorphism' },
+      { tag: '// GRÁFICOS & ÁUDIO', val: 'Three.js WebGL + Web Audio API' }
+    ]
+  },
+  backend: {
+    tag: 'MOTOR RELACIONAL // REST APIS',
+    tagColor: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+    title: 'Servidor SQL & Arquitetura de Dados',
+    desc: 'Modelagem relacional de alta integridade, APIs RESTful padronizadas em Node.js/Express, conformidade estrita com transações ACID e persistência em banco relacional.',
+    stat1Label: 'LATÊNCIA QUERY',
+    stat1Val: (boosted) => (boosted ? '0.12 ms (CACHE HIT)' : '0.38 ms (INDEXED)'),
+    stat2Label: 'CONFIABILIDADE',
+    stat2Val: () => 'ACID COMPLIANT',
+    highlights: [
+      { tag: '// RUNTIME & SERVIDOR', val: 'Node.js + Express + TypeScript' },
+      { tag: '// BANCOS DE DADOS', val: 'MySQL Relacional & PostgreSQL' },
+      { tag: '// SEGURANÇA & REGRAS', val: 'JWT Auth + Sanitização de Queries' }
+    ]
+  },
+  devops: {
+    tag: 'PIPELINE CI/CD // VERSIONAMENTO',
+    tagColor: 'bg-rose-50 border-rose-200 text-rose-800',
+    title: 'Grafo Git & Orquestração de Deploy',
+    desc: 'Versionamento semântico de código com Git Flow, pipelines automatizados de compilação, testes no GitHub Actions e entrega contínua na Vercel Edge Network.',
+    stat1Label: 'PIPELINE STATUS',
+    stat1Val: () => 'PASSING (0 ERRORS)',
+    stat2Label: 'BRANCH ATIVO',
+    stat2Val: (boosted) => (boosted ? 'main (DEPLOYED)' : 'main (SYNCED)'),
+    highlights: [
+      { tag: '// CONTROLE DE VERSÃO', val: 'Git + Semantic Commit History' },
+      { tag: '// CLOUD DEPLOY', val: 'Vercel Serverless Edge Global' },
+      { tag: '// SISTEMA OPERACIONAL', val: 'Linux Terminal / Bash Shell' }
+    ]
+  }
+};
+
+// Interactive 3D Technology Showcase Component
+function TechArtifactsShowcase({ activeArtifact, setActiveArtifact }) {
   const [boosted, setBoosted] = React.useState(false);
   const [packetCount, setPacketCount] = React.useState(1048);
 
-  const handleMcuClick = () => {
-    sound.playRelayClick(!boosted);
-    setBoosted((prev) => !prev);
-    setPacketCount((prev) => prev + Math.floor(Math.random() * 24 + 1));
+  const handleArtifactInteract = (type) => {
+    if (type === 'iot') {
+      sound.playRelayClick(!boosted);
+      setBoosted((prev) => !prev);
+      setPacketCount((prev) => prev + Math.floor(Math.random() * 24 + 1));
+    } else if (type === 'frontend') {
+      sound.playSelect();
+      setBoosted((prev) => !prev);
+    } else if (type === 'backend') {
+      sound.playMechanicalKey();
+      setBoosted((prev) => !prev);
+    } else if (type === 'devops') {
+      sound.playSuccess();
+      setBoosted((prev) => !prev);
+    }
   };
+
+  const currentData = ARTIFACT_DATA[activeArtifact] || ARTIFACT_DATA.iot;
 
   return (
     <div className="mb-20 relative">
-      {/* Background ambient PCB glow */}
+      {/* Background ambient glow */}
       <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[380px] bg-emerald-400/10 blur-[130px] rounded-full"></div>
+
+      {/* Modern Pill Tab Selector */}
+      <div className="flex flex-wrap items-center justify-center gap-2 mb-10 relative z-20">
+        {ARTIFACT_TABS.map((tab) => {
+          const isActive = activeArtifact === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => {
+                sound.playClick();
+                setActiveArtifact(tab.id);
+              }}
+              onMouseEnter={() => sound.playHover()}
+              className={`px-4 py-2 rounded-full font-mono text-xs transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+                isActive
+                  ? 'bg-zinc-950 text-white shadow-md scale-105 border border-zinc-800'
+                  : 'bg-white/80 border border-zinc-200 text-zinc-600 hover:text-zinc-950 hover:border-zinc-300 backdrop-blur-sm shadow-2xs'
+              }`}
+            >
+              <span>{tab.icon}</span>
+              <span className="font-bold">{tab.label}</span>
+            </button>
+          );
+        })}
+      </div>
 
       <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 relative z-10">
         {/* Left Telemetry Info */}
         <div className="space-y-3.5 text-left max-w-sm shrink-0">
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[10px] font-mono font-bold text-emerald-800">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-            <span>HARDWARE EMBARCADO ATIVO</span>
+          <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full border text-[10px] font-mono font-bold ${currentData.tagColor}`}>
+            <span className="w-2 h-2 rounded-full bg-current animate-ping"></span>
+            <span>{currentData.tag}</span>
           </div>
           <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-zinc-950 font-['Space_Grotesk'] tracking-tight">
-            Núcleo de Controle SoC ESP8266
+            {currentData.title}
           </h3>
           <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
-            Microcontrolador 32-bit Xtensa LX106 com Wi-Fi nativo 802.11 b/g/n, operando sensores de umidade, temperatura e acionamento de atuadores no projeto MARIOT.
+            {currentData.desc}
           </p>
           <div className="flex items-center gap-3 pt-2 font-mono text-xs text-zinc-500">
-            <span>CLOCK: <strong className={boosted ? 'text-rose-600 font-bold' : 'text-zinc-900'}>{boosted ? '160 MHz (BOOST)' : '80 MHz'}</strong></span>
+            <span>{currentData.stat1Label}: <strong className={boosted ? 'text-rose-600 font-bold' : 'text-zinc-900'}>{currentData.stat1Val(boosted)}</strong></span>
             <span>•</span>
-            <span>PACOTES: <strong className="text-emerald-700 font-bold">{packetCount}</strong></span>
+            <span>{currentData.stat2Label}: <strong className="text-emerald-700 font-bold">{currentData.stat2Val(packetCount)}</strong></span>
           </div>
         </div>
 
-        {/* Center: Real-Time Interactive 3D ESP8266 Module directly on the screen (Three.js / WebGL) */}
+        {/* Center: Real-Time Interactive 3D Artifact directly on the screen (Three.js / WebGL) */}
         <div className="w-full max-w-md lg:max-w-lg flex items-center justify-center">
-          <Esp8266Canvas3D boosted={boosted} onToggleBoost={handleMcuClick} />
+          <TechArtifactsCanvas3D
+            activeArtifact={activeArtifact}
+            boosted={boosted}
+            onInteract={handleArtifactInteract}
+          />
         </div>
 
         {/* Right Feature Highlights */}
         <div className="space-y-3 text-left max-w-xs shrink-0 font-mono text-xs text-zinc-700">
-          <div className="p-3 rounded-2xl bg-white/90 border border-zinc-200/80 shadow-2xs backdrop-blur-sm">
-            <span className="text-[10px] text-zinc-500 uppercase block font-semibold mb-0.5">// FIRMWARE & PROTOCOLO</span>
-            <span className="font-bold text-zinc-900">C++ / Arduino IDE / HTTP REST</span>
-          </div>
-          <div className="p-3 rounded-2xl bg-white/90 border border-zinc-200/80 shadow-2xs backdrop-blur-sm">
-            <span className="text-[10px] text-zinc-500 uppercase block font-semibold mb-0.5">// SENSORES & ATUADORES</span>
-            <span className="font-bold text-zinc-900">Módulo Relé, DHT22, Higrômetro</span>
-          </div>
-          <div className="p-3 rounded-2xl bg-white/90 border border-zinc-200/80 shadow-2xs backdrop-blur-sm">
-            <span className="text-[10px] text-zinc-500 uppercase block font-semibold mb-0.5">// PUBLICAÇÃO CIENTÍFICA</span>
-            <span className="font-bold text-emerald-700">Artigo Aceito no CSBC / WCAMA 2025</span>
-          </div>
+          {currentData.highlights.map((h, i) => (
+            <div key={i} className="p-3 rounded-2xl bg-white/90 border border-zinc-200/80 shadow-2xs backdrop-blur-sm">
+              <span className="text-[10px] text-zinc-500 uppercase block font-semibold mb-0.5">{h.tag}</span>
+              <span className="font-bold text-zinc-900">{h.val}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -67,7 +174,7 @@ function Esp8266McuCore({ hoveredCategory }) {
 }
 
 // 3D Perspective Tilt Card for Arsenal Skills
-function ArsenalMatrixCard({ group, config, getCategoryIcon }) {
+function ArsenalMatrixCard({ group, config, getCategoryIcon, isActive, onSelectCategory }) {
   const [tilt, setTilt] = React.useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = React.useState(false);
 
@@ -88,6 +195,7 @@ function ArsenalMatrixCard({ group, config, getCategoryIcon }) {
 
   return (
     <div
+      onClick={onSelectCategory}
       onMouseEnter={() => {
         sound.playHover();
         setIsHovered(true);
@@ -100,7 +208,11 @@ function ArsenalMatrixCard({ group, config, getCategoryIcon }) {
           : undefined,
         transition: isHovered ? 'transform 80ms ease-out' : 'transform 400ms ease-out',
       }}
-      className={`group relative rounded-3xl glass-panel bg-white/95 p-7 sm:p-8 border border-zinc-200/80 hover:border-rose-300 shadow-xs hover:shadow-2xl transition-all duration-300 overflow-hidden will-change-transform ${config.colSpan} ${config.offset}`}
+      className={`group relative rounded-3xl glass-panel bg-white/95 p-7 sm:p-8 border transition-all duration-300 overflow-hidden will-change-transform cursor-pointer ${
+        isActive
+          ? 'border-rose-400 ring-2 ring-rose-300/40 shadow-xl'
+          : 'border-zinc-200/80 hover:border-rose-300 shadow-xs hover:shadow-2xl'
+      } ${config.colSpan} ${config.offset}`}
     >
       {/* Soft ambient corner glow on hover */}
       <div className={`pointer-events-none absolute -top-16 -right-16 w-48 h-48 ${config.glow} rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500`}></div>
@@ -169,6 +281,15 @@ function ArsenalMatrixCard({ group, config, getCategoryIcon }) {
 }
 
 export default function Arsenal() {
+  const [activeArtifact, setActiveArtifact] = React.useState('iot');
+
+  const categoryToArtifact = {
+    'Front-End & Creative': 'frontend',
+    'Hardware, IoT & Firmware': 'iot',
+    'Back-End & Banco de Dados': 'backend',
+    'Ambiente, DevOps & Práticas': 'devops',
+  };
+
   const getCategoryIcon = (category) => {
     switch (category) {
       case 'Front-End & Creative':
@@ -240,13 +361,18 @@ export default function Arsenal() {
           </p>
         </div>
 
-        {/* Central Interactive ESP8266 MCU Microchip */}
-        <Esp8266McuCore />
+        {/* Central Real-Time Interactive 3D Stack Showcase (Three.js / WebGL) */}
+        <TechArtifactsShowcase
+          activeArtifact={activeArtifact}
+          setActiveArtifact={setActiveArtifact}
+        />
 
         {/* 4 Pillars Bento-Editorial Matrix Grid with 3D Tilt Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-16">
           {ARSENAL_SKILLS.map((group, groupIdx) => {
             const config = configs[groupIdx] || configs[0];
+            const artifactId = categoryToArtifact[group.category] || 'iot';
+            const isActive = activeArtifact === artifactId;
 
             return (
               <ArsenalMatrixCard
@@ -254,6 +380,11 @@ export default function Arsenal() {
                 group={group}
                 config={config}
                 getCategoryIcon={getCategoryIcon}
+                isActive={isActive}
+                onSelectCategory={() => {
+                  sound.playSelect();
+                  setActiveArtifact(artifactId);
+                }}
               />
             );
           })}
