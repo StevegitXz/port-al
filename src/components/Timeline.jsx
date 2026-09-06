@@ -3,6 +3,7 @@ import { Calendar, Award, BookOpen, GraduationCap, Sparkles, CheckCircle2, Chevr
 import { TIMELINE, PERSONAL_INFO } from '../utils/data';
 import { sound } from '../utils/sound';
 import SakuraTreeTimeline from './SakuraTreeTimeline';
+import JapaneseDragonTimeline from './effects/JapaneseDragonTimeline';
 
 // 3D Perspective Tilt Card for Academic Records
 function TimelineRecordCard({ item, idx, isFullWidth = false }) {
@@ -103,7 +104,7 @@ function TimelineRecordCard({ item, idx, isFullWidth = false }) {
           : undefined,
         transition: isHovered ? 'transform 80ms ease-out' : 'transform 400ms ease-out',
       }}
-      className={`group relative rounded-3xl glass-panel bg-white/95 p-7 sm:p-8 border border-zinc-200/80 ${theme.borderHover} shadow-xs hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col justify-between will-change-transform ${
+      className={`group relative z-10 rounded-3xl glass-panel bg-white/95 p-7 sm:p-8 border border-zinc-200/80 ${theme.borderHover} shadow-xs hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col justify-between will-change-transform ${
         isFullWidth ? 'md:col-span-2' : ''
       }`}
     >
@@ -247,13 +248,21 @@ export default function Timeline() {
       </div>
 
       {/* 2. REORGANIZED & BALANCED EDITORIAL DOSSIER SECTION */}
-      <div className="max-w-6xl mx-auto px-4 py-20">
+      <div className="relative max-w-6xl mx-auto px-4 py-20 overflow-hidden sm:overflow-visible">
+        {/* Japanese Dragon (Ryu / 龍) in Sumi-e ink slithering dynamically along all cards */}
+        <JapaneseDragonTimeline opacity={0.85} />
+
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 pb-6 border-b border-zinc-200/80">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 pb-6 border-b border-zinc-200/80">
           <div>
             <div className="flex items-center gap-2 text-xs font-mono text-rose-600 tracking-widest uppercase mb-2 font-semibold">
               <span className="inline-block w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
               <span>// 04. DOSSIÊ ACADÊMICO & CIENTÍFICO</span>
+              <span className="text-zinc-300 hidden sm:inline">•</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 border border-rose-200 text-rose-700 font-bold hidden sm:inline-flex items-center gap-1">
+                <span>🐉</span>
+                <span>ESPÍRITO RYU</span>
+              </span>
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase text-zinc-950 font-['Space_Grotesk'] tracking-tight">
               Registros Oficiais & Produção
@@ -301,7 +310,7 @@ export default function Timeline() {
         </div>
 
         {/* Lattes & CNPq Metadata Card */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="relative z-10 p-4 sm:p-5 rounded-2xl bg-white border border-zinc-200/80 shadow-2xs mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 shrink-0">
               <ShieldCheck className="w-5 h-5" />
@@ -338,7 +347,7 @@ export default function Timeline() {
         {featuredItem && (
           <div
             onMouseEnter={() => sound.playHover()}
-            className="group relative rounded-3xl glass-panel bg-white/95 border-2 border-amber-300/90 hover:border-amber-400 p-8 sm:p-10 shadow-md hover:shadow-2xl transition-all duration-300 mb-8 overflow-hidden will-change-transform"
+            className="group relative z-10 rounded-3xl glass-panel bg-white/95 border-2 border-amber-300/90 hover:border-amber-400 p-8 sm:p-10 shadow-md hover:shadow-2xl transition-all duration-300 mb-8 overflow-hidden will-change-transform"
           >
             {/* Ambient golden glow */}
             <div className="pointer-events-none absolute -top-20 -right-20 w-64 h-64 bg-amber-200/35 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-500"></div>
@@ -425,7 +434,7 @@ export default function Timeline() {
         )}
 
         {/* HARMONIOUS 2-COLUMN GRID FOR ALL REMAINING RECORDS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
           {gridItems.map((item, index) => {
             const actualIndex = TIMELINE.findIndex((t) => t.title === item.title);
             const isLastOdd = gridItems.length % 2 !== 0 && index === gridItems.length - 1;
