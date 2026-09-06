@@ -279,7 +279,7 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
         {/* Center Stage: 3D Workstation (No Delimiting Cards) OR Classic Window */}
         <div className="w-full max-w-5xl mx-auto flex flex-col items-center">
           {viewMode === '3d' ? (
-            <div className="w-full flex flex-col items-center -space-y-4 sm:-space-y-6">
+            <div className="w-full flex flex-col items-center gap-1 sm:gap-3">
               {/* 1. RETRO CRT BOX COMPUTER (O MONITOR DE CAIXA RETRÔ) */}
               <RetroCrtMonitor3D
                 history={history}

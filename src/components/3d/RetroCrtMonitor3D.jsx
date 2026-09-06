@@ -149,17 +149,17 @@ export default function RetroCrtMonitor3D({
     }
 
     // Top Header Banner
-    ctx.font = 'bold 15px "Consolas", "Courier New", monospace';
+    ctx.font = 'bold 18px "Consolas", "Courier New", monospace';
     ctx.fillStyle = fgDim;
-    ctx.fillText('╔' + '═'.repeat(66) + '╗', 34, 38);
-    ctx.fillText('║  IFAC VT-100 RETRO CRT // KERNEL v4.19-ZEN // 80x25 // ACTIVE       ║', 34, 56);
-    ctx.fillText('╚' + '═'.repeat(66) + '╝', 34, 74);
+    ctx.fillText('╔' + '═'.repeat(54) + '╗', 42, 42);
+    ctx.fillText('║ IFAC VT-100 CRT // KERNEL v4.19-ZEN // ONLINE       ║', 42, 64);
+    ctx.fillText('╚' + '═'.repeat(54) + '╝', 42, 86);
 
-    // Terminal History Text lines
-    ctx.font = '16px "Consolas", "Monaco", "Courier New", monospace';
-    const lineHeight = 24;
-    const maxLines = 23;
-    const startY = 104;
+    // Terminal History Text lines (Larger, crisp, bold retro CRT font)
+    ctx.font = 'bold 22px "Consolas", "Monaco", "Courier New", monospace';
+    const lineHeight = 32;
+    const maxLines = 18;
+    const startY = 124;
 
     const formattedLines = [];
     history.forEach((item) => {
@@ -172,11 +172,11 @@ export default function RetroCrtMonitor3D({
 
       const rawLines = String(item.text).split('\n');
       rawLines.forEach((l) => {
-        if (l.length <= 68) {
+        if (l.length <= 54) {
           formattedLines.push({ text: l, color });
         } else {
-          for (let c = 0; c < l.length; c += 68) {
-            formattedLines.push({ text: l.slice(c, c + 68), color });
+          for (let c = 0; c < l.length; c += 54) {
+            formattedLines.push({ text: l.slice(c, c + 54), color });
           }
         }
       });
@@ -185,25 +185,25 @@ export default function RetroCrtMonitor3D({
     const visibleLines = formattedLines.slice(-maxLines);
     visibleLines.forEach((line, idx) => {
       ctx.fillStyle = line.color;
-      ctx.fillText(line.text, 44, startY + idx * lineHeight);
+      ctx.fillText(line.text, 48, startY + idx * lineHeight);
     });
 
     // Active Prompt Line at the bottom
-    const promptY = Math.min(height - 40, startY + visibleLines.length * lineHeight + 8);
-    ctx.font = 'bold 17px "Consolas", "Courier New", monospace';
+    const promptY = Math.min(height - 45, startY + visibleLines.length * lineHeight + 10);
+    ctx.font = 'bold 22px "Consolas", "Courier New", monospace';
     ctx.fillStyle = fgColor;
-    ctx.fillText('steve@ifac:~$ ', 44, promptY);
+    ctx.fillText('steve@ifac:~$ ', 48, promptY);
 
     const promptWidth = ctx.measureText('steve@ifac:~$ ').width;
     ctx.fillStyle = fgWhite;
-    ctx.fillText(input, 44 + promptWidth, promptY);
+    ctx.fillText(input, 48 + promptWidth, promptY);
 
     // Blinking Block Cursor
     const isBlinking = Math.floor(performance.now() / 450) % 2 === 0;
     if (isBlinking) {
       const inputWidth = ctx.measureText(input).width;
       ctx.fillStyle = fgColor;
-      ctx.fillRect(44 + promptWidth + inputWidth + 2, promptY - 15, 11, 19);
+      ctx.fillRect(48 + promptWidth + inputWidth + 2, promptY - 20, 14, 24);
     }
 
     // Mark texture for update
@@ -250,14 +250,14 @@ export default function RetroCrtMonitor3D({
     scene.background = null;
 
     const camera = new THREE.PerspectiveCamera(
-      32,
+      34,
       container.clientWidth / container.clientHeight,
       0.1,
       100
     );
-    // Framed directly on the retro PC chassis
-    camera.position.set(0, 0.5, 6.4);
-    camera.lookAt(0, 0.1, 0);
+    // Zoomed-out comfortable perspective showing the full retro computer with breathing room
+    camera.position.set(0, 0.35, 9.4);
+    camera.lookAt(0, -0.05, 0);
 
     // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -544,22 +544,13 @@ export default function RetroCrtMonitor3D({
   }, [drawScreenCanvas]);
 
   return (
-    <div className={`relative w-full h-[460px] sm:h-[520px] lg:h-[560px] select-none ${className}`}>
+    <div className={`relative w-full h-[420px] sm:h-[480px] lg:h-[520px] select-none ${className}`}>
       {/* 3D WebGL Canvas Viewport */}
       <div
         ref={mountRef}
         className="w-full h-full cursor-grab active:cursor-grabbing"
+        title="Clique e arraste para girar em 360°"
       />
-
-      {/* Floating Status Pill */}
-      <div className="pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/80 shadow-md text-xs font-mono">
-        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-        <span className="text-zinc-800 font-semibold tracking-wide">
-          MONITOR CRT RETRÔ // TELA CONVEXA DE FÓSFORO
-        </span>
-        <span className="text-zinc-400">|</span>
-        <span className="text-rose-600 font-bold">ARRASTE 360°</span>
-      </div>
     </div>
   );
 }
