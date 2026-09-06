@@ -59,7 +59,7 @@ function createWorkstationShadowTexture() {
 /**
  * Creates curved geometry for cathode ray tube glass face
  */
-function createCrtCurvedScreenGeometry(width, height, segX = 32, segY = 32, curvature = 0.045) {
+function createCrtCurvedScreenGeometry(width, height, segX = 32, segY = 32, curvature = 0.08) {
   const geo = new THREE.PlaneGeometry(width, height, segX, segY);
   const pos = geo.attributes.position;
   const halfW = width * 0.5;
@@ -299,14 +299,14 @@ export default function RetroWorkstation3D({
     ctx.fillStyle = bgBase;
     ctx.fillRect(0, 0, width, height);
 
-    // Subtle CRT glass curve vignette (ultra-gentle, no swallowed text at edges)
+    // Subtle CRT glass curve vignette (Gently enhances spherical depth without swallowing text)
     const radialGrad = ctx.createRadialGradient(
-      width * 0.5, height * 0.5, width * 0.35,
-      width * 0.5, height * 0.5, width * 0.85
+      width * 0.5, height * 0.5, width * 0.28,
+      width * 0.5, height * 0.5, width * 0.82
     );
-    radialGrad.addColorStop(0, 'rgba(255, 255, 255, 0.02)');
-    radialGrad.addColorStop(0.85, 'rgba(0, 0, 0, 0.03)');
-    radialGrad.addColorStop(1, 'rgba(0, 0, 0, 0.08)');
+    radialGrad.addColorStop(0, 'rgba(255, 255, 255, 0.025)');
+    radialGrad.addColorStop(0.72, 'rgba(0, 0, 0, 0.04)');
+    radialGrad.addColorStop(1, 'rgba(0, 0, 0, 0.15)');
     ctx.fillStyle = radialGrad;
     ctx.fillRect(0, 0, width, height);
 
@@ -609,11 +609,11 @@ export default function RetroWorkstation3D({
     // Inset Screen Bezel Frame (Slim, minimal bezel behind screen)
     const screenWellGeo = new THREE.BoxGeometry(3.70, 2.54, 0.06);
     const screenWellMesh = new THREE.Mesh(screenWellGeo, darkBezelMat);
-    screenWellMesh.position.set(0, 0.82, 1.49);
+    screenWellMesh.position.set(0, 0.82, 1.48);
     pcGroup.add(screenWellMesh);
 
-    // Curved CRT Glass Face (Expanded to 3.60 x 2.44, sitting proudly in front)
-    const crtScreenGeo = createCrtCurvedScreenGeometry(3.60, 2.44, 36, 36, 0.045);
+    // Curved CRT Glass Face (Expanded to 3.60 x 2.44, gently rounded CRT curve)
+    const crtScreenGeo = createCrtCurvedScreenGeometry(3.60, 2.44, 36, 36, 0.08);
     const crtScreenMesh = new THREE.Mesh(crtScreenGeo, crtScreenMat);
     crtScreenMesh.position.set(0, 0.82, 1.535);
     pcGroup.add(crtScreenMesh);
