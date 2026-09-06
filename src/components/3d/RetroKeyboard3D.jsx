@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import * as THREE from 'three';
 import { sound } from '../../utils/sound';
 
@@ -165,6 +165,16 @@ export default function RetroKeyboard3D({
     inputValRef.current = input;
   }, [input]);
 
+  const onExecuteCommandRef = useRef(onExecuteCommand);
+  useEffect(() => {
+    onExecuteCommandRef.current = onExecuteCommand;
+  }, [onExecuteCommand]);
+
+  const setInputRef = useRef(setInput);
+  useEffect(() => {
+    setInputRef.current = setInput;
+  }, [setInput]);
+
   const matrixModeRef = useRef(matrixMode);
   useEffect(() => {
     matrixModeRef.current = matrixMode;
@@ -219,14 +229,14 @@ export default function RetroKeyboard3D({
   const pressKey = useCallback((code, rawKey) => {
     const mesh = findKeyMesh(code, rawKey);
     if (mesh) {
-      mesh.userData.targetY = mesh.userData.baseY - 0.15;
+      mesh.userData.targetY = mesh.userData.baseY - 0.16;
       mesh.userData.targetRotX = -0.16;
       mesh.userData.isPressed = true;
 
       // Glow highlight on top face
       if (Array.isArray(mesh.material) && mesh.material[2]) {
         mesh.material[2].emissive.set(matrixModeRef.current ? 0x22c55e : 0xe11d48);
-        mesh.material[2].emissiveIntensity = 0.85;
+        mesh.material[2].emissiveIntensity = 0.9;
       }
     }
   }, [findKeyMesh]);
@@ -246,7 +256,7 @@ export default function RetroKeyboard3D({
     }
   }, [findKeyMesh]);
 
-  // Setup Three.js Scene for the Keyboard
+  // Setup Three.js Scene for the Keyboard (RUNS ONLY ONCE ON MOUNT)
   useEffect(() => {
     const container = mountRef.current;
     if (!container) return;
@@ -466,13 +476,13 @@ export default function RetroKeyboard3D({
           setTimeout(() => releaseKey(code, label), 160);
 
           if (code === 'Enter') {
-            onExecuteCommand(inputValRef.current);
+            onExecuteCommandRef.current?.(inputValRef.current);
           } else if (code === 'Backspace') {
-            setInput((prev) => prev.slice(0, -1));
+            setInputRef.current?.((prev) => prev.slice(0, -1));
           } else if (code === 'Space') {
-            setInput((prev) => prev + ' ');
+            setInputRef.current?.((prev) => prev + ' ');
           } else if (label && label.length === 1) {
-            setInput((prev) => prev + label.toLowerCase());
+            setInputRef.current?.((prev) => prev + label.toLowerCase());
           }
         }
       }
@@ -483,7 +493,7 @@ export default function RetroKeyboard3D({
     const domEl = renderer.domElement;
     domEl.addEventListener('click', handleCanvasClick);
 
-    // Animation loop (Lerp key movement smoothly)
+    // Animation loop (Smooth key lerp)
     let animId;
     const animate = () => {
       animId = requestAnimationFrame(animate);
@@ -520,27 +530,27 @@ export default function RetroKeyboard3D({
       }
       renderer.dispose();
     };
-  }, [pressKey, releaseKey, onExecuteCommand, setInput]);
+  }, []); // Mounts strictly ONCE! Never tears down during typing
 
-  // Global window listener for typing
+  // Global window listener for typing when not typing inside another external input
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
-      if (
-        document.activeElement &&
-        document.activeElement.tagName === 'INPUT' &&
-        document.activeElement !== promptInputRef.current
-      ) {
+      // If typing inside our prompt input, let the input handler manage it
+      if (document.activeElement && document.activeElement.tagName === 'INPUT') {
         return;
       }
       pressKey(e.code, e.key);
       sound.playMechanicalKey();
 
       if (e.key === 'Enter') {
-        onExecuteCommand(inputValRef.current);
+        onExecuteCommandRef.current?.(inputValRef.current);
       }
     };
 
     const handleGlobalKeyUp = (e) => {
+      if (document.activeElement && document.activeElement.tagName === 'INPUT') {
+        return;
+      }
       releaseKey(e.code, e.key);
     };
 
@@ -550,17 +560,17 @@ export default function RetroKeyboard3D({
       window.removeEventListener('keydown', handleGlobalKeyDown);
       window.removeEventListener('keyup', handleGlobalKeyUp);
     };
-  }, [pressKey, releaseKey, onExecuteCommand]);
+  }, [pressKey, releaseKey]);
 
   return (
     <div className={`w-full flex flex-col items-center select-none ${className}`}>
       {/* 3D Mechanical Keyboard Canvas (All 5 rows 100% visible) */}
-      <div className="relative w-full h-[250px] sm:h-[280px] lg:h-[310px] cursor-pointer">
+      <div className="relative w-full h-[240px] sm:h-[270px] lg:h-[300px] cursor-pointer">
         <div ref={mountRef} className="w-full h-full" />
       </div>
 
       {/* Integrated Prompt Input Bar Directly Below Keyboard */}
-      <div className="w-full max-w-2xl mx-auto px-4 mt-2">
+      <div className="w-full max-w-2xl mx-auto px-4 mt-1">
         <div className="flex items-center gap-2.5 p-2.5 px-4 rounded-2xl bg-white/95 backdrop-blur-xl border border-zinc-300/80 shadow-xl transition-all focus-within:border-rose-400 focus-within:ring-2 focus-within:ring-rose-200/50">
           <span className={`text-xs sm:text-sm font-mono font-bold ${matrixMode ? 'text-emerald-600' : 'text-rose-600'}`}>
             steve@ifac:~$
@@ -570,14 +580,7 @@ export default function RetroKeyboard3D({
             type="text"
             value={input}
             onChange={(e) => {
-              const newVal = e.target.value;
-              if (newVal.length > input.length) {
-                const addedChar = newVal.slice(-1);
-                pressKey('', addedChar);
-                sound.playMechanicalKey();
-                setTimeout(() => releaseKey('', addedChar), 150);
-              }
-              setInput(newVal);
+              setInput(e.target.value);
             }}
             onKeyDown={(e) => {
               pressKey(e.code, e.key);

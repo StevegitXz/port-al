@@ -25,7 +25,7 @@ export default function Terminal() {
     }
   }, [history]);
 
-  const executeCommand = (cmdText) => {
+  const executeCommand = useCallback((cmdText) => {
     const raw = cmdText.trim();
     if (!raw) return;
 
@@ -33,14 +33,14 @@ export default function Terminal() {
     achievementManager.unlock('terminal_hacker');
     const command = raw.toLowerCase();
 
-    // Add command echo to history
-    const newHistory = [...history, { type: 'cmd', text: `steve@ifac-node:~$ ${raw}` }];
+    setHistory((prevHistory) => {
+      const newHistory = [...prevHistory, { type: 'cmd', text: `steve@ifac-node:~$ ${raw}` }];
 
-    switch (command) {
-      case 'help':
-        newHistory.push({
-          type: 'res',
-          text: `COMANDOS DISPONÍVEIS:
+      switch (command) {
+        case 'help':
+          newHistory.push({
+            type: 'res',
+            text: `COMANDOS DISPONÍVEIS:
   • bio       - Exibe resumo acadêmico e biografia
   • projects  - Lista o inventário de softwares e IoT
   • mariot    - Detalhes da publicação no CSBC 2025
@@ -53,63 +53,63 @@ export default function Terminal() {
   • lattes    - Dados cadastrados no CNPq
   • zen       - Pensamento de equilíbrio Cyber-Zen
   • clear     - Limpa o buffer do terminal`
-        });
-        break;
+          });
+          break;
 
-      case 'bio':
-        newHistory.push({
-          type: 'res',
-          text: `NOME: ${PERSONAL_INFO.name} (${PERSONAL_INFO.age} anos)
+        case 'bio':
+          newHistory.push({
+            type: 'res',
+            text: `NOME: ${PERSONAL_INFO.name} (${PERSONAL_INFO.age} anos)
 ORIGEM: ${PERSONAL_INFO.location}
 INSTITUIÇÃO: ${PERSONAL_INFO.institution}
 CURSO: ${PERSONAL_INFO.course} (${PERSONAL_INFO.period})
 RESUMO: ${PERSONAL_INFO.tagline}`
-        });
-        break;
+          });
+          break;
 
-      case 'projects':
-        newHistory.push({
-          type: 'res',
-          text: PROJECTS.map((p, i) => `[0${i + 1}] ${p.title} (${p.year}) -> ${p.category}`).join('\n')
-        });
-        break;
+        case 'projects':
+          newHistory.push({
+            type: 'res',
+            text: PROJECTS.map((p, i) => `[0${i + 1}] ${p.title} (${p.year}) -> ${p.category}`).join('\n')
+          });
+          break;
 
-      case 'mariot':
-        newHistory.push({
-          type: 'res',
-          text: `PROJETO MARIOT (Artigo no 45º CSBC / 16º WCAMA 2025):
+        case 'mariot':
+          newHistory.push({
+            type: 'res',
+            text: `PROJETO MARIOT (Artigo no 45º CSBC / 16º WCAMA 2025):
 Automação e Irrigação Inteligente com ESP8266, C++, Relés e Sensores.
 Foco em sustentabilidade hídrica e monitoramento climático na Amazônia Ocidental.`
-        });
-        break;
+          });
+          break;
 
-      case 'skills':
-        newHistory.push({
-          type: 'res',
-          text: `FRONT-END: React, Vite, Tailwind CSS, JavaScript ES6+, HTML5/CSS3
+        case 'skills':
+          newHistory.push({
+            type: 'res',
+            text: `FRONT-END: React, Vite, Tailwind CSS, JavaScript ES6+, HTML5/CSS3
 BACK-END: Node.js, Express, MySQL, REST APIs, Python
 HARDWARE/IoT: ESP8266, C++, Arduino IDE, Sensores e Relés
 DEVOPS/TOOLS: Git, GitHub, Vercel, Linux, VS Code`
-        });
-        break;
+          });
+          break;
 
-      case 'weather':
-        newHistory.push({
-          type: 'res',
-          text: `[ESTAÇÃO METEOROLÓGICA // IFAC RIO BRANCO - AC]
+        case 'weather':
+          newHistory.push({
+            type: 'res',
+            text: `[ESTAÇÃO METEOROLÓGICA // IFAC RIO BRANCO - AC]
 📍 COORDENADAS: 09°58'29"S 67°48'36"W (Amazônia Ocidental)
 🌡️ TEMPERATURA: 31.8 °C (Sensação Térmica: 36.2 °C)
 💧 UMIDADE RELATIVA: 82% (Microclima Úmido Equatorial)
 🌧️ PRECIPITAÇÃO: Probabilidade de pancadas tropicais vespertinas
 📡 HARDWARE NÓ 01: ESP8266 + Sensor DHT22 + Higrômetro Analógico [ONLINE]
 🌱 SISTEMA MARIOT: Solo hidratado (78%) - Válvulas de irrigação em stand-by.`
-        });
-        break;
+          });
+          break;
 
-      case 'game':
-        newHistory.push({
-          type: 'res',
-          text: `[DESAFIO CYBER-ZEN // TESTE DE ARQUITETURA]
+        case 'game':
+          newHistory.push({
+            type: 'res',
+            text: `[DESAFIO CYBER-ZEN // TESTE DE ARQUITETURA]
 Questão: Qual dos seguintes pinos do ESP-12F deve ser mantido em nível ALTO (HIGH) durante o boot normal?
   [A] GPIO15
   [B] GPIO0
@@ -117,69 +117,69 @@ Questão: Qual dos seguintes pinos do ESP-12F deve ser mantido em nível ALTO (H
   [D] ADC0
 
 💡 Dica de Hardware: Durante o boot, GPIO0 em HIGH entra no modo execução da memória Flash SPI!`
-        });
-        break;
+          });
+          break;
 
-      case 'sudo':
-        sound.playAchievement();
-        newHistory.push({
-          type: 'res',
-          text: `[AUTH SUCCESSFUL] UID 0 (root) concedido para @stevegitxz.
+        case 'sudo':
+          sound.playAchievement();
+          newHistory.push({
+            type: 'res',
+            text: `[AUTH SUCCESSFUL] UID 0 (root) concedido para @stevegitxz.
 > Kernel: Linux neo-tokyo-ifac 6.8.0-zen-rt #1 PREEMPT_DYNAMIC
 > Status: Superusuário verificado com chave ed25519.
 > Privilégios: Acesso completo ao hardware embarcado e compilador web.
 "Na dúvida, 'sudo rm -rf /' nunca é a resposta correta."`
-        });
-        break;
+          });
+          break;
 
-      case 'contact':
-        newHistory.push({
-          type: 'res',
-          text: `E-MAIL: ${PERSONAL_INFO.email}
+        case 'contact':
+          newHistory.push({
+            type: 'res',
+            text: `E-MAIL: ${PERSONAL_INFO.email}
 GITHUB: ${PERSONAL_INFO.github}
 LOCAL: ${PERSONAL_INFO.location}`
-        });
-        break;
+          });
+          break;
 
-      case 'lattes':
-        newHistory.push({
-          type: 'res',
-          text: `CURRÍCULO LATTES (CNPq):
+        case 'lattes':
+          newHistory.push({
+            type: 'res',
+            text: `CURRÍCULO LATTES (CNPq):
 Citação: ${PERSONAL_INFO.cnpqCitation}
 Áreas: ${PERSONAL_INFO.cnpqAreas.join(', ')}`
-        });
-        break;
+          });
+          break;
 
-      case 'zen':
-        newHistory.push({
-          type: 'res',
-          text: `調和 (Zen): "No silêncio do circuito e no fluir do código, a complexidade se dissolve na clareza da solução."`
-        });
-        break;
+        case 'zen':
+          newHistory.push({
+            type: 'res',
+            text: `調和 (Zen): "No silêncio do circuito e no fluir do código, a complexidade se dissolve na clareza da solução."`
+          });
+          break;
 
-      case 'matrix':
-        setMatrixMode((prev) => !prev);
-        newHistory.push({
-          type: 'res',
-          text: `[!] Tema visual Matrix ${!matrixMode ? 'ATIVADO (Green Phosphor)' : 'DESATIVADO (Cyber-Zen)'}.`
-        });
-        break;
+        case 'matrix':
+          setMatrixMode((prev) => !prev);
+          newHistory.push({
+            type: 'res',
+            text: `[!] Tema visual Matrix alternado.`
+          });
+          break;
 
-      case 'clear':
-        setHistory([]);
-        setInput('');
-        return;
+        case 'clear':
+          return [];
 
-      default:
-        newHistory.push({
-          type: 'err',
-          text: `Comando não reconhecido: "${raw}". Digite "help" para lista de opções.`
-        });
-    }
+        default:
+          newHistory.push({
+            type: 'err',
+            text: `Comando não reconhecido: "${raw}". Digite "help" para lista de opções.`
+          });
+      }
 
-    setHistory(newHistory);
+      return newHistory;
+    });
+
     setInput('');
-  };
+  }, []);
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {

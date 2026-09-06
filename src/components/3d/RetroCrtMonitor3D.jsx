@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import * as THREE from 'three';
 
 /**
@@ -13,16 +13,13 @@ function createBadgeTexture() {
   ctx.fillStyle = '#1e222b';
   ctx.fillRect(0, 0, 256, 64);
 
-  // Border
   ctx.strokeStyle = '#475569';
   ctx.lineWidth = 4;
   ctx.strokeRect(4, 4, 248, 56);
 
-  // Accent stripe
   ctx.fillStyle = '#e11d48';
   ctx.fillRect(10, 10, 8, 44);
 
-  // Typography
   ctx.fillStyle = '#38bdf8';
   ctx.font = 'bold 24px "Consolas", monospace';
   ctx.textAlign = 'left';
@@ -94,6 +91,18 @@ export default function RetroCrtMonitor3D({
   const powerLedMatRef = useRef(null);
   const diskLedMatRef = useRef(null);
 
+  // Always keep latest props in refs to avoid stale closures in animate() loop
+  const historyRef = useRef(history);
+  const inputRef = useRef(input);
+  const matrixModeRef = useRef(matrixMode);
+
+  useEffect(() => {
+    historyRef.current = history;
+    inputRef.current = input;
+    matrixModeRef.current = matrixMode;
+    drawScreenCanvas();
+  });
+
   // Rotation & spring-back state
   const rotationState = useRef({
     currentX: 0.08,
@@ -108,7 +117,7 @@ export default function RetroCrtMonitor3D({
     lastInteractTime: Date.now(),
   });
 
-  // Re-draw 2D CRT Screen on Canvas
+  // Re-draw 2D CRT Screen on Canvas (Always uses latest ref values)
   const drawScreenCanvas = useCallback(() => {
     const canvas = screenCanvasRef.current;
     if (!canvas) return;
@@ -118,8 +127,10 @@ export default function RetroCrtMonitor3D({
     const width = canvas.width;
     const height = canvas.height;
 
-    // Background phosphor colors
-    const isMatrix = matrixMode;
+    const curHistory = historyRef.current || [];
+    const curInput = inputRef.current || '';
+    const isMatrix = matrixModeRef.current;
+
     const bgBase = isMatrix ? '#040e06' : '#070a12';
     const fgColor = isMatrix ? '#22c55e' : '#38bdf8';
     const fgDim = isMatrix ? '#15803d' : '#0284c7';
@@ -162,7 +173,7 @@ export default function RetroCrtMonitor3D({
     const startY = 124;
 
     const formattedLines = [];
-    history.forEach((item) => {
+    curHistory.forEach((item) => {
       let color = fgWhite;
       if (item.type === 'sys') color = fgDim;
       else if (item.type === 'info') color = fgAmber;
@@ -196,26 +207,20 @@ export default function RetroCrtMonitor3D({
 
     const promptWidth = ctx.measureText('steve@ifac:~$ ').width;
     ctx.fillStyle = fgWhite;
-    ctx.fillText(input, 48 + promptWidth, promptY);
+    ctx.fillText(curInput, 48 + promptWidth, promptY);
 
     // Blinking Block Cursor
     const isBlinking = Math.floor(performance.now() / 450) % 2 === 0;
     if (isBlinking) {
-      const inputWidth = ctx.measureText(input).width;
+      const inputWidth = ctx.measureText(curInput).width;
       ctx.fillStyle = fgColor;
       ctx.fillRect(48 + promptWidth + inputWidth + 2, promptY - 20, 14, 24);
     }
 
-    // Mark texture for update
     if (screenTextureRef.current) {
       screenTextureRef.current.needsUpdate = true;
     }
-  }, [history, input, matrixMode]);
-
-  // Update canvas on props change
-  useEffect(() => {
-    drawScreenCanvas();
-  }, [drawScreenCanvas]);
+  }, []);
 
   // Blink disk activity LED when commands execute or input changes
   useEffect(() => {
@@ -419,8 +424,8 @@ export default function RetroCrtMonitor3D({
     // Pulsing Power LED
     const powerLedGeo = new THREE.SphereGeometry(0.05, 14, 14);
     const powerLedMat = new THREE.MeshStandardMaterial({
-      color: matrixMode ? 0x22c55e : 0xf59e0b,
-      emissive: matrixMode ? 0x22c55e : 0xf59e0b,
+      color: matrixModeRef.current ? 0x22c55e : 0xf59e0b,
+      emissive: matrixModeRef.current ? 0x22c55e : 0xf59e0b,
       emissiveIntensity: 1.8,
       roughness: 0.2,
     });
@@ -504,7 +509,7 @@ export default function RetroCrtMonitor3D({
         powerLedMatRef.current.emissiveIntensity = pulse;
       }
 
-      // Blinking cursor redraw
+      // Blinking cursor redraw - always uses latest input via ref!
       const now = performance.now();
       if (now - lastBlink > 450) {
         lastBlink = now;
