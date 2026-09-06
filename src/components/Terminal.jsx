@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Terminal as TerminalIcon, Sparkles, Send, CornerDownLeft, RefreshCw, Box, Monitor } from 'lucide-react';
 import { PERSONAL_INFO, PROJECTS } from '../utils/data';
 import { sound } from '../utils/sound';
