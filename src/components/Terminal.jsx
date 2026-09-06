@@ -3,7 +3,8 @@ import { Terminal as TerminalIcon, Sparkles, Send, CornerDownLeft, RefreshCw, Bo
 import { PERSONAL_INFO, PROJECTS } from '../utils/data';
 import { sound } from '../utils/sound';
 import { achievementManager } from '../utils/achievements';
-import RetroTerminalCanvas3D from './3d/RetroTerminalCanvas3D';
+import RetroCrtMonitor3D from './3d/RetroCrtMonitor3D';
+import RetroKeyboard3D from './3d/RetroKeyboard3D';
 
 export default function Terminal() {
   const [input, setInput] = useState('');
@@ -278,13 +279,22 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
         {/* Center Stage: 3D Workstation (No Delimiting Cards) OR Classic Window */}
         <div className="w-full max-w-5xl mx-auto flex flex-col items-center">
           {viewMode === '3d' ? (
-            <RetroTerminalCanvas3D
-              history={history}
-              input={input}
-              setInput={setInput}
-              onExecuteCommand={executeCommand}
-              matrixMode={matrixMode}
-            />
+            <div className="w-full flex flex-col items-center -space-y-4 sm:-space-y-6">
+              {/* 1. RETRO CRT BOX COMPUTER (O MONITOR DE CAIXA RETRÔ) */}
+              <RetroCrtMonitor3D
+                history={history}
+                input={input}
+                matrixMode={matrixMode}
+              />
+
+              {/* 2. DEDICATED MECHANICAL KEYBOARD (100% VISIBLE KEYS & PHYSICAL CONTRACTION) */}
+              <RetroKeyboard3D
+                input={input}
+                setInput={setInput}
+                onExecuteCommand={executeCommand}
+                matrixMode={matrixMode}
+              />
+            </div>
           ) : (
             <div className={`w-full max-w-3xl mx-auto rounded-3xl border ${matrixMode ? 'border-emerald-500/60 shadow-[0_0_50px_rgba(16,185,129,0.25)]' : 'border-zinc-300/90 shadow-2xl'} bg-[#0c0e14] overflow-hidden transition-all duration-300`}>
               {/* Terminal Title Bar */}
