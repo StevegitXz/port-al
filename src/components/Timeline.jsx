@@ -250,7 +250,7 @@ export default function Timeline() {
       {/* 2. REORGANIZED & BALANCED EDITORIAL DOSSIER SECTION */}
       <div className="relative max-w-6xl mx-auto px-4 py-20 overflow-hidden sm:overflow-visible">
         {/* Japanese Dragon (Ryu / 龍) in Sumi-e ink slithering dynamically along all cards */}
-        <JapaneseDragonTimeline opacity={0.85} />
+        <JapaneseDragonTimeline opacity={0.92} />
 
         {/* Section Header */}
         <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 pb-6 border-b border-zinc-200/80">
