@@ -5,6 +5,7 @@ import ScrambleText from './ScrambleText';
 import { PERSONAL_INFO, METRICS } from '../utils/data';
 import { sound } from '../utils/sound';
 import { achievementManager } from '../utils/achievements';
+import authorPhoto from '../assets/FotoEu.jpeg';
 
 export default function Hero() {
   const [copied, setCopied] = useState(false);
@@ -64,8 +65,13 @@ export default function Hero() {
       <div className="relative z-10 max-w-5xl mx-auto flex flex-col items-center text-center">
         {/* Top Status & Hanko Stamp Strip */}
         <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
-          {/* Status HUD Pill */}
-          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/90 border border-zinc-200/90 backdrop-blur-md shadow-xs">
+          {/* Status HUD Pill with Author Avatar */}
+          <div className="inline-flex items-center gap-2.5 pl-1.5 pr-3.5 py-1 rounded-full bg-white/90 border border-zinc-200/90 backdrop-blur-md shadow-xs hover:border-rose-300 transition-colors">
+            <img
+              src={authorPhoto}
+              alt={PERSONAL_INFO.name}
+              className="w-6 h-6 rounded-full object-cover object-top border border-rose-400/70 shadow-xs ring-1 ring-rose-300/40"
+            />
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
