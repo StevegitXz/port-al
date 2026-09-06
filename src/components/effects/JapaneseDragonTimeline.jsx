@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 
 /**
- * Catmull-Rom Spline interpolation for silky smooth closed flight trajectories
+ * Catmull-Rom Spline interpolation for silky smooth closed 3D flight trajectories
  */
 function catmullRom(p0, p1, p2, p3, t) {
   const t2 = t * t;
@@ -16,49 +16,60 @@ function catmullRom(p0, p1, p2, p3, t) {
 }
 
 /**
- * High-Fidelity Japanese Imperial Dragon (Ryu / 龍) with Insane Kasumi & Kumo Mist
- * - Much larger, imposing scale (NUM_SEGMENTS = 58, torso width up to 46px, 1100px+ spine)
- * - Hyper-realistic Sumi-e details: ventral belly plates (Hara-tate), curved scales (Uroko),
- *   sharp fangs, glowing amber eyes, multi-tier deer antlers, 4-clawed muscular paws, and brush plume tail.
- * - Insane Japanese Mist (Kumo & Kasumi): multi-lobed cloud puffs, rolling atmospheric fog banks,
- *   nostril vapor exhalations, and golden/sakura embers.
+ * High-Fidelity Japanese Imperial Dragon (Ryu / 龍) with Multi-Layer Z-Depth
+ * - 2-Canvas Stacking Architecture:
+ *   1. Background Canvas (z-0): Deep atmospheric Kasumi fog rivers and submerged dragon segments behind cards (z-10).
+ *   2. Foreground Canvas (z-20): Surfaced dragon segments, glowing amber eyes, golden whiskers,
+ *      razor claws and mist soaring DIRECTLY OVER the cards with physical drop-shadow.
+ * - Periodic Surfacing: Weaves in and out of the card layer dynamically and organically ("de vez em quando").
+ * - Zero impact on card usability: Both canvases have pointer-events-none, keeping all links and buttons 100% interactive.
  */
 export default function JapaneseDragonTimeline({
-  className = 'pointer-events-none absolute inset-0 z-0 overflow-hidden w-full h-full select-none',
-  opacity = 0.9,
+  opacity = 0.92,
 }) {
-  const canvasRef = useRef(null);
+  const bgCanvasRef = useRef(null);
+  const fgCanvasRef = useRef(null);
   const containerRef = useRef(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const bgCanvas = bgCanvasRef.current;
+    const fgCanvas = fgCanvasRef.current;
+    if (!bgCanvas || !fgCanvas) return;
+
+    const bgCtx = bgCanvas.getContext('2d');
+    const fgCtx = fgCanvas.getContext('2d');
+    if (!bgCtx || !fgCtx) return;
 
     let animId;
     let isVisible = true;
 
     // Dimensions
-    let width = (canvas.width = canvas.parentElement?.clientWidth || window.innerWidth);
-    let height = (canvas.height = canvas.parentElement?.clientHeight || window.innerHeight);
+    let width = bgCanvas.parentElement?.clientWidth || window.innerWidth;
+    let height = bgCanvas.parentElement?.clientHeight || window.innerHeight;
 
     // DPR Scaling for Ultra-Sharp High-DPI Screens
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    ctx.scale(dpr, dpr);
+
+    const setupCanvas = (c, ctx) => {
+      c.width = width * dpr;
+      c.height = height * dpr;
+      ctx.scale(dpr, dpr);
+    };
+
+    setupCanvas(bgCanvas, bgCtx);
+    setupCanvas(fgCanvas, fgCtx);
 
     // Spine Configuration (58 articulated vertebrae nodes, broader and longer)
     const NUM_SEGMENTS = 58;
     const SEGMENT_LENGTH = 19;
 
-    // Initialize Body Vertebrae
+    // Initialize Body Vertebrae with 3D coordinate (x, y, z)
     const spine = Array.from({ length: NUM_SEGMENTS }, (_, i) => {
       const widthFactor = Math.sin((i / NUM_SEGMENTS) * Math.PI);
       return {
         x: width * 0.5 - i * SEGMENT_LENGTH,
         y: height * 0.2,
+        z: -1.0, // Starts submerged in background mist
         angle: 0,
         width: Math.max(10, widthFactor * 32 + 14), // Torso reaches up to 46px width!
       };
@@ -84,20 +95,22 @@ export default function JapaneseDragonTimeline({
       { yPercent: 0.82, speed: 0.18, offset: 260, amp: 30, height: 190, alpha: 0.26 },
     ];
 
-    // Flight patrol circuit waypoints weaving around and between every card in the dossier
+    // Flight patrol circuit waypoints with (x, y, z) coordinates:
+    // z > 0: Surfaced OVER cards (Foreground Canvas z-20)
+    // z < 0: Submerged in background mist BEHIND cards (Background Canvas z-0)
     const getWaypoints = (w, h) => [
-      { x: w * 0.90, y: h * 0.07 }, // High right above CNPq/Lattes
-      { x: w * 0.38, y: h * 0.11 }, // Swoop across header title
-      { x: w * 0.08, y: h * 0.20 }, // Upper left loop
-      { x: w * 0.48, y: h * 0.28 }, // Dive over featured paper card
-      { x: w * 0.94, y: h * 0.40 }, // Wide sweep around right margin
-      { x: w * 0.50, y: h * 0.52 }, // Center crossover between 2 columns
-      { x: w * 0.06, y: h * 0.63 }, // Left flank loop outside column 1
-      { x: w * 0.52, y: h * 0.74 }, // Center diagonal swoop between row 2
-      { x: w * 0.92, y: h * 0.83 }, // Right flank loop outside certificates
-      { x: w * 0.38, y: h * 0.96 }, // Deep bottom sweep under certificates
-      { x: w * 0.05, y: h * 0.82 }, // Ascending left turn
-      { x: w * 0.42, y: h * 0.46 }, // Center ascending crossing
+      { x: w * 0.90, y: h * 0.07, z: -1.0 }, // Behind top right margin
+      { x: w * 0.42, y: h * 0.11, z: 0.95 }, // Surfacing over Lattes card and top header
+      { x: w * 0.08, y: h * 0.20, z: -1.0 }, // Diving behind upper left margin
+      { x: w * 0.50, y: h * 0.28, z: 1.45 }, // SURFACED MAJESTICALLY OVER FEATURED CSBC 2025 PAPER CARD!
+      { x: w * 0.94, y: h * 0.40, z: -1.0 }, // Diving behind right gutter
+      { x: w * 0.50, y: h * 0.52, z: 1.30 }, // SURFACED OVER CENTER RECORDS (Row 1)!
+      { x: w * 0.06, y: h * 0.63, z: -1.0 }, // Diving behind left gutter
+      { x: w * 0.52, y: h * 0.74, z: 1.35 }, // SURFACED OVER LOWER RECORDS (Row 2)!
+      { x: w * 0.92, y: h * 0.83, z: -1.0 }, // Diving behind right gutter
+      { x: w * 0.44, y: h * 0.95, z: 0.85 }, // Low sweep under certificates
+      { x: w * 0.05, y: h * 0.82, z: -1.0 }, // Diving behind bottom left margin
+      { x: w * 0.42, y: h * 0.46, z: -0.6 }, // Submerged ascending crossover
     ];
 
     let waypoints = getWaypoints(width, height);
@@ -113,7 +126,7 @@ export default function JapaneseDragonTimeline({
     const mouse = { x: -2000, y: -2000, active: false };
 
     const handleMouseMove = (e) => {
-      const rect = canvas.getBoundingClientRect();
+      const rect = bgCanvas.getBoundingClientRect();
       mouse.x = e.clientX - rect.left;
       mouse.y = e.clientY - rect.top;
       mouse.active = true;
@@ -134,7 +147,7 @@ export default function JapaneseDragonTimeline({
     window.addEventListener('mouseleave', handleMouseLeave);
     window.addEventListener('scroll', handleScroll, { passive: true });
 
-    // Path position evaluator with Catmull-Rom
+    // Path position evaluator with Catmull-Rom (X, Y, Z)
     const getPathPoint = (t) => {
       const n = waypoints.length;
       let normT = ((t % 1) + 1) % 1;
@@ -148,14 +161,14 @@ export default function JapaneseDragonTimeline({
       return {
         x: catmullRom(waypoints[i0].x, waypoints[i1].x, waypoints[i2].x, waypoints[i3].x, localT),
         y: catmullRom(waypoints[i0].y, waypoints[i1].y, waypoints[i2].y, waypoints[i3].y, localT),
+        z: catmullRom(waypoints[i0].z, waypoints[i1].z, waypoints[i2].z, waypoints[i3].z, localT),
       };
     };
 
     // Spawn Multi-Lobed Japanese Mist Cloud (Kumo)
-    const spawnMistCloud = (x, y, vx, vy, scale = 1.0, isDarkSmoke = false) => {
+    const spawnMistCloud = (x, y, vx, vy, scale = 1.0, isDarkSmoke = false, isForeground = false) => {
       if (mistClouds.length >= MAX_MIST_CLOUDS) mistClouds.shift();
 
-      // 4-5 circular cloud lobes forming an organic Japanese cloud curl
       const lobes = [];
       const numLobes = 4 + Math.floor(Math.random() * 2);
       for (let l = 0; l < numLobes; l++) {
@@ -181,21 +194,23 @@ export default function JapaneseDragonTimeline({
         growRate: 1.008,
         lobes,
         isDarkSmoke,
+        isForeground,
       });
     };
 
     // Spawn Luminous Sakura / Golden Ember
-    const spawnEmber = (x, y, vx, vy) => {
+    const spawnEmber = (x, y, vx, vy, isForeground = false) => {
       if (embers.length >= MAX_EMBERS) embers.shift();
       embers.push({
         x: x + (Math.random() - 0.5) * 10,
         y: y + (Math.random() - 0.5) * 10,
         vx: vx * 0.2 + (Math.random() - 0.5) * 0.9,
-        vy: vy * 0.2 - (0.4 + Math.random() * 0.7), // Gently floats upward
+        vy: vy * 0.2 - (0.4 + Math.random() * 0.7),
         life: 1.0,
         decay: 0.016 + Math.random() * 0.014,
         size: 2.2 + Math.random() * 3.0,
-        color: Math.random() > 0.45 ? '#f43f5e' : '#fbbf24', // Sakura Rose or Golden Amber
+        color: Math.random() > 0.45 ? '#f43f5e' : '#fbbf24',
+        isForeground,
       });
     };
 
@@ -213,14 +228,22 @@ export default function JapaneseDragonTimeline({
       currentSpeed = baseSpeed + scrollVelocity;
       pathProgress += currentSpeed;
 
-      // 1. Advance Dragon Head along Flight Spline
+      // 1. Advance Dragon Head along Flight Spline (X, Y, Z)
       const targetPoint = getPathPoint(pathProgress);
       const lookAheadPoint = getPathPoint(pathProgress + 0.002);
 
       let targetHeadX = targetPoint.x;
       let targetHeadY = targetPoint.y;
 
-      // Magnetic Mouse Steering
+      // Periodic macro cycle for surfacing ("passar de vez em quando"):
+      // Sine wave with period ~26 seconds: modulates when the dragon breaches into the foreground
+      const macroSurfacingCycle = Math.sin(time * 0.22);
+      const isSurfacingPhase = macroSurfacingCycle > -0.20;
+      const surfacingAmp = isSurfacingPhase ? (macroSurfacingCycle + 0.20) * 0.85 + 0.45 : 0;
+
+      let targetHeadZ = targetPoint.z > 0 ? targetPoint.z * surfacingAmp : targetPoint.z;
+
+      // Magnetic Mouse Steering & Surfacing Elevation Boost
       if (mouse.active) {
         const dx = mouse.x - targetHeadX;
         const dy = mouse.y - targetHeadY;
@@ -229,18 +252,23 @@ export default function JapaneseDragonTimeline({
           const pull = (1 - dist / 460) * 52;
           targetHeadX += (dx / dist) * pull;
           targetHeadY += (dy / dist) * pull;
+          targetHeadZ += (1 - dist / 460) * 0.95; // Surfacing pull near cursor!
         }
       }
 
       const head = spine[0];
       head.x += (targetHeadX - head.x) * 0.12;
       head.y += (targetHeadY - head.y) * 0.12;
+      head.z += (targetHeadZ - head.z) * 0.12;
       head.angle = Math.atan2(lookAheadPoint.y - head.y, lookAheadPoint.x - head.x);
 
       // 2. Spine Kinematics & Wave Undulation (Fluid Aerial Swimming Motion)
       for (let i = 1; i < NUM_SEGMENTS; i++) {
         const prev = spine[i - 1];
         const cur = spine[i];
+
+        // Propagate depth Z through spine like a wave
+        cur.z += (prev.z - cur.z) * 0.42;
 
         const waveFreq = 0.24;
         const waveAmp = Math.sin((i / NUM_SEGMENTS) * Math.PI) * (18 + scrollVelocity * 3200);
@@ -261,7 +289,7 @@ export default function JapaneseDragonTimeline({
         cur.y += (targetY + perpY - cur.y) * 0.52;
       }
 
-      // 3. Whisker Physics (Long flowing barbels)
+      // 3. Whisker Physics
       const whiskerBaseOffset = 14;
       leftWhisker[0] = {
         x: head.x + Math.cos(head.angle + 0.6) * whiskerBaseOffset,
@@ -286,66 +314,70 @@ export default function JapaneseDragonTimeline({
         curR.y += (prevR.y - Math.sin(head.angle) * 11 - curR.y) * 0.38;
       }
 
-      // 4. Emit Mist Clouds & Embers
+      // 4. Emit Mist Clouds & Embers (flagged with isForeground based on node.z)
       // Nostril breath vapor
       if (Math.random() < 0.40) {
         const nostrilX = head.x + Math.cos(head.angle) * 26;
         const nostrilY = head.y + Math.sin(head.angle) * 26;
-        spawnMistCloud(nostrilX, nostrilY, -Math.cos(head.angle) * 2.5, -Math.sin(head.angle) * 2.5, 0.55, false);
+        spawnMistCloud(nostrilX, nostrilY, -Math.cos(head.angle) * 2.5, -Math.sin(head.angle) * 2.5, 0.55, false, head.z > 0.05);
       }
 
       // Body & Claw Wake Mist Clouds
       if (Math.random() < 0.50 + scrollVelocity * 120) {
         const segIdx = 12 + Math.floor(Math.random() * (NUM_SEGMENTS - 20));
         const node = spine[segIdx];
-        spawnMistCloud(node.x, node.y, -Math.cos(node.angle) * 1.8, -Math.sin(node.angle) * 1.8, 0.95 + Math.random() * 0.4, Math.random() > 0.65);
+        spawnMistCloud(node.x, node.y, -Math.cos(node.angle) * 1.8, -Math.sin(node.angle) * 1.8, 0.95 + Math.random() * 0.4, Math.random() > 0.65, node.z > 0.05);
       }
 
       // Tail Sakura Embers
       if (Math.random() < 0.60) {
         const tail = spine[NUM_SEGMENTS - 1];
-        spawnEmber(tail.x, tail.y, -Math.cos(tail.angle) * 2.0, -Math.sin(tail.angle) * 2.0);
+        spawnEmber(tail.x, tail.y, -Math.cos(tail.angle) * 2.0, -Math.sin(tail.angle) * 2.0, tail.z > 0.05);
       }
 
       // ----------------------------------------------------
-      // DRAWING PASS
+      // DRAWING PASS (Clear both Background & Foreground)
       // ----------------------------------------------------
-      ctx.clearRect(0, 0, width, height);
+      bgCtx.clearRect(0, 0, width, height);
+      fgCtx.clearRect(0, 0, width, height);
+
+      bgCtx.globalAlpha = opacity;
+      fgCtx.globalAlpha = opacity;
 
       // ====================================================
-      // LAYER 1: ATMOSPHERIC ROLLING KASUMI FOG BANKS
+      // LAYER 1: ATMOSPHERIC ROLLING KASUMI FOG BANKS (Always Background)
       // ====================================================
-      ctx.save();
+      bgCtx.save();
       fogBanks.forEach((bank, bIdx) => {
         bank.offset += bank.speed;
         const baseY = height * bank.yPercent;
 
-        const fogGrad = ctx.createLinearGradient(0, baseY - bank.height * 0.5, 0, baseY + bank.height * 0.5);
+        const fogGrad = bgCtx.createLinearGradient(0, baseY - bank.height * 0.5, 0, baseY + bank.height * 0.5);
         fogGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
         fogGrad.addColorStop(0.3, `rgba(255, 255, 255, ${bank.alpha})`);
         fogGrad.addColorStop(0.7, `rgba(244, 246, 250, ${bank.alpha * 0.85})`);
         fogGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
-        ctx.fillStyle = fogGrad;
-        ctx.beginPath();
-        ctx.moveTo(0, baseY + bank.height);
+        bgCtx.fillStyle = fogGrad;
+        bgCtx.beginPath();
+        bgCtx.moveTo(0, baseY + bank.height);
 
         const step = 60;
         for (let x = 0; x <= width + step; x += step) {
           const wave =
             Math.sin(x * 0.004 + bank.offset * 0.02) * bank.amp +
             Math.cos(x * 0.008 - time * 0.8 + bIdx) * (bank.amp * 0.5);
-          ctx.lineTo(x, baseY - bank.height * 0.4 + wave);
+          bgCtx.lineTo(x, baseY - bank.height * 0.4 + wave);
         }
 
-        ctx.lineTo(width, baseY + bank.height);
-        ctx.closePath();
-        ctx.fill();
+        bgCtx.lineTo(width, baseY + bank.height);
+        bgCtx.closePath();
+        bgCtx.fill();
       });
-      ctx.restore();
+      bgCtx.restore();
 
       // ====================================================
-      // LAYER 2: VOLUMETRIC KUMO MIST PUFFS (Dragon Wake)
+      // LAYER 2: VOLUMETRIC KUMO MIST PUFFS (Dispatched to bgCtx or fgCtx)
       // ====================================================
       for (let m = mistClouds.length - 1; m >= 0; m--) {
         const cloud = mistClouds[m];
@@ -360,37 +392,35 @@ export default function JapaneseDragonTimeline({
           continue;
         }
 
-        ctx.save();
-        ctx.translate(cloud.x, cloud.y);
-        ctx.rotate(cloud.rotation);
-        ctx.scale(cloud.scale, cloud.scale);
+        const targetCtx = cloud.isForeground ? fgCtx : bgCtx;
+        targetCtx.save();
+        targetCtx.translate(cloud.x, cloud.y);
+        targetCtx.rotate(cloud.rotation);
+        targetCtx.scale(cloud.scale, cloud.scale);
 
-        // Render each puffy lobe with soft radial gradient
         cloud.lobes.forEach((lobe) => {
-          const grad = ctx.createRadialGradient(lobe.relX, lobe.relY, 0, lobe.relX, lobe.relY, lobe.radius);
+          const grad = targetCtx.createRadialGradient(lobe.relX, lobe.relY, 0, lobe.relX, lobe.relY, lobe.radius);
           if (cloud.isDarkSmoke) {
-            // Soft Sumi-e ink vapor
             grad.addColorStop(0, `rgba(30, 41, 59, ${(cloud.life * 0.12).toFixed(3)})`);
             grad.addColorStop(0.6, `rgba(51, 65, 85, ${(cloud.life * 0.06).toFixed(3)})`);
             grad.addColorStop(1, 'rgba(30, 41, 59, 0)');
           } else {
-            // Ethereal white celestial mist
             grad.addColorStop(0, `rgba(255, 255, 255, ${(cloud.life * 0.35).toFixed(3)})`);
             grad.addColorStop(0.5, `rgba(245, 248, 255, ${(cloud.life * 0.22).toFixed(3)})`);
             grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
           }
 
-          ctx.fillStyle = grad;
-          ctx.beginPath();
-          ctx.arc(lobe.relX, lobe.relY, lobe.radius, 0, Math.PI * 2);
-          ctx.fill();
+          targetCtx.fillStyle = grad;
+          targetCtx.beginPath();
+          targetCtx.arc(lobe.relX, lobe.relY, lobe.radius, 0, Math.PI * 2);
+          targetCtx.fill();
         });
 
-        ctx.restore();
+        targetCtx.restore();
       }
 
       // ====================================================
-      // LAYER 3: LUMINOUS SAKURA & GOLDEN EMBERS
+      // LAYER 3: LUMINOUS SAKURA & GOLDEN EMBERS (Dispatched to bgCtx or fgCtx)
       // ====================================================
       for (let e = embers.length - 1; e >= 0; e--) {
         const emb = embers[e];
@@ -403,22 +433,21 @@ export default function JapaneseDragonTimeline({
           continue;
         }
 
-        ctx.save();
-        ctx.shadowColor = emb.color;
-        ctx.shadowBlur = 8;
-        ctx.fillStyle = emb.color;
-        ctx.globalAlpha = emb.life * 0.85;
-        ctx.beginPath();
-        ctx.arc(emb.x, emb.y, emb.size * 0.5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
+        const targetCtx = emb.isForeground ? fgCtx : bgCtx;
+        targetCtx.save();
+        targetCtx.shadowColor = emb.color;
+        targetCtx.shadowBlur = 8;
+        targetCtx.fillStyle = emb.color;
+        targetCtx.globalAlpha = emb.life * 0.85;
+        targetCtx.beginPath();
+        targetCtx.arc(emb.x, emb.y, emb.size * 0.5, 0, Math.PI * 2);
+        targetCtx.fill();
+        targetCtx.restore();
       }
 
       // ====================================================
       // LAYER 4: THE IMPERIAL SUMI-E DRAGON (RYU / 龍)
       // ====================================================
-      ctx.save();
-
       // Construct Ribbon Profile Points
       const leftPoints = [];
       const rightPoints = [];
@@ -438,119 +467,109 @@ export default function JapaneseDragonTimeline({
         });
       }
 
-      // Main Dragon Body Gradient
-      const bodyGrad = ctx.createLinearGradient(
-        spine[0].x,
-        spine[0].y,
-        spine[NUM_SEGMENTS - 1].x,
-        spine[NUM_SEGMENTS - 1].y
-      );
-      bodyGrad.addColorStop(0, 'rgba(15, 19, 26, 0.72)');
-      bodyGrad.addColorStop(0.25, 'rgba(26, 32, 44, 0.65)');
-      bodyGrad.addColorStop(0.65, 'rgba(190, 24, 60, 0.52)'); // Deep Carmine Sakura glow
-      bodyGrad.addColorStop(1, 'rgba(15, 19, 26, 0.42)');
+      // Helper to generate body gradient on any context
+      const createDragonGrad = (targetCtx) => {
+        const grad = targetCtx.createLinearGradient(
+          spine[0].x,
+          spine[0].y,
+          spine[NUM_SEGMENTS - 1].x,
+          spine[NUM_SEGMENTS - 1].y
+        );
+        grad.addColorStop(0, 'rgba(15, 19, 26, 0.72)');
+        grad.addColorStop(0.25, 'rgba(26, 32, 44, 0.65)');
+        grad.addColorStop(0.65, 'rgba(190, 24, 60, 0.52)');
+        grad.addColorStop(1, 'rgba(15, 19, 26, 0.42)');
+        return grad;
+      };
 
-      // Draw Serpentine Body Ribbon
-      ctx.beginPath();
-      ctx.moveTo(leftPoints[0].x, leftPoints[0].y);
+      // 4A. DRAW ON BACKGROUND CANVAS (Full continuous dragon ribbon)
+      bgCtx.save();
+      const bgBodyGrad = createDragonGrad(bgCtx);
+
+      bgCtx.beginPath();
+      bgCtx.moveTo(leftPoints[0].x, leftPoints[0].y);
       for (let i = 1; i < leftPoints.length; i++) {
         const xc = (leftPoints[i].x + leftPoints[i - 1].x) * 0.5;
         const yc = (leftPoints[i].y + leftPoints[i - 1].y) * 0.5;
-        ctx.quadraticCurveTo(leftPoints[i - 1].x, leftPoints[i - 1].y, xc, yc);
+        bgCtx.quadraticCurveTo(leftPoints[i - 1].x, leftPoints[i - 1].y, xc, yc);
       }
-      ctx.lineTo(leftPoints[leftPoints.length - 1].x, leftPoints[leftPoints.length - 1].y);
+      bgCtx.lineTo(leftPoints[leftPoints.length - 1].x, leftPoints[leftPoints.length - 1].y);
 
       const tailTip = spine[NUM_SEGMENTS - 1];
-      ctx.lineTo(tailTip.x, tailTip.y);
+      bgCtx.lineTo(tailTip.x, tailTip.y);
 
       for (let i = rightPoints.length - 1; i > 0; i--) {
         const xc = (rightPoints[i].x + rightPoints[i - 1].x) * 0.5;
         const yc = (rightPoints[i].y + rightPoints[i - 1].y) * 0.5;
-        ctx.quadraticCurveTo(rightPoints[i].x, rightPoints[i - 1].y, xc, yc);
+        bgCtx.quadraticCurveTo(rightPoints[i].x, rightPoints[i - 1].y, xc, yc);
       }
-      ctx.lineTo(rightPoints[0].x, rightPoints[0].y);
-      ctx.closePath();
+      bgCtx.lineTo(rightPoints[0].x, rightPoints[0].y);
+      bgCtx.closePath();
 
-      ctx.fillStyle = bodyGrad;
-      ctx.fill();
+      bgCtx.fillStyle = bgBodyGrad;
+      bgCtx.fill();
 
-      // Calligraphic ink contour outline
-      ctx.strokeStyle = 'rgba(10, 14, 20, 0.55)';
-      ctx.lineWidth = 2.4;
-      ctx.stroke();
+      bgCtx.strokeStyle = 'rgba(10, 14, 20, 0.55)';
+      bgCtx.lineWidth = 2.4;
+      bgCtx.stroke();
 
-      // ====================================================
-      // 4A. VENTRAL BELLY PLATES (HARA-TATE / 腹板)
-      // Segmented ivory/washi belly bands along the inner curve
-      // ====================================================
+      // Background Belly Plates
       for (let i = 3; i < NUM_SEGMENTS - 5; i += 2) {
         const node = spine[i];
         const normal = node.angle + Math.PI * 0.5;
         const bW = node.width * 0.38;
 
-        // Draw segmented belly plate
-        ctx.fillStyle = 'rgba(254, 243, 199, 0.38)'; // Pale washi cream
-        ctx.beginPath();
-        ctx.ellipse(node.x - Math.cos(normal) * (bW * 0.5), node.y - Math.sin(normal) * (bW * 0.5), bW, 4.5, node.angle, 0, Math.PI * 2);
-        ctx.fill();
+        bgCtx.fillStyle = 'rgba(254, 243, 199, 0.38)';
+        bgCtx.beginPath();
+        bgCtx.ellipse(node.x - Math.cos(normal) * (bW * 0.5), node.y - Math.sin(normal) * (bW * 0.5), bW, 4.5, node.angle, 0, Math.PI * 2);
+        bgCtx.fill();
 
-        ctx.strokeStyle = 'rgba(180, 83, 9, 0.35)'; // Amber/sepia segment line
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
+        bgCtx.strokeStyle = 'rgba(180, 83, 9, 0.35)';
+        bgCtx.lineWidth = 1.2;
+        bgCtx.stroke();
       }
 
-      // ====================================================
-      // 4B. OVERLAPPING BODY SCALES (UROKO / 鱗)
-      // Delicate curved ink scale texture arcs along the dorsal body
-      // ====================================================
+      // Background Scales
       for (let i = 4; i < NUM_SEGMENTS - 6; i += 3) {
         const node = spine[i];
         const normal = node.angle + Math.PI * 0.5;
         const scaleRadius = node.width * 0.28;
 
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)'; // Luminous scale edge
-        ctx.lineWidth = 1.4;
-        ctx.beginPath();
-        ctx.arc(
+        bgCtx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+        bgCtx.lineWidth = 1.4;
+        bgCtx.beginPath();
+        bgCtx.arc(
           node.x + Math.cos(normal) * (node.width * 0.22),
           node.y + Math.sin(normal) * (node.width * 0.22),
           scaleRadius,
           node.angle - 1.2,
           node.angle + 1.2
         );
-        ctx.stroke();
+        bgCtx.stroke();
       }
 
-      // ====================================================
-      // 4C. DORSAL FLAME CREST FINS (SEHIRE / 背鰭)
-      // Serrated fiery spines undulating along the back
-      // ====================================================
+      // Background Dorsal Fins
       for (let i = 3; i < NUM_SEGMENTS - 5; i += 2) {
         const node = spine[i];
         const finAngle = node.angle + Math.PI * 0.5;
         const finLength = node.width * 0.95 + Math.sin(time * 3.2 + i * 0.45) * 6;
         const finBase = 8;
 
-        // Gradient fin tip
-        ctx.fillStyle = 'rgba(225, 29, 72, 0.55)'; // Crimson flame
-        ctx.beginPath();
-        ctx.moveTo(node.x - Math.cos(node.angle) * finBase, node.y - Math.sin(node.angle) * finBase);
-        ctx.lineTo(node.x + Math.cos(finAngle) * finLength, node.y + Math.sin(finAngle) * finLength);
-        ctx.lineTo(node.x + Math.cos(node.angle) * finBase, node.y + Math.sin(node.angle) * finBase);
-        ctx.closePath();
-        ctx.fill();
+        bgCtx.fillStyle = 'rgba(225, 29, 72, 0.55)';
+        bgCtx.beginPath();
+        bgCtx.moveTo(node.x - Math.cos(node.angle) * finBase, node.y - Math.sin(node.angle) * finBase);
+        bgCtx.lineTo(node.x + Math.cos(finAngle) * finLength, node.y + Math.sin(finAngle) * finLength);
+        bgCtx.lineTo(node.x + Math.cos(node.angle) * finBase, node.y + Math.sin(node.angle) * finBase);
+        bgCtx.closePath();
+        bgCtx.fill();
 
-        // Gold tipped spine highlight
-        ctx.fillStyle = '#fbbf24';
-        ctx.beginPath();
-        ctx.arc(node.x + Math.cos(finAngle) * finLength, node.y + Math.sin(finAngle) * finLength, 1.8, 0, Math.PI * 2);
-        ctx.fill();
+        bgCtx.fillStyle = '#fbbf24';
+        bgCtx.beginPath();
+        bgCtx.arc(node.x + Math.cos(finAngle) * finLength, node.y + Math.sin(finAngle) * finLength, 1.8, 0, Math.PI * 2);
+        bgCtx.fill();
       }
 
-      // ====================================================
-      // 4D. FOUR MUSCULAR IMPERIAL LEGS & CLAWS (TSUME / 爪)
-      // 3-jointed legs with 4 curved talons and knuckles
-      // ====================================================
+      // Background Legs & Claws
       const legSegments = [12, 22, 34, 44];
       legSegments.forEach((segIdx, legIdx) => {
         const node = spine[segIdx];
@@ -559,262 +578,585 @@ export default function JapaneseDragonTimeline({
         const hipX = node.x + Math.cos(node.angle + side * Math.PI * 0.5) * (node.width * 0.48);
         const hipY = node.y + Math.sin(node.angle + side * Math.PI * 0.5) * (node.width * 0.48);
 
-        // Thigh
         const thighLen = 22;
         const kneeX = hipX + Math.cos(legBaseAngle) * thighLen;
         const kneeY = hipY + Math.sin(legBaseAngle) * thighLen;
 
-        // Shin
         const shinAngle = legBaseAngle + side * 0.75 + Math.sin(time * 3 + legIdx) * 0.15;
         const shinLen = 18;
         const ankleX = kneeX + Math.cos(shinAngle) * shinLen;
         const ankleY = kneeY + Math.sin(shinAngle) * shinLen;
 
-        // Paw Pad
-        ctx.strokeStyle = 'rgba(20, 24, 34, 0.75)';
-        ctx.lineWidth = 5.5;
-        ctx.lineCap = 'round';
-        ctx.beginPath();
-        ctx.moveTo(hipX, hipY);
-        ctx.lineTo(kneeX, kneeY);
-        ctx.lineTo(ankleX, ankleY);
-        ctx.stroke();
+        bgCtx.strokeStyle = 'rgba(20, 24, 34, 0.75)';
+        bgCtx.lineWidth = 5.5;
+        bgCtx.lineCap = 'round';
+        bgCtx.beginPath();
+        bgCtx.moveTo(hipX, hipY);
+        bgCtx.lineTo(kneeX, kneeY);
+        bgCtx.lineTo(ankleX, ankleY);
+        bgCtx.stroke();
 
-        // 4 Curved Razor Talons
         for (let c = -1.5; c <= 1.5; c += 1.0) {
           const clawAngle = shinAngle + c * 0.4;
           const clawLen = 12;
           const tipX = ankleX + Math.cos(clawAngle) * clawLen;
           const tipY = ankleY + Math.sin(clawAngle) * clawLen;
 
-          // Talon body
-          ctx.strokeStyle = '#e11d48'; // Crimson talons
-          ctx.lineWidth = 2.8;
-          ctx.beginPath();
-          ctx.moveTo(ankleX, ankleY);
-          ctx.quadraticCurveTo(
+          bgCtx.strokeStyle = '#e11d48';
+          bgCtx.lineWidth = 2.8;
+          bgCtx.beginPath();
+          bgCtx.moveTo(ankleX, ankleY);
+          bgCtx.quadraticCurveTo(
             ankleX + Math.cos(clawAngle) * (clawLen * 0.6) + side * 3,
             ankleY + Math.sin(clawAngle) * (clawLen * 0.6),
             tipX,
             tipY
           );
-          ctx.stroke();
+          bgCtx.stroke();
 
-          // Silver talon tip
-          ctx.fillStyle = '#ffffff';
-          ctx.beginPath();
-          ctx.arc(tipX, tipY, 1.2, 0, Math.PI * 2);
-          ctx.fill();
+          bgCtx.fillStyle = '#ffffff';
+          bgCtx.beginPath();
+          bgCtx.arc(tipX, tipY, 1.2, 0, Math.PI * 2);
+          bgCtx.fill();
         }
       });
 
-      // ====================================================
-      // 4E. CALLIGRAPHIC INK BRUSH TAIL PLUME (OPPO / 尾)
-      // Massive flared flame fan of calligraphic streaks
-      // ====================================================
+      // Background Tail Plume
       const tailNode = spine[NUM_SEGMENTS - 1];
-      const tailAngle = tailNode.angle;
       for (let t = -3; t <= 3; t++) {
-        const tuftAngle = tailAngle + t * 0.28 + Math.sin(time * 3 + t * 0.7) * 0.25;
+        const tuftAngle = tailNode.angle + t * 0.28 + Math.sin(time * 3 + t * 0.7) * 0.25;
         const tuftLen = 42 - Math.abs(t) * 6;
 
-        ctx.fillStyle = t % 2 === 0 ? 'rgba(225, 29, 72, 0.65)' : 'rgba(20, 24, 34, 0.75)';
-        ctx.beginPath();
-        ctx.moveTo(tailNode.x, tailNode.y);
-        ctx.quadraticCurveTo(
+        bgCtx.fillStyle = t % 2 === 0 ? 'rgba(225, 29, 72, 0.65)' : 'rgba(20, 24, 34, 0.75)';
+        bgCtx.beginPath();
+        bgCtx.moveTo(tailNode.x, tailNode.y);
+        bgCtx.quadraticCurveTo(
           tailNode.x + Math.cos(tuftAngle) * (tuftLen * 0.5) + t * 5,
           tailNode.y + Math.sin(tuftAngle) * (tuftLen * 0.5),
           tailNode.x + Math.cos(tuftAngle) * tuftLen,
           tailNode.y + Math.sin(tuftAngle) * tuftLen
         );
-        ctx.lineTo(tailNode.x, tailNode.y);
-        ctx.fill();
+        bgCtx.lineTo(tailNode.x, tailNode.y);
+        bgCtx.fill();
       }
 
-      // ====================================================
-      // 4F. THE IMPERIAL DRAGON HEAD (ATAMA / 頭)
-      // Imposing skull, deer antlers, fangs, glowing eyes, flowing mane
-      // ====================================================
-      ctx.save();
-      ctx.translate(head.x, head.y);
-      ctx.rotate(head.angle);
+      // Background Head
+      bgCtx.save();
+      bgCtx.translate(head.x, head.y);
+      bgCtx.rotate(head.angle);
 
-      // Skull Base
-      ctx.fillStyle = 'rgba(16, 20, 28, 0.92)';
-      ctx.beginPath();
-      ctx.ellipse(6, 0, 32, 20, 0, 0, Math.PI * 2);
-      ctx.fill();
+      bgCtx.fillStyle = 'rgba(16, 20, 28, 0.92)';
+      bgCtx.beginPath();
+      bgCtx.ellipse(6, 0, 32, 20, 0, 0, Math.PI * 2);
+      bgCtx.fill();
 
-      // Snout / Upper Jaw (46px long)
-      ctx.beginPath();
-      ctx.moveTo(14, -14);
-      ctx.lineTo(42, -9);
-      ctx.lineTo(46, 0);
-      ctx.lineTo(42, 9);
-      ctx.lineTo(14, 14);
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(22, 28, 38, 0.95)';
-      ctx.fill();
+      bgCtx.beginPath();
+      bgCtx.moveTo(14, -14);
+      bgCtx.lineTo(42, -9);
+      bgCtx.lineTo(46, 0);
+      bgCtx.lineTo(42, 9);
+      bgCtx.lineTo(14, 14);
+      bgCtx.closePath();
+      bgCtx.fillStyle = 'rgba(22, 28, 38, 0.95)';
+      bgCtx.fill();
 
-      // Lower Jaw (36px long)
-      ctx.beginPath();
-      ctx.moveTo(14, 8);
-      ctx.lineTo(34, 11);
-      ctx.lineTo(28, 17);
-      ctx.lineTo(10, 14);
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(30, 38, 50, 0.92)';
-      ctx.fill();
+      bgCtx.beginPath();
+      bgCtx.moveTo(14, 8);
+      bgCtx.lineTo(34, 11);
+      bgCtx.lineTo(28, 17);
+      bgCtx.lineTo(10, 14);
+      bgCtx.closePath();
+      bgCtx.fillStyle = 'rgba(30, 38, 50, 0.92)';
+      bgCtx.fill();
 
-      // Fangs (Kiba / 牙) in Ivory White
-      ctx.fillStyle = '#f8fafc';
-      // Upper Fang
-      ctx.beginPath();
-      ctx.moveTo(34, 4);
-      ctx.lineTo(36, 12);
-      ctx.lineTo(38, 4);
-      ctx.closePath();
-      ctx.fill();
+      bgCtx.fillStyle = '#f8fafc';
+      bgCtx.beginPath();
+      bgCtx.moveTo(34, 4);
+      bgCtx.lineTo(36, 12);
+      bgCtx.lineTo(38, 4);
+      bgCtx.closePath();
+      bgCtx.fill();
 
-      // Lower Fang
-      ctx.beginPath();
-      ctx.moveTo(26, 11);
-      ctx.lineTo(28, 3);
-      ctx.lineTo(30, 11);
-      ctx.closePath();
-      ctx.fill();
+      bgCtx.beginPath();
+      bgCtx.moveTo(26, 11);
+      bgCtx.lineTo(28, 3);
+      bgCtx.lineTo(30, 11);
+      bgCtx.closePath();
+      bgCtx.fill();
 
-      // Flared Nostrils
-      ctx.fillStyle = '#0f172a';
-      ctx.beginPath();
-      ctx.ellipse(38, -4, 3, 2, -0.3, 0, Math.PI * 2);
-      ctx.fill();
+      bgCtx.fillStyle = '#0f172a';
+      bgCtx.beginPath();
+      bgCtx.ellipse(38, -4, 3, 2, -0.3, 0, Math.PI * 2);
+      bgCtx.fill();
 
-      // Flowing Beard / Mane under Chin (Tategami)
       for (let b = 0; b < 3; b++) {
-        ctx.fillStyle = b === 1 ? 'rgba(225, 29, 72, 0.75)' : 'rgba(20, 24, 34, 0.85)';
-        ctx.beginPath();
-        ctx.moveTo(10, 10 + b * 2);
-        ctx.quadraticCurveTo(
-          -14,
-          24 + b * 6 + Math.sin(time * 3.8 + b) * 5,
-          -32 - b * 6,
-          16 + b * 4
-        );
-        ctx.lineTo(-4, 6);
-        ctx.closePath();
-        ctx.fill();
+        bgCtx.fillStyle = b === 1 ? 'rgba(225, 29, 72, 0.75)' : 'rgba(20, 24, 34, 0.85)';
+        bgCtx.beginPath();
+        bgCtx.moveTo(10, 10 + b * 2);
+        bgCtx.quadraticCurveTo(-14, 24 + b * 6 + Math.sin(time * 3.8 + b) * 5, -32 - b * 6, 16 + b * 4);
+        bgCtx.lineTo(-4, 6);
+        bgCtx.closePath();
+        bgCtx.fill();
       }
 
-      // Crown Mane streaming backward from head
       for (let m = 0; m < 4; m++) {
-        ctx.fillStyle = m % 2 === 0 ? 'rgba(225, 29, 72, 0.70)' : 'rgba(30, 41, 59, 0.85)';
-        ctx.beginPath();
-        ctx.moveTo(-6, -8 + m * 5);
-        ctx.quadraticCurveTo(
-          -28,
-          -22 + m * 8 + Math.sin(time * 3.5 + m) * 4,
-          -48 - m * 8,
-          -14 + m * 6
-        );
-        ctx.lineTo(-12, -2);
-        ctx.closePath();
-        ctx.fill();
+        bgCtx.fillStyle = m % 2 === 0 ? 'rgba(225, 29, 72, 0.70)' : 'rgba(30, 41, 59, 0.85)';
+        bgCtx.beginPath();
+        bgCtx.moveTo(-6, -8 + m * 5);
+        bgCtx.quadraticCurveTo(-28, -22 + m * 8 + Math.sin(time * 3.5 + m) * 4, -48 - m * 8, -14 + m * 6);
+        bgCtx.lineTo(-12, -2);
+        bgCtx.closePath();
+        bgCtx.fill();
       }
 
-      // Pair of Magnificent Branched Deer Antlers (Tsuno / 角)
       [-1, 1].forEach((sign) => {
-        ctx.strokeStyle = '#334155';
-        ctx.lineWidth = 4.5;
-        ctx.lineCap = 'round';
+        bgCtx.strokeStyle = '#334155';
+        bgCtx.lineWidth = 4.5;
+        bgCtx.lineCap = 'round';
 
-        // Main antler beam (50px)
-        ctx.beginPath();
-        ctx.moveTo(-4, sign * 10);
-        ctx.quadraticCurveTo(-22, sign * 24, -44, sign * 30);
-        ctx.stroke();
+        bgCtx.beginPath();
+        bgCtx.moveTo(-4, sign * 10);
+        bgCtx.quadraticCurveTo(-22, sign * 24, -44, sign * 30);
+        bgCtx.stroke();
 
-        // Fork 1 (Front tine)
-        ctx.lineWidth = 3.2;
-        ctx.beginPath();
-        ctx.moveTo(-22, sign * 24);
-        ctx.lineTo(-30, sign * 14);
-        ctx.stroke();
+        bgCtx.lineWidth = 3.2;
+        bgCtx.beginPath();
+        bgCtx.moveTo(-22, sign * 24);
+        bgCtx.lineTo(-30, sign * 14);
+        bgCtx.stroke();
 
-        // Fork 2 (Top tine)
-        ctx.beginPath();
-        ctx.moveTo(-32, sign * 27);
-        ctx.lineTo(-42, sign * 20);
-        ctx.stroke();
+        bgCtx.beginPath();
+        bgCtx.moveTo(-32, sign * 27);
+        bgCtx.lineTo(-42, sign * 20);
+        bgCtx.stroke();
 
-        // Luminous Golden Antler Tips
-        ctx.fillStyle = '#fbbf24';
-        ctx.beginPath();
-        ctx.arc(-44, sign * 30, 3.2, 0, Math.PI * 2);
-        ctx.fill();
+        bgCtx.fillStyle = '#fbbf24';
+        bgCtx.beginPath();
+        bgCtx.arc(-44, sign * 30, 3.2, 0, Math.PI * 2);
+        bgCtx.fill();
 
-        ctx.beginPath();
-        ctx.arc(-30, sign * 14, 2.5, 0, Math.PI * 2);
-        ctx.fill();
+        bgCtx.beginPath();
+        bgCtx.arc(-30, sign * 14, 2.5, 0, Math.PI * 2);
+        bgCtx.fill();
       });
 
-      // Hyper-Realistic Glowing Golden Amber Eye
-      ctx.shadowColor = '#fbbf24';
-      ctx.shadowBlur = 18;
-      ctx.fillStyle = '#fbbf24';
-      ctx.beginPath();
-      ctx.ellipse(18, -6, 6.5, 4.2, -0.25, 0, Math.PI * 2);
-      ctx.fill();
+      bgCtx.shadowColor = '#fbbf24';
+      bgCtx.shadowBlur = 18;
+      bgCtx.fillStyle = '#fbbf24';
+      bgCtx.beginPath();
+      bgCtx.ellipse(18, -6, 6.5, 4.2, -0.25, 0, Math.PI * 2);
+      bgCtx.fill();
 
-      // Slit Pupil
-      ctx.fillStyle = '#0f172a';
-      ctx.shadowBlur = 0;
-      ctx.beginPath();
-      ctx.ellipse(18, -6, 1.8, 4.2, -0.25, 0, Math.PI * 2);
-      ctx.fill();
+      bgCtx.fillStyle = '#0f172a';
+      bgCtx.shadowBlur = 0;
+      bgCtx.beginPath();
+      bgCtx.ellipse(18, -6, 1.8, 4.2, -0.25, 0, Math.PI * 2);
+      bgCtx.fill();
 
-      // Specular Gleam
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(16.5, -7.5, 1.2, 0, Math.PI * 2);
-      ctx.fill();
+      bgCtx.fillStyle = '#ffffff';
+      bgCtx.beginPath();
+      bgCtx.arc(16.5, -7.5, 1.2, 0, Math.PI * 2);
+      bgCtx.fill();
 
-      ctx.restore();
+      bgCtx.restore();
 
-      // ====================================================
-      // 4G. DYNAMIC TRAILING WHISKERS (HIGE / 髭)
-      // Long sweeping golden barbels undulating with fluid inertia
-      // ====================================================
+      // Background Whiskers
       [leftWhisker, rightWhisker].forEach((whisker) => {
-        ctx.beginPath();
-        ctx.moveTo(whisker[0].x, whisker[0].y);
+        bgCtx.beginPath();
+        bgCtx.moveTo(whisker[0].x, whisker[0].y);
         for (let k = 1; k < whisker.length; k++) {
           const xc = (whisker[k].x + whisker[k - 1].x) * 0.5;
           const yc = (whisker[k].y + whisker[k - 1].y) * 0.5;
-          ctx.quadraticCurveTo(whisker[k - 1].x, whisker[k - 1].y, xc, yc);
+          bgCtx.quadraticCurveTo(whisker[k - 1].x, whisker[k - 1].y, xc, yc);
         }
-        ctx.strokeStyle = 'rgba(251, 191, 36, 0.85)'; // Radiant gold
-        ctx.lineWidth = 2.4;
-        ctx.lineCap = 'round';
-        ctx.stroke();
+        bgCtx.strokeStyle = 'rgba(251, 191, 36, 0.85)';
+        bgCtx.lineWidth = 2.4;
+        bgCtx.lineCap = 'round';
+        bgCtx.stroke();
       });
 
-      ctx.restore();
+      bgCtx.restore();
+
+      // ====================================================
+      // 4B. DRAW ON FOREGROUND CANVAS (z-20: SOARING OVER CARDS!)
+      // Only segments with z > 0.05 are drawn on fgCanvas, casting drop-shadow directly onto cards!
+      // ====================================================
+      const hasSurfacedSegments = spine.some((node) => node.z > 0.05);
+
+      if (hasSurfacedSegments) {
+        fgCtx.save();
+        const fgBodyGrad = createDragonGrad(fgCtx);
+
+        // Draw Surfaced Body Quads with Physical Drop-Shadow on Cards
+        for (let i = 0; i < NUM_SEGMENTS - 1; i++) {
+          const zAvg = (spine[i].z + spine[i + 1].z) * 0.5;
+          if (zAvg > 0.05) {
+            const segAlpha = Math.min(1.0, (zAvg - 0.05) * 2.2);
+
+            fgCtx.save();
+            fgCtx.globalAlpha = opacity * segAlpha;
+
+            // Soft drop shadow cast onto card faces below
+            fgCtx.shadowColor = 'rgba(15, 23, 42, 0.24)';
+            fgCtx.shadowBlur = 18;
+            fgCtx.shadowOffsetX = 3;
+            fgCtx.shadowOffsetY = 12;
+
+            // Joint disc to eliminate sub-pixel seam
+            fgCtx.beginPath();
+            fgCtx.arc(spine[i].x, spine[i].y, spine[i].width * 0.5, 0, Math.PI * 2);
+            fgCtx.fillStyle = fgBodyGrad;
+            fgCtx.fill();
+
+            // Segment Quad
+            fgCtx.beginPath();
+            fgCtx.moveTo(leftPoints[i].x, leftPoints[i].y);
+            fgCtx.lineTo(leftPoints[i + 1].x, leftPoints[i + 1].y);
+            fgCtx.lineTo(rightPoints[i + 1].x, rightPoints[i + 1].y);
+            fgCtx.lineTo(rightPoints[i].x, rightPoints[i].y);
+            fgCtx.closePath();
+            fgCtx.fillStyle = fgBodyGrad;
+            fgCtx.fill();
+
+            // Clear shadow for crisp calligraphic borders and details
+            fgCtx.shadowColor = 'transparent';
+            fgCtx.shadowBlur = 0;
+
+            fgCtx.strokeStyle = 'rgba(10, 14, 20, 0.55)';
+            fgCtx.lineWidth = 2.4;
+            fgCtx.beginPath();
+            fgCtx.moveTo(leftPoints[i].x, leftPoints[i].y);
+            fgCtx.lineTo(leftPoints[i + 1].x, leftPoints[i + 1].y);
+            fgCtx.stroke();
+
+            fgCtx.beginPath();
+            fgCtx.moveTo(rightPoints[i].x, rightPoints[i].y);
+            fgCtx.lineTo(rightPoints[i + 1].x, rightPoints[i + 1].y);
+            fgCtx.stroke();
+
+            // Surfaced Belly Plates
+            if (i >= 3 && i < NUM_SEGMENTS - 5 && i % 2 === 1) {
+              const node = spine[i];
+              const normal = node.angle + Math.PI * 0.5;
+              const bW = node.width * 0.38;
+
+              fgCtx.fillStyle = 'rgba(254, 243, 199, 0.45)';
+              fgCtx.beginPath();
+              fgCtx.ellipse(node.x - Math.cos(normal) * (bW * 0.5), node.y - Math.sin(normal) * (bW * 0.5), bW, 4.5, node.angle, 0, Math.PI * 2);
+              fgCtx.fill();
+
+              fgCtx.strokeStyle = 'rgba(180, 83, 9, 0.40)';
+              fgCtx.lineWidth = 1.2;
+              fgCtx.stroke();
+            }
+
+            // Surfaced Overlapping Scales
+            if (i >= 4 && i < NUM_SEGMENTS - 6 && i % 3 === 1) {
+              const node = spine[i];
+              const normal = node.angle + Math.PI * 0.5;
+              const scaleRadius = node.width * 0.28;
+
+              fgCtx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
+              fgCtx.lineWidth = 1.4;
+              fgCtx.beginPath();
+              fgCtx.arc(
+                node.x + Math.cos(normal) * (node.width * 0.22),
+                node.y + Math.sin(normal) * (node.width * 0.22),
+                scaleRadius,
+                node.angle - 1.2,
+                node.angle + 1.2
+              );
+              fgCtx.stroke();
+            }
+
+            // Surfaced Dorsal Fins with Gold Highlight
+            if (i >= 3 && i < NUM_SEGMENTS - 5 && i % 2 === 1) {
+              const node = spine[i];
+              const finAngle = node.angle + Math.PI * 0.5;
+              const finLength = node.width * 0.95 + Math.sin(time * 3.2 + i * 0.45) * 6;
+              const finBase = 8;
+
+              fgCtx.fillStyle = 'rgba(225, 29, 72, 0.65)';
+              fgCtx.beginPath();
+              fgCtx.moveTo(node.x - Math.cos(node.angle) * finBase, node.y - Math.sin(node.angle) * finBase);
+              fgCtx.lineTo(node.x + Math.cos(finAngle) * finLength, node.y + Math.sin(finAngle) * finLength);
+              fgCtx.lineTo(node.x + Math.cos(node.angle) * finBase, node.y + Math.sin(node.angle) * finBase);
+              fgCtx.closePath();
+              fgCtx.fill();
+
+              fgCtx.fillStyle = '#fbbf24';
+              fgCtx.beginPath();
+              fgCtx.arc(node.x + Math.cos(finAngle) * finLength, node.y + Math.sin(finAngle) * finLength, 1.8, 0, Math.PI * 2);
+              fgCtx.fill();
+            }
+
+            fgCtx.restore();
+          }
+        }
+
+        // Surfaced Legs & Claws
+        legSegments.forEach((segIdx, legIdx) => {
+          const node = spine[segIdx];
+          if (node.z > 0.05) {
+            const side = legIdx % 2 === 0 ? 1 : -1;
+            const legBaseAngle = node.angle + side * 1.35;
+            const hipX = node.x + Math.cos(node.angle + side * Math.PI * 0.5) * (node.width * 0.48);
+            const hipY = node.y + Math.sin(node.angle + side * Math.PI * 0.5) * (node.width * 0.48);
+
+            const thighLen = 22;
+            const kneeX = hipX + Math.cos(legBaseAngle) * thighLen;
+            const kneeY = hipY + Math.sin(legBaseAngle) * thighLen;
+
+            const shinAngle = legBaseAngle + side * 0.75 + Math.sin(time * 3 + legIdx) * 0.15;
+            const shinLen = 18;
+            const ankleX = kneeX + Math.cos(shinAngle) * shinLen;
+            const ankleY = kneeY + Math.sin(shinAngle) * shinLen;
+
+            fgCtx.save();
+            fgCtx.shadowColor = 'rgba(15, 23, 42, 0.25)';
+            fgCtx.shadowBlur = 14;
+            fgCtx.shadowOffsetY = 8;
+
+            fgCtx.strokeStyle = 'rgba(20, 24, 34, 0.85)';
+            fgCtx.lineWidth = 5.5;
+            fgCtx.lineCap = 'round';
+            fgCtx.beginPath();
+            fgCtx.moveTo(hipX, hipY);
+            fgCtx.lineTo(kneeX, kneeY);
+            fgCtx.lineTo(ankleX, ankleY);
+            fgCtx.stroke();
+
+            fgCtx.shadowColor = 'transparent';
+            fgCtx.shadowBlur = 0;
+
+            for (let c = -1.5; c <= 1.5; c += 1.0) {
+              const clawAngle = shinAngle + c * 0.4;
+              const clawLen = 12;
+              const tipX = ankleX + Math.cos(clawAngle) * clawLen;
+              const tipY = ankleY + Math.sin(clawAngle) * clawLen;
+
+              fgCtx.strokeStyle = '#e11d48';
+              fgCtx.lineWidth = 2.8;
+              fgCtx.beginPath();
+              fgCtx.moveTo(ankleX, ankleY);
+              fgCtx.quadraticCurveTo(
+                ankleX + Math.cos(clawAngle) * (clawLen * 0.6) + side * 3,
+                ankleY + Math.sin(clawAngle) * (clawLen * 0.6),
+                tipX,
+                tipY
+              );
+              fgCtx.stroke();
+
+              fgCtx.fillStyle = '#ffffff';
+              fgCtx.beginPath();
+              fgCtx.arc(tipX, tipY, 1.2, 0, Math.PI * 2);
+              fgCtx.fill();
+            }
+            fgCtx.restore();
+          }
+        });
+
+        // Surfaced Head with Shadow & Glowing Eye
+        if (head.z > 0.05) {
+          const headAlpha = Math.min(1.0, (head.z - 0.05) * 2.5);
+
+          fgCtx.save();
+          fgCtx.globalAlpha = opacity * headAlpha;
+          fgCtx.translate(head.x, head.y);
+          fgCtx.rotate(head.angle);
+
+          // Skull Shadow on Card Face
+          fgCtx.shadowColor = 'rgba(15, 23, 42, 0.28)';
+          fgCtx.shadowBlur = 22;
+          fgCtx.shadowOffsetX = 4;
+          fgCtx.shadowOffsetY = 14;
+
+          fgCtx.fillStyle = 'rgba(16, 20, 28, 0.95)';
+          fgCtx.beginPath();
+          fgCtx.ellipse(6, 0, 32, 20, 0, 0, Math.PI * 2);
+          fgCtx.fill();
+
+          fgCtx.shadowColor = 'transparent';
+          fgCtx.shadowBlur = 0;
+
+          // Snout / Upper Jaw
+          fgCtx.beginPath();
+          fgCtx.moveTo(14, -14);
+          fgCtx.lineTo(42, -9);
+          fgCtx.lineTo(46, 0);
+          fgCtx.lineTo(42, 9);
+          fgCtx.lineTo(14, 14);
+          fgCtx.closePath();
+          fgCtx.fillStyle = 'rgba(22, 28, 38, 0.98)';
+          fgCtx.fill();
+
+          // Lower Jaw
+          fgCtx.beginPath();
+          fgCtx.moveTo(14, 8);
+          fgCtx.lineTo(34, 11);
+          fgCtx.lineTo(28, 17);
+          fgCtx.lineTo(10, 14);
+          fgCtx.closePath();
+          fgCtx.fillStyle = 'rgba(30, 38, 50, 0.95)';
+          fgCtx.fill();
+
+          // Fangs in Ivory
+          fgCtx.fillStyle = '#f8fafc';
+          fgCtx.beginPath();
+          fgCtx.moveTo(34, 4);
+          fgCtx.lineTo(36, 12);
+          fgCtx.lineTo(38, 4);
+          fgCtx.closePath();
+          fgCtx.fill();
+
+          fgCtx.beginPath();
+          fgCtx.moveTo(26, 11);
+          fgCtx.lineTo(28, 3);
+          fgCtx.lineTo(30, 11);
+          fgCtx.closePath();
+          fgCtx.fill();
+
+          // Flared Nostrils
+          fgCtx.fillStyle = '#0f172a';
+          fgCtx.beginPath();
+          fgCtx.ellipse(38, -4, 3, 2, -0.3, 0, Math.PI * 2);
+          fgCtx.fill();
+
+          // Beard Mane
+          for (let b = 0; b < 3; b++) {
+            fgCtx.fillStyle = b === 1 ? 'rgba(225, 29, 72, 0.85)' : 'rgba(20, 24, 34, 0.92)';
+            fgCtx.beginPath();
+            fgCtx.moveTo(10, 10 + b * 2);
+            fgCtx.quadraticCurveTo(-14, 24 + b * 6 + Math.sin(time * 3.8 + b) * 5, -32 - b * 6, 16 + b * 4);
+            fgCtx.lineTo(-4, 6);
+            fgCtx.closePath();
+            fgCtx.fill();
+          }
+
+          // Crown Mane
+          for (let m = 0; m < 4; m++) {
+            fgCtx.fillStyle = m % 2 === 0 ? 'rgba(225, 29, 72, 0.80)' : 'rgba(30, 41, 59, 0.92)';
+            fgCtx.beginPath();
+            fgCtx.moveTo(-6, -8 + m * 5);
+            fgCtx.quadraticCurveTo(-28, -22 + m * 8 + Math.sin(time * 3.5 + m) * 4, -48 - m * 8, -14 + m * 6);
+            fgCtx.lineTo(-12, -2);
+            fgCtx.closePath();
+            fgCtx.fill();
+          }
+
+          // Deer Antlers
+          [-1, 1].forEach((sign) => {
+            fgCtx.strokeStyle = '#334155';
+            fgCtx.lineWidth = 4.5;
+            fgCtx.lineCap = 'round';
+
+            fgCtx.beginPath();
+            fgCtx.moveTo(-4, sign * 10);
+            fgCtx.quadraticCurveTo(-22, sign * 24, -44, sign * 30);
+            fgCtx.stroke();
+
+            fgCtx.lineWidth = 3.2;
+            fgCtx.beginPath();
+            fgCtx.moveTo(-22, sign * 24);
+            fgCtx.lineTo(-30, sign * 14);
+            fgCtx.stroke();
+
+            fgCtx.beginPath();
+            fgCtx.moveTo(-32, sign * 27);
+            fgCtx.lineTo(-42, sign * 20);
+            fgCtx.stroke();
+
+            fgCtx.fillStyle = '#fbbf24';
+            fgCtx.beginPath();
+            fgCtx.arc(-44, sign * 30, 3.2, 0, Math.PI * 2);
+            fgCtx.fill();
+
+            fgCtx.beginPath();
+            fgCtx.arc(-30, sign * 14, 2.5, 0, Math.PI * 2);
+            fgCtx.fill();
+          });
+
+          // Radiant Glowing Amber Eye Floating Over Card
+          fgCtx.shadowColor = '#fbbf24';
+          fgCtx.shadowBlur = 24;
+          fgCtx.fillStyle = '#fbbf24';
+          fgCtx.beginPath();
+          fgCtx.ellipse(18, -6, 6.5, 4.2, -0.25, 0, Math.PI * 2);
+          fgCtx.fill();
+
+          fgCtx.fillStyle = '#0f172a';
+          fgCtx.shadowBlur = 0;
+          fgCtx.beginPath();
+          fgCtx.ellipse(18, -6, 1.8, 4.2, -0.25, 0, Math.PI * 2);
+          fgCtx.fill();
+
+          fgCtx.fillStyle = '#ffffff';
+          fgCtx.beginPath();
+          fgCtx.arc(16.5, -7.5, 1.2, 0, Math.PI * 2);
+          fgCtx.fill();
+
+          fgCtx.restore();
+
+          // Surfaced Golden Whiskers
+          [leftWhisker, rightWhisker].forEach((whisker) => {
+            fgCtx.save();
+            fgCtx.shadowColor = 'rgba(251, 191, 36, 0.45)';
+            fgCtx.shadowBlur = 10;
+            fgCtx.beginPath();
+            fgCtx.moveTo(whisker[0].x, whisker[0].y);
+            for (let k = 1; k < whisker.length; k++) {
+              const xc = (whisker[k].x + whisker[k - 1].x) * 0.5;
+              const yc = (whisker[k].y + whisker[k - 1].y) * 0.5;
+              fgCtx.quadraticCurveTo(whisker[k - 1].x, whisker[k - 1].y, xc, yc);
+            }
+            fgCtx.strokeStyle = 'rgba(251, 191, 36, 0.95)';
+            fgCtx.lineWidth = 2.6;
+            fgCtx.lineCap = 'round';
+            fgCtx.stroke();
+            fgCtx.restore();
+          });
+        }
+
+        // Surfaced Tail Plume
+        if (tailNode.z > 0.05) {
+          fgCtx.save();
+          for (let t = -3; t <= 3; t++) {
+            const tuftAngle = tailNode.angle + t * 0.28 + Math.sin(time * 3 + t * 0.7) * 0.25;
+            const tuftLen = 42 - Math.abs(t) * 6;
+
+            fgCtx.fillStyle = t % 2 === 0 ? 'rgba(225, 29, 72, 0.75)' : 'rgba(20, 24, 34, 0.85)';
+            fgCtx.beginPath();
+            fgCtx.moveTo(tailNode.x, tailNode.y);
+            fgCtx.quadraticCurveTo(
+              tailNode.x + Math.cos(tuftAngle) * (tuftLen * 0.5) + t * 5,
+              tailNode.y + Math.sin(tuftAngle) * (tuftLen * 0.5),
+              tailNode.x + Math.cos(tuftAngle) * tuftLen,
+              tailNode.y + Math.sin(tuftAngle) * tuftLen
+            );
+            fgCtx.lineTo(tailNode.x, tailNode.y);
+            fgCtx.fill();
+          }
+          fgCtx.restore();
+        }
+
+        fgCtx.restore();
+      }
     };
 
-    // Resize Handler
+    // Resize Handler for Both Canvases
     const handleResize = () => {
-      width = canvas.parentElement?.clientWidth || window.innerWidth;
-      height = canvas.parentElement?.clientHeight || window.innerHeight;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      ctx.scale(dpr, dpr);
+      width = bgCanvas.parentElement?.clientWidth || window.innerWidth;
+      height = bgCanvas.parentElement?.clientHeight || window.innerHeight;
+
+      setupCanvas(bgCanvas, bgCtx);
+      setupCanvas(fgCanvas, fgCtx);
+
       waypoints = getWaypoints(width, height);
     };
 
     const resizeObserver = new ResizeObserver(handleResize);
-    if (canvas.parentElement) {
-      resizeObserver.observe(canvas.parentElement);
+    if (bgCanvas.parentElement) {
+      resizeObserver.observe(bgCanvas.parentElement);
     }
 
     const intersectionObserver = new IntersectionObserver(
@@ -823,7 +1165,7 @@ export default function JapaneseDragonTimeline({
       },
       { threshold: 0.05 }
     );
-    intersectionObserver.observe(canvas);
+    intersectionObserver.observe(bgCanvas);
 
     render();
 
@@ -835,16 +1177,24 @@ export default function JapaneseDragonTimeline({
       window.removeEventListener('mouseleave', handleMouseLeave);
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [opacity]);
 
   return (
     <div
       ref={containerRef}
-      className={className}
-      style={{ opacity }}
+      className="pointer-events-none absolute inset-0 w-full h-full select-none"
       aria-hidden="true"
     >
-      <canvas ref={canvasRef} className="w-full h-full block" />
+      {/* Background Canvas: renders Kasumi fog and submerged dragon segments behind cards (z-0) */}
+      <canvas
+        ref={bgCanvasRef}
+        className="pointer-events-none absolute inset-0 z-0 w-full h-full block"
+      />
+      {/* Foreground Canvas: renders surfaced dragon segments, glowing eyes & mist OVER cards (z-20) */}
+      <canvas
+        ref={fgCanvasRef}
+        className="pointer-events-none absolute inset-0 z-20 w-full h-full block"
+      />
     </div>
   );
 }
