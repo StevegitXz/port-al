@@ -86,10 +86,10 @@ Foco em sustentabilidade hídrica e monitoramento climático na Amazônia Ociden
         case 'skills':
           newHistory.push({
             type: 'res',
-            text: `FRONT-END: React, Vite, Tailwind CSS, JavaScript ES6+, HTML5/CSS3
-BACK-END: Node.js, Express, MySQL, REST APIs, Python
-HARDWARE/IoT: ESP8266, C++, Arduino IDE, Sensores e Relés
-DEVOPS/TOOLS: Git, GitHub, Vercel, Linux, VS Code`
+            text: `FRONT-END [Avançado]: React, Vite, Tailwind CSS, JavaScript ES6+, HTML5/CSS3
+BACK-END: Node.js, Express, MySQL, REST APIs [Avançado] | Python, PHP [Iniciante]
+HARDWARE/IoT [Intermediário]: ESP8266, C++, Arduino IDE, Sensores, Relés e Automação
+DEVOPS/TOOLS: Git, GitHub, Vercel, VS Code [Avançado] | Linux / Bash [Iniciante]`
           });
           break;
 

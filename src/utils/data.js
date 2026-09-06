@@ -168,44 +168,44 @@ export const ARSENAL_SKILLS = [
     category: "Front-End & Creative",
     icon: "Layout",
     skills: [
-      { name: "React", level: 90, status: "Avançado", badge: "Core" },
-      { name: "Tailwind CSS", level: 95, status: "Especialista", badge: "Design" },
-      { name: "JavaScript (ES6+)", level: 92, status: "Avançado", badge: "Lógica" },
-      { name: "HTML5 / CSS3", level: 95, status: "Avançado", badge: "Markup" },
-      { name: "Vite / Modern Bundlers", level: 88, status: "Intermediário+", badge: "Build" },
-      { name: "UI/UX & Figma", level: 85, status: "Intermediário+", badge: "Prototipagem" }
+      { name: "React", level: 90, status: "Avançado", badge: "Core", tier: "advanced" },
+      { name: "Tailwind CSS", level: 95, status: "Especialista", badge: "Design", tier: "expert" },
+      { name: "JavaScript (ES6+)", level: 92, status: "Avançado", badge: "Lógica", tier: "advanced" },
+      { name: "HTML5 / CSS3", level: 95, status: "Avançado", badge: "Markup", tier: "advanced" },
+      { name: "Vite / Modern Bundlers", level: 88, status: "Intermediário+", badge: "Build", tier: "intermediate" },
+      { name: "UI/UX & Figma", level: 85, status: "Intermediário+", badge: "Prototipagem", tier: "intermediate" }
     ]
   },
   {
     category: "Back-End & Banco de Dados",
     icon: "Server",
     skills: [
-      { name: "Node.js & Express", level: 88, status: "Avançado", badge: "APIs" },
-      { name: "MySQL Relacional", level: 85, status: "Avançado", badge: "Database" },
-      { name: "Arquitetura MVC & REST", level: 88, status: "Avançado", badge: "Patterns" },
-      { name: "Python", level: 78, status: "Intermediário", badge: "Scripts" },
-      { name: "PHP", level: 75, status: "Intermediário", badge: "Legacy/Web" }
+      { name: "Node.js & Express", level: 88, status: "Avançado", badge: "APIs", tier: "advanced" },
+      { name: "MySQL Relacional", level: 85, status: "Avançado", badge: "Database", tier: "advanced" },
+      { name: "Arquitetura MVC & REST", level: 88, status: "Avançado", badge: "Patterns", tier: "advanced" },
+      { name: "Python", level: 45, status: "Iniciante", badge: "Scripts & Base", tier: "beginner" },
+      { name: "PHP", level: 40, status: "Iniciante", badge: "Web Fundamentos", tier: "beginner" }
     ]
   },
   {
     category: "Hardware, IoT & Firmware",
     icon: "Cpu",
     skills: [
-      { name: "ESP8266 Microcontrolador", level: 88, status: "Avançado", badge: "IoT Core" },
-      { name: "C++ para Embarcados", level: 82, status: "Intermediário+", badge: "Firmware" },
-      { name: "Arduino IDE & Ferramentas", level: 90, status: "Avançado", badge: "Tooling" },
-      { name: "Sensores, Relés & Circuitos", level: 85, status: "Avançado", badge: "Eletrônica" },
-      { name: "Automação & Robótica Maker", level: 88, status: "Avançado", badge: "Suframa 40h" }
+      { name: "ESP8266 Microcontrolador", level: 74, status: "Intermediário", badge: "IoT Core", tier: "intermediate" },
+      { name: "C++ para Embarcados", level: 70, status: "Intermediário", badge: "Firmware", tier: "intermediate" },
+      { name: "Arduino IDE & Ferramentas", level: 75, status: "Intermediário", badge: "Tooling", tier: "intermediate" },
+      { name: "Sensores, Relés & Circuitos", level: 72, status: "Intermediário", badge: "Eletrônica", tier: "intermediate" },
+      { name: "Automação & Robótica Maker", level: 70, status: "Intermediário", badge: "Suframa 40h", tier: "intermediate" }
     ]
   },
   {
     category: "Ambiente, DevOps & Práticas",
     icon: "Terminal",
     skills: [
-      { name: "Git & Versionamento GitHub", level: 92, status: "Avançado", badge: "Version Control" },
-      { name: "Vercel & Cloud Deploy", level: 88, status: "Avançado", badge: "CI/CD" },
-      { name: "Linux / Shell Scripting", level: 80, status: "Intermediário", badge: "OS" },
-      { name: "VS Code Customizado", level: 95, status: "Avançado", badge: "DevEnv" }
+      { name: "Git & Versionamento GitHub", level: 92, status: "Avançado", badge: "Version Control", tier: "advanced" },
+      { name: "Vercel & Cloud Deploy", level: 88, status: "Avançado", badge: "CI/CD", tier: "advanced" },
+      { name: "Linux / Shell Scripting", level: 45, status: "Iniciante", badge: "Terminal & Shell", tier: "beginner" },
+      { name: "VS Code Customizado", level: 95, status: "Avançado", badge: "DevEnv", tier: "advanced" }
     ]
   }
 ];
