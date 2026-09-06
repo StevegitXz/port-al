@@ -114,10 +114,11 @@ function createShieldTexture() {
   return texture;
 }
 
+const REST_ROTATION = { x: 0.28, y: -0.38 };
+
 export default function Esp8266Canvas3D({ boosted, onToggleBoost }) {
   const mountRef = useRef(null);
   const [isInteracting, setIsInteracting] = useState(false);
-  const [autoRotate, setAutoRotate] = useState(true);
 
   // Refs for Three.js state
   const sceneRef = useRef(null);
@@ -132,8 +133,8 @@ export default function Esp8266Canvas3D({ boosted, onToggleBoost }) {
   const isDraggingRef = useRef(false);
   const prevMouseRef = useRef({ x: 0, y: 0 });
   const rotVelocityRef = useRef({ x: 0, y: 0 });
-  const targetRotationRef = useRef({ x: 0.35, y: -0.45 });
-  const currentRotationRef = useRef({ x: 0.35, y: -0.45 });
+  const targetRotationRef = useRef({ ...REST_ROTATION });
+  const currentRotationRef = useRef({ ...REST_ROTATION });
   const hasMovedRef = useRef(false);
 
   useEffect(() => {
@@ -364,25 +365,15 @@ export default function Esp8266Canvas3D({ boosted, onToggleBoost }) {
       const elapsedTime = clock.getElapsedTime();
 
       // Floating gentle levitation motion
-      const floatOffset = Math.sin(elapsedTime * 1.8) * 0.08;
+      const floatOffset = Math.sin(elapsedTime * 1.6) * 0.07;
       chipGroup.position.y = floatOffset;
-      shadowMesh.scale.setScalar(1 - floatOffset * 0.4);
+      shadowMesh.scale.setScalar(1 - floatOffset * 0.35);
 
-      // Inertia & Smooth Rotation Interpolation
+      // When released, smoothly spring back to resting showcase angle
       if (!isDraggingRef.current) {
-        if (autoRotate) {
-          targetRotationRef.current.y += 0.006;
-        } else {
-          // Apply gentle damping to velocity
-          targetRotationRef.current.y += rotVelocityRef.current.y;
-          targetRotationRef.current.x += rotVelocityRef.current.x;
-          rotVelocityRef.current.y *= 0.94;
-          rotVelocityRef.current.x *= 0.94;
-        }
+        targetRotationRef.current.x += (REST_ROTATION.x - targetRotationRef.current.x) * 0.07;
+        targetRotationRef.current.y += (REST_ROTATION.y - targetRotationRef.current.y) * 0.07;
       }
-
-      // Clamp X tilt
-      targetRotationRef.current.x = Math.max(-0.8, Math.min(0.8, targetRotationRef.current.x));
 
       currentRotationRef.current.x += (targetRotationRef.current.x - currentRotationRef.current.x) * 0.12;
       currentRotationRef.current.y += (targetRotationRef.current.y - currentRotationRef.current.y) * 0.12;
@@ -510,19 +501,6 @@ export default function Esp8266Canvas3D({ boosted, onToggleBoost }) {
     }
   }, [boosted]);
 
-  const handleResetAngle = (e) => {
-    e.stopPropagation();
-    sound.playClick();
-    targetRotationRef.current = { x: 0.35, y: -0.45 };
-    setAutoRotate(true);
-  };
-
-  const handleToggleAutoRotate = (e) => {
-    e.stopPropagation();
-    sound.playClick();
-    setAutoRotate((prev) => !prev);
-  };
-
   return (
     <div className="relative w-full h-80 sm:h-96 flex items-center justify-center select-none">
       {/* 3D WebGL Canvas Container */}
@@ -531,38 +509,13 @@ export default function Esp8266Canvas3D({ boosted, onToggleBoost }) {
         className="w-full h-full flex items-center justify-center touch-none outline-none"
       />
 
-      {/* Floating HUD Controls */}
-      <div className="absolute top-2 right-2 flex items-center gap-1.5 z-20">
-        <button
-          type="button"
-          onClick={handleToggleAutoRotate}
-          title={autoRotate ? 'Pausar rotação contínua' : 'Ativar rotação contínua'}
-          className={`p-1.5 rounded-lg border text-xs font-mono transition-all backdrop-blur-md shadow-xs ${
-            autoRotate
-              ? 'bg-rose-50/90 border-rose-200 text-rose-600'
-              : 'bg-white/80 border-zinc-200 text-zinc-600 hover:text-zinc-900'
-          }`}
-        >
-          <RotateCw className={`w-3.5 h-3.5 ${autoRotate ? 'animate-spin' : ''}`} style={{ animationDuration: '6s' }} />
-        </button>
-
-        <button
-          type="button"
-          onClick={handleResetAngle}
-          title="Centralizar visão frontal do chip"
-          className="px-2 py-1 rounded-lg border border-zinc-200/90 bg-white/85 backdrop-blur-md text-[10px] font-mono text-zinc-600 hover:text-zinc-950 hover:border-zinc-300 transition-all shadow-xs"
-        >
-          RESET
-        </button>
-      </div>
-
       {/* Bottom Floating Instruction & Gesture Tip */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/80 text-[10px] font-mono text-zinc-600 shadow-xs pointer-events-none whitespace-nowrap">
+      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/80 text-[10px] font-mono text-zinc-600 shadow-xs pointer-events-none whitespace-nowrap">
         <span className={`w-1.5 h-1.5 rounded-full ${boosted ? 'bg-rose-500 animate-ping' : 'bg-emerald-500 animate-pulse'}`}></span>
         <span>
           {isInteracting
-            ? 'GIRANDO EM 360°'
-            : '[ ARRASTE PARA GIRAR • CLIQUE PARA PULSAR ]'}
+            ? 'EXPLORANDO EM 360° (SOLTE PARA VOLTAR)'
+            : '[ ARRASTE PARA GIRAR • SOLTE PARA VOLTAR • CLIQUE PARA OVERCLOCK ]'}
         </span>
       </div>
     </div>

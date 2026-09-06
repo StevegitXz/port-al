@@ -17,46 +17,46 @@ function Esp8266McuCore({ hoveredCategory }) {
   };
 
   return (
-    <div className="mb-14 p-6 sm:p-8 rounded-3xl glass-panel bg-white/95 border border-zinc-200/90 shadow-sm relative overflow-hidden group">
+    <div className="mb-20 relative">
       {/* Background ambient PCB glow */}
-      <div className="pointer-events-none absolute -top-20 left-1/2 -translate-x-1/2 w-96 h-44 bg-emerald-300/20 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-500"></div>
+      <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[380px] bg-emerald-400/10 blur-[130px] rounded-full"></div>
 
-      <div className="flex flex-col lg:flex-row items-center justify-between gap-8 relative z-10">
+      <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-12 relative z-10">
         {/* Left Telemetry Info */}
-        <div className="space-y-3 text-left max-w-sm">
-          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-emerald-50 border border-emerald-200 text-[10px] font-mono font-bold text-emerald-800">
+        <div className="space-y-3.5 text-left max-w-sm shrink-0">
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[10px] font-mono font-bold text-emerald-800">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
             <span>HARDWARE EMBARCADO ATIVO</span>
           </div>
-          <h3 className="text-xl sm:text-2xl font-black text-zinc-950 font-['Space_Grotesk'] tracking-tight">
+          <h3 className="text-2xl sm:text-3xl md:text-4xl font-black text-zinc-950 font-['Space_Grotesk'] tracking-tight">
             Núcleo de Controle SoC ESP8266
           </h3>
           <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed font-normal">
             Microcontrolador 32-bit Xtensa LX106 com Wi-Fi nativo 802.11 b/g/n, operando sensores de umidade, temperatura e acionamento de atuadores no projeto MARIOT.
           </p>
-          <div className="flex items-center gap-3 pt-2 font-mono text-[11px] text-zinc-500">
+          <div className="flex items-center gap-3 pt-2 font-mono text-xs text-zinc-500">
             <span>CLOCK: <strong className={boosted ? 'text-rose-600 font-bold' : 'text-zinc-900'}>{boosted ? '160 MHz (BOOST)' : '80 MHz'}</strong></span>
             <span>•</span>
             <span>PACOTES: <strong className="text-emerald-700 font-bold">{packetCount}</strong></span>
           </div>
         </div>
 
-        {/* Center: Real-Time Interactive 3D ESP8266 Module (Three.js / WebGL) */}
-        <div className="w-full max-w-sm lg:max-w-md flex items-center justify-center">
+        {/* Center: Real-Time Interactive 3D ESP8266 Module directly on the screen (Three.js / WebGL) */}
+        <div className="w-full max-w-md lg:max-w-lg flex items-center justify-center">
           <Esp8266Canvas3D boosted={boosted} onToggleBoost={handleMcuClick} />
         </div>
 
         {/* Right Feature Highlights */}
-        <div className="space-y-2 text-left max-w-xs font-mono text-xs text-zinc-700">
-          <div className="p-2.5 rounded-xl bg-zinc-50 border border-zinc-200/80">
+        <div className="space-y-3 text-left max-w-xs shrink-0 font-mono text-xs text-zinc-700">
+          <div className="p-3 rounded-2xl bg-white/90 border border-zinc-200/80 shadow-2xs backdrop-blur-sm">
             <span className="text-[10px] text-zinc-500 uppercase block font-semibold mb-0.5">// FIRMWARE & PROTOCOLO</span>
             <span className="font-bold text-zinc-900">C++ / Arduino IDE / HTTP REST</span>
           </div>
-          <div className="p-2.5 rounded-xl bg-zinc-50 border border-zinc-200/80">
+          <div className="p-3 rounded-2xl bg-white/90 border border-zinc-200/80 shadow-2xs backdrop-blur-sm">
             <span className="text-[10px] text-zinc-500 uppercase block font-semibold mb-0.5">// SENSORES & ATUADORES</span>
             <span className="font-bold text-zinc-900">Módulo Relé, DHT22, Higrômetro</span>
           </div>
-          <div className="p-2.5 rounded-xl bg-zinc-50 border border-zinc-200/80">
+          <div className="p-3 rounded-2xl bg-white/90 border border-zinc-200/80 shadow-2xs backdrop-blur-sm">
             <span className="text-[10px] text-zinc-500 uppercase block font-semibold mb-0.5">// PUBLICAÇÃO CIENTÍFICA</span>
             <span className="font-bold text-emerald-700">Artigo Aceito no CSBC / WCAMA 2025</span>
           </div>
