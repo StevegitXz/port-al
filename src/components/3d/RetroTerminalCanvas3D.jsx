@@ -15,8 +15,8 @@ function createKeycapTexture(label, subLabel = '', bgColor = '#ded8cc', textColo
   ctx.fillStyle = bgColor;
   ctx.fillRect(0, 0, 128, 128);
 
-  // Subtle keycap surface bevel/recess
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+  // Keycap surface recess / bevel
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
   ctx.fillRect(8, 8, 112, 112);
   ctx.fillStyle = bgColor;
   ctx.fillRect(14, 14, 100, 100);
@@ -27,20 +27,20 @@ function createKeycapTexture(label, subLabel = '', bgColor = '#ded8cc', textColo
   ctx.textBaseline = 'middle';
 
   if (label.length === 1) {
-    ctx.font = 'bold 54px monospace';
-    ctx.fillText(label, 64, subLabel ? 54 : 64);
+    ctx.font = 'bold 56px "Space Mono", monospace';
+    ctx.fillText(label, 64, subLabel ? 52 : 64);
   } else if (label.length <= 4) {
-    ctx.font = 'bold 34px monospace';
+    ctx.font = 'bold 36px "Space Mono", monospace';
     ctx.fillText(label, 64, 64);
   } else {
-    ctx.font = 'bold 24px monospace';
+    ctx.font = 'bold 26px "Space Mono", monospace';
     ctx.fillText(label, 64, 64);
   }
 
   if (subLabel) {
-    ctx.font = 'bold 22px monospace';
-    ctx.fillStyle = 'rgba(45, 49, 55, 0.7)';
-    ctx.fillText(subLabel, 64, 96);
+    ctx.font = 'bold 22px "Space Mono", monospace';
+    ctx.fillStyle = 'rgba(45, 49, 55, 0.65)';
+    ctx.fillText(subLabel, 64, 94);
   }
 
   const texture = new THREE.CanvasTexture(canvas);
@@ -49,9 +49,30 @@ function createKeycapTexture(label, subLabel = '', bgColor = '#ded8cc', textColo
 }
 
 /**
+ * Soft radial shadow texture for workstation grounding on desk surface
+ */
+function createShadowTexture() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext('2d');
+
+  const grad = ctx.createRadialGradient(256, 256, 40, 256, 256, 256);
+  grad.addColorStop(0, 'rgba(0, 0, 0, 0.28)');
+  grad.addColorStop(0.5, 'rgba(0, 0, 0, 0.12)');
+  grad.addColorStop(0.85, 'rgba(0, 0, 0, 0.03)');
+  grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 512, 512);
+
+  return new THREE.CanvasTexture(canvas);
+}
+
+/**
  * Creates a curved convex geometry for the CRT glass tube
  */
-function createCrtCurvedScreenGeometry(width, height, segX = 32, segY = 32, curvature = 0.22) {
+function createCrtCurvedScreenGeometry(width, height, segX = 36, segY = 36, curvature = 0.24) {
   const geo = new THREE.PlaneGeometry(width, height, segX, segY);
   const pos = geo.attributes.position;
   const halfW = width * 0.5;
@@ -60,7 +81,6 @@ function createCrtCurvedScreenGeometry(width, height, segX = 32, segY = 32, curv
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i);
     const y = pos.getY(i);
-    // Convex cathode tube bulge
     const factorX = 1 - Math.pow(x / halfW, 2);
     const factorY = 1 - Math.pow(y / halfH, 2);
     const bulge = Math.max(0, factorX * factorY) * curvature;
@@ -161,6 +181,7 @@ export default function RetroTerminalCanvas3D({
 }) {
   const mountRef = useRef(null);
   const hiddenInputRef = useRef(null);
+  const promptInputRef = useRef(null);
   const screenCanvasRef = useRef(null);
   const screenTextureRef = useRef(null);
   const keysMapRef = useRef(new Map());
@@ -173,16 +194,21 @@ export default function RetroTerminalCanvas3D({
     inputValRef.current = input;
   }, [input]);
 
+  const matrixModeRef = useRef(matrixMode);
+  useEffect(() => {
+    matrixModeRef.current = matrixMode;
+  }, [matrixMode]);
+
   const [isFocused, setIsFocused] = useState(false);
 
-  // Rotation / spring-back state
+  // Rotation / spring-back state (centered and closer viewing angle)
   const rotationState = useRef({
-    currentX: 0.18,
-    currentY: -0.12,
-    targetX: 0.18,
-    targetY: -0.12,
-    defaultX: 0.18,
-    defaultY: -0.12,
+    currentX: 0.12,
+    currentY: -0.05,
+    targetX: 0.12,
+    targetY: -0.05,
+    defaultX: 0.12,
+    defaultY: -0.05,
     isDragging: false,
     prevMouseX: 0,
     prevMouseY: 0,
@@ -203,9 +229,9 @@ export default function RetroTerminalCanvas3D({
 
     // Background phosphor colors
     const isMatrix = matrixMode;
-    const bgBase = isMatrix ? '#040d06' : '#080d14';
+    const bgBase = isMatrix ? '#040d06' : '#070b12';
     const fgColor = isMatrix ? '#22c55e' : '#38bdf8';
-    const fgDim = isMatrix ? '#15803d' : '#0284c7';
+    const fgDim = isMatrix ? '#15803d' : '#0369a1';
     const fgWhite = isMatrix ? '#86efac' : '#f8fafc';
     const fgAmber = '#fbbf24';
     const fgRed = '#f87171';
@@ -219,20 +245,20 @@ export default function RetroTerminalCanvas3D({
       width * 0.5, height * 0.5, width * 0.15,
       width * 0.5, height * 0.5, width * 0.72
     );
-    radialGrad.addColorStop(0, 'rgba(255, 255, 255, 0.04)');
-    radialGrad.addColorStop(0.75, 'rgba(0, 0, 0, 0.2)');
-    radialGrad.addColorStop(1, 'rgba(0, 0, 0, 0.75)');
+    radialGrad.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
+    radialGrad.addColorStop(0.72, 'rgba(0, 0, 0, 0.22)');
+    radialGrad.addColorStop(1, 'rgba(0, 0, 0, 0.85)');
     ctx.fillStyle = radialGrad;
     ctx.fillRect(0, 0, width, height);
 
     // CRT Scanlines
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.26)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
     for (let y = 0; y < height; y += 4) {
       ctx.fillRect(0, y, width, 2);
     }
 
     // Top Header Banner
-    ctx.font = 'bold 15px monospace';
+    ctx.font = 'bold 15px "Space Mono", monospace';
     ctx.fillStyle = fgDim;
     ctx.fillText('╔' + '═'.repeat(66) + '╗', 34, 38);
     ctx.fillText(`║  IFAC VT-100 TERMINAL EMULATOR // NODE RIO BRANCO // 80x25 // ONLINE `, 34, 56);
@@ -256,7 +282,6 @@ export default function RetroTerminalCanvas3D({
 
       const rawLines = String(item.text).split('\n');
       rawLines.forEach((l) => {
-        // Simple word/char wrap at 68 chars
         if (l.length <= 68) {
           formattedLines.push({ text: l, color });
         } else {
@@ -303,38 +328,85 @@ export default function RetroTerminalCanvas3D({
     drawScreenCanvas();
   }, [drawScreenCanvas]);
 
-  // Handle Physical Keyboard Press Animation
-  const pressKeyMesh = useCallback((code) => {
-    let keyMesh = keysMapRef.current.get(code);
-    if (!keyMesh && code) {
-      for (const [k, v] of keysMapRef.current.entries()) {
-        if (k.toLowerCase() === code.toLowerCase()) {
-          keyMesh = v;
-          break;
-        }
+  // Comprehensive Key Finder supporting Code, Key, Case and Character Variants
+  const findKeyMesh = useCallback((codeOrKey, rawKey) => {
+    const map = keysMapRef.current;
+    if (!map || map.size === 0) return null;
+
+    // 1. Direct code lookup
+    if (codeOrKey && map.has(codeOrKey)) {
+      return map.get(codeOrKey);
+    }
+
+    // 2. Direct key normalization
+    const target = (rawKey || codeOrKey || '').toLowerCase();
+    if (!target) return null;
+
+    if (target === ' ' || target === 'space' || target === 'spacebar') {
+      return map.get('Space');
+    }
+    if (target === 'enter') return map.get('Enter');
+    if (target === 'backspace') return map.get('Backspace');
+    if (target === 'escape' || target === 'esc') return map.get('Escape');
+    if (target === 'tab') return map.get('Tab');
+    if (target === 'shift') return map.get('ShiftLeft');
+    if (target === 'control' || target === 'ctrl') return map.get('ControlLeft');
+    if (target === 'alt') return map.get('AltLeft');
+
+    // Single letters (a-z)
+    if (target.length === 1 && target >= 'a' && target <= 'z') {
+      const candidateCode = 'Key' + target.toUpperCase();
+      if (map.has(candidateCode)) return map.get(candidateCode);
+    }
+
+    // Numbers (0-9)
+    if (target.length === 1 && target >= '0' && target <= '9') {
+      const candidateCode = 'Digit' + target;
+      if (map.has(candidateCode)) return map.get(candidateCode);
+    }
+
+    // 3. Fallback search by label
+    for (const [, mesh] of map.entries()) {
+      if (mesh.userData?.label?.toLowerCase() === target) {
+        return mesh;
       }
     }
-    if (keyMesh) {
-      keyMesh.userData.targetY = keyMesh.userData.baseY - 0.085;
-      keyMesh.userData.isPressed = true;
-    }
+
+    return null;
   }, []);
 
-  const releaseKeyMesh = useCallback((code) => {
-    let keyMesh = keysMapRef.current.get(code);
-    if (!keyMesh && code) {
-      for (const [k, v] of keysMapRef.current.entries()) {
-        if (k.toLowerCase() === code.toLowerCase()) {
-          keyMesh = v;
-          break;
-        }
+  // Physically Depress 3D Keycap (Visible mechanical motion + glow highlight)
+  const pressKey = useCallback((code, rawKey) => {
+    const mesh = findKeyMesh(code, rawKey);
+    if (mesh) {
+      // Substantial physical travel downwards + backward mechanical pivot
+      mesh.userData.targetY = mesh.userData.baseY - 0.16;
+      mesh.userData.targetRotX = -0.16;
+      mesh.userData.isPressed = true;
+
+      // Glow highlight on top face
+      if (Array.isArray(mesh.material) && mesh.material[2]) {
+        mesh.material[2].emissive.set(matrixModeRef.current ? 0x22c55e : 0xe11d48);
+        mesh.material[2].emissiveIntensity = 0.85;
       }
     }
-    if (keyMesh) {
-      keyMesh.userData.targetY = keyMesh.userData.baseY;
-      keyMesh.userData.isPressed = false;
+  }, [findKeyMesh]);
+
+  // Release 3D Keycap with spring-back
+  const releaseKey = useCallback((code, rawKey) => {
+    const mesh = findKeyMesh(code, rawKey);
+    if (mesh) {
+      mesh.userData.targetY = mesh.userData.baseY;
+      mesh.userData.targetRotX = 0;
+      mesh.userData.isPressed = false;
+
+      // Remove highlight
+      if (Array.isArray(mesh.material) && mesh.material[2]) {
+        mesh.material[2].emissive.set(0x000000);
+        mesh.material[2].emissiveIntensity = 0;
+      }
     }
-  }, []);
+  }, [findKeyMesh]);
 
   // Update lights and LED when matrixMode changes without rebuilding scene
   useEffect(() => {
@@ -363,20 +435,21 @@ export default function RetroTerminalCanvas3D({
     screenTexture.anisotropy = 4;
     screenTextureRef.current = screenTexture;
 
-    // Scene & Camera
+    // Scene & Camera - Set closer and centered for high-impact monumentality
     const scene = new THREE.Scene();
-    scene.background = null;
+    scene.background = null; // Completely transparent: workstation sits directly on the page!
 
     const camera = new THREE.PerspectiveCamera(
-      36,
+      34,
       container.clientWidth / container.clientHeight,
       0.1,
       100
     );
-    camera.position.set(0, 2.0, 7.8);
-    camera.lookAt(0, 0.25, 0);
+    // Camera placed closer (5.6 instead of 7.8) and looking straight at workstation center
+    camera.position.set(0, 1.5, 5.6);
+    camera.lookAt(0, 0.15, 0);
 
-    // Renderer
+    // Renderer with full alpha transparency
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -384,26 +457,26 @@ export default function RetroTerminalCanvas3D({
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(renderer.domElement);
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+    // Lighting (Warm studio lighting + phosphor bounce)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xfff7ed, 1.4);
+    const dirLight = new THREE.DirectionalLight(0xfff7ed, 1.5);
     dirLight.position.set(5, 9, 7);
     dirLight.castShadow = true;
     dirLight.shadow.mapSize.width = 1024;
     dirLight.shadow.mapSize.height = 1024;
     scene.add(dirLight);
 
-    const fillLight = new THREE.DirectionalLight(0xcfd8dc, 0.65);
+    const fillLight = new THREE.DirectionalLight(0xcfd8dc, 0.7);
     fillLight.position.set(-6, 4, 3);
     scene.add(fillLight);
 
     // Screen phosphor glow onto the workstation
     const screenGlowLight = new THREE.PointLight(
       matrixMode ? 0x22c55e : 0x38bdf8,
-      1.6,
-      4.2
+      1.8,
+      4.5
     );
     screenGlowLight.position.set(0, 0.8, 1.0);
     screenGlowLightRef.current = screenGlowLight;
@@ -412,6 +485,20 @@ export default function RetroTerminalCanvas3D({
     // Workstation Root Group (for rotation and spring-back)
     const workstationGroup = new THREE.Group();
     scene.add(workstationGroup);
+
+    // Soft Desk Ambient Shadow Plane (grounds the workstation on the page seamlessly)
+    const shadowTex = createShadowTexture();
+    const shadowGeo = new THREE.PlaneGeometry(7.2, 5.8);
+    const shadowMat = new THREE.MeshBasicMaterial({
+      map: shadowTex,
+      transparent: true,
+      opacity: 0.8,
+      depthWrite: false,
+    });
+    const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
+    shadowMesh.rotation.x = -Math.PI * 0.5;
+    shadowMesh.position.set(0, -1.35, 0.4);
+    workstationGroup.add(shadowMesh);
 
     // ----------------------------------------------------
     // MATERIALS (Vintage Retro Beige & Mechanical Accents)
@@ -450,7 +537,7 @@ export default function RetroTerminalCanvas3D({
     monitorGroup.position.set(0, 0.75, -0.2);
 
     // Swivel Base / Pedestal
-    const baseGeo = new THREE.BoxGeometry(2.3, 0.16, 2.0);
+    const baseGeo = new THREE.BoxGeometry(2.4, 0.16, 2.1);
     const baseMesh = new THREE.Mesh(baseGeo, casingBevelBeige);
     baseMesh.position.set(0, -1.32, 0);
     baseMesh.castShadow = true;
@@ -469,7 +556,7 @@ export default function RetroTerminalCanvas3D({
     frontHousingMesh.castShadow = true;
     monitorGroup.add(frontHousingMesh);
 
-    // Tapered Rear Cathode Tube Housing (Iconic Box Depth)
+    // Tapered Rear Cathode Tube Housing (Iconic Deep Box Depth)
     const rearHousingGeo = new THREE.BoxGeometry(3.4, 2.9, 2.2);
     const rearHousingMesh = new THREE.Mesh(rearHousingGeo, casingBevelBeige);
     rearHousingMesh.position.set(0, 0.45, -1.9);
@@ -520,7 +607,7 @@ export default function RetroTerminalCanvas3D({
     monitorGroup.add(rightBezel);
 
     // Curved CRT Screen Mesh
-    const crtScreenGeo = createCrtCurvedScreenGeometry(3.22, 2.2, 32, 32, 0.22);
+    const crtScreenGeo = createCrtCurvedScreenGeometry(3.22, 2.2, 36, 36, 0.24);
     const crtScreenMesh = new THREE.Mesh(crtScreenGeo, screenCrtMat);
     crtScreenMesh.position.set(0, 0.6, 0.36);
     monitorGroup.add(crtScreenMesh);
@@ -572,7 +659,7 @@ export default function RetroTerminalCanvas3D({
     // 2. RETRO MECHANICAL KEYBOARD
     // ----------------------------------------------------
     const keyboardGroup = new THREE.Group();
-    keyboardGroup.position.set(0, -0.85, 2.15);
+    keyboardGroup.position.set(0, -0.82, 2.15);
     keyboardGroup.rotation.x = -0.16; // Tilted ergonomically towards user
 
     // Keyboard Base / Chassis
@@ -693,6 +780,7 @@ export default function RetroTerminalCanvas3D({
           label: keyData.label,
           baseY: posY,
           targetY: posY,
+          targetRotX: 0,
           isPressed: false,
         };
 
@@ -750,8 +838,11 @@ export default function RetroTerminalCanvas3D({
       // Check if this was a click (not a drag)
       const dist = Math.hypot(e.clientX - rot.downMouseX, e.clientY - rot.downMouseY);
       if (dist < 6) {
-        // Focus real input
-        if (hiddenInputRef.current) {
+        // Focus prompt input
+        if (promptInputRef.current) {
+          promptInputRef.current.focus();
+          setIsFocused(true);
+        } else if (hiddenInputRef.current) {
           hiddenInputRef.current.focus();
           setIsFocused(true);
         }
@@ -767,9 +858,9 @@ export default function RetroTerminalCanvas3D({
           const hitMesh = intersects[0].object;
           if (hitMesh && hitMesh.userData && hitMesh.userData.code) {
             const { code, label } = hitMesh.userData;
-            pressKeyMesh(code);
+            pressKey(code, label);
             sound.playMechanicalKey();
-            setTimeout(() => releaseKeyMesh(code), 150);
+            setTimeout(() => releaseKey(code, label), 160);
 
             // Trigger typing action
             if (code === 'Enter') {
@@ -813,9 +904,10 @@ export default function RetroTerminalCanvas3D({
       workstationGroup.rotation.x = rot.currentX;
       workstationGroup.rotation.y = rot.currentY;
 
-      // Animate 3D physical keys (depression & spring-back)
+      // Animate 3D physical keys (depression & spring-back lerp)
       newKeysMap.forEach((mesh) => {
-        mesh.position.y += (mesh.userData.targetY - mesh.position.y) * 0.42;
+        mesh.position.y += (mesh.userData.targetY - mesh.position.y) * 0.45;
+        mesh.rotation.x += (mesh.userData.targetRotX - mesh.rotation.x) * 0.45;
       });
 
       // Pulse power LED
@@ -864,39 +956,30 @@ export default function RetroTerminalCanvas3D({
       }
       renderer.dispose();
     };
-  }, [drawScreenCanvas]); // Notice: only runs on mount
+  }, [drawScreenCanvas, pressKey, releaseKey]);
 
-  // Keyboard Event Handlers for Real Physical PC Typing
-  const handleKeyDown = (e) => {
-    pressKeyMesh(e.code);
-    sound.playMechanicalKey();
-
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      onExecuteCommand(input);
-    }
-  };
-
-  const handleKeyUp = (e) => {
-    releaseKeyMesh(e.code);
-  };
-
-  // Global window listener when user types anywhere while terminal is focused or interacting
+  // Global window listener for typing when focused or interacting
   useEffect(() => {
     const handleGlobalKeyDown = (e) => {
-      // Don't intercept if user is typing in another input element
+      // If typing in another input element outside our terminal, don't interfere
       if (
         document.activeElement &&
         document.activeElement.tagName === 'INPUT' &&
-        document.activeElement !== hiddenInputRef.current
+        document.activeElement !== hiddenInputRef.current &&
+        document.activeElement !== promptInputRef.current
       ) {
         return;
       }
-      pressKeyMesh(e.code);
+      pressKey(e.code, e.key);
+      sound.playMechanicalKey();
+
+      if (e.key === 'Enter') {
+        onExecuteCommand(inputValRef.current);
+      }
     };
 
     const handleGlobalKeyUp = (e) => {
-      releaseKeyMesh(e.code);
+      releaseKey(e.code, e.key);
     };
 
     window.addEventListener('keydown', handleGlobalKeyDown);
@@ -905,82 +988,92 @@ export default function RetroTerminalCanvas3D({
       window.removeEventListener('keydown', handleGlobalKeyDown);
       window.removeEventListener('keyup', handleGlobalKeyUp);
     };
-  }, [pressKeyMesh, releaseKeyMesh]);
+  }, [pressKey, releaseKey, onExecuteCommand]);
 
   return (
     <div
       onMouseEnter={() => {
-        hiddenInputRef.current?.focus();
         setIsFocused(true);
       }}
-      className={`relative w-full h-[520px] sm:h-[580px] lg:h-[640px] rounded-3xl overflow-hidden select-none bg-[#090b10] border border-zinc-800/90 shadow-2xl ${className}`}
+      className={`relative w-full flex flex-col items-center select-none ${className}`}
     >
-      {/* 3D WebGL Canvas Viewport */}
-      <div
-        ref={mountRef}
-        className="w-full h-full cursor-grab active:cursor-grabbing"
-      />
+      {/* 3D WebGL Canvas Viewport - Pure transparent stage, NO bounding borders or card boxes */}
+      <div className="relative w-full h-[580px] sm:h-[680px] lg:h-[750px]">
+        <div
+          ref={mountRef}
+          className="w-full h-full cursor-grab active:cursor-grabbing"
+        />
 
-      {/* Hidden real input for keyboard focus & mobile keyboards */}
+        {/* Workstation Status Badge Floating at Top-Center */}
+        <div className="pointer-events-none absolute top-3 left-1/2 -translate-x-1/2 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200/80 shadow-md text-xs font-mono">
+          <span className={`w-2 h-2 rounded-full ${isFocused ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'}`} />
+          <span className="text-zinc-800 font-semibold tracking-wide">
+            {isFocused ? 'TECLADO CONECTADO (DIGITE LIVREMENTE)' : 'CLIQUE NO MONITOR OU TECLADO P/ DIGITAR'}
+          </span>
+          <span className="text-zinc-400">|</span>
+          <span className="text-rose-600 font-bold">CRT 3D</span>
+        </div>
+      </div>
+
+      {/* Hidden fallback input */}
       <input
         ref={hiddenInputRef}
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-        onKeyUp={handleKeyUp}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
         className="absolute opacity-0 pointer-events-none -left-9999px"
-        aria-label="Terminal Input"
+        aria-label="Hidden Terminal Input"
       />
 
-      {/* Retro CRT Overlay Controls & Indicator Badges */}
-      <div className="pointer-events-none absolute top-4 left-4 right-4 flex items-center justify-between">
-        {/* Workstation Status Badge */}
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900/80 backdrop-blur-md border border-zinc-700/60 shadow-lg text-xs font-mono">
-          <span className={`w-2 h-2 rounded-full ${isFocused ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
-          <span className="text-zinc-200 font-semibold tracking-wide">
-            {isFocused ? 'TECLADO CONECTADO (DIGITE LIVREMENTE)' : 'CLIQUE NO MONITOR P/ DIGITAR'}
+      {/* Centered Integrated Floating Prompt Bar - Seamless Glass Design */}
+      <div className="w-full max-w-2xl mx-auto -mt-6 sm:-mt-8 z-10 px-4">
+        <div className="flex items-center gap-2.5 p-2.5 px-4 rounded-2xl bg-white/95 backdrop-blur-xl border border-zinc-300/80 shadow-xl transition-all focus-within:border-rose-400 focus-within:ring-2 focus-within:ring-rose-200/50">
+          <span className={`text-xs sm:text-sm font-mono font-bold ${matrixMode ? 'text-emerald-600' : 'text-rose-600'}`}>
+            steve@ifac:~$
           </span>
-        </div>
-
-        {/* 3D Physical Keys Activity Counter */}
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-900/80 backdrop-blur-md border border-zinc-700/60 shadow-lg text-[11px] font-mono text-zinc-300">
-          <span className="text-rose-400 font-bold">CRT 3D</span>
-          <span>•</span>
-          <span className="text-zinc-400">Arraste para girar 360°</span>
-        </div>
-      </div>
-
-      {/* Floating Prompt Bar at bottom for click-to-focus and command entry */}
-      <div className="absolute bottom-4 left-4 right-4 max-w-xl mx-auto flex items-center gap-2 p-2 px-3.5 rounded-2xl bg-zinc-900/85 backdrop-blur-md border border-zinc-700/80 shadow-2xl">
-        <span className={`text-xs font-mono font-bold ${matrixMode ? 'text-emerald-400' : 'text-rose-400'}`}>
-          steve@ifac:~$
-        </span>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            pressKeyMesh(e.code);
-            sound.playMechanicalKey();
-            if (e.key === 'Enter') {
-              e.preventDefault();
+          <input
+            ref={promptInputRef}
+            type="text"
+            value={input}
+            onChange={(e) => {
+              const newVal = e.target.value;
+              if (newVal.length > input.length) {
+                const addedChar = newVal.slice(-1);
+                pressKey('', addedChar);
+                sound.playMechanicalKey();
+                setTimeout(() => releaseKey('', addedChar), 150);
+              }
+              setInput(newVal);
+            }}
+            onKeyDown={(e) => {
+              pressKey(e.code, e.key);
+              sound.playMechanicalKey();
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                onExecuteCommand(input);
+                pressKey('Enter', 'Enter');
+                setTimeout(() => releaseKey('Enter', 'Enter'), 180);
+              }
+            }}
+            onKeyUp={(e) => releaseKey(e.code, e.key)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            placeholder="digite um comando (ex: help, projects, weather)..."
+            className="flex-1 bg-transparent text-zinc-900 placeholder-zinc-400 outline-none font-mono text-xs sm:text-sm font-medium"
+          />
+          <button
+            type="button"
+            onClick={() => {
               onExecuteCommand(input);
-            }
-          }}
-          onKeyUp={(e) => releaseKeyMesh(e.code)}
-          placeholder="digite um comando (ex: help, projects)..."
-          className="flex-1 bg-transparent text-white placeholder-zinc-500 outline-none font-mono text-xs sm:text-sm"
-        />
-        <button
-          type="button"
-          onClick={() => onExecuteCommand(input)}
-          className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-mono text-xs font-bold transition-colors shadow-sm cursor-pointer"
-        >
-          ENTER
-        </button>
+              pressKey('Enter', 'Enter');
+              setTimeout(() => releaseKey('Enter', 'Enter'), 180);
+            }}
+            className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-rose-600 text-white font-mono text-xs font-bold transition-all shadow-sm cursor-pointer flex items-center gap-1.5"
+          >
+            <span>ENTER</span>
+            <span className="text-[10px] text-zinc-400 font-normal">↵</span>
+          </button>
+        </div>
       </div>
     </div>
   );

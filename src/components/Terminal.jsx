@@ -207,22 +207,22 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
       <div className="pointer-events-none absolute bottom-10 right-1/4 w-[400px] h-[400px] bg-emerald-200/20 blur-[140px] rounded-full"></div>
 
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col items-start mb-16">
+        {/* Header (Centered) */}
+        <div className="flex flex-col items-center text-center mb-10">
           <div className="flex items-center gap-2 text-xs font-mono text-rose-600 tracking-widest uppercase mb-2 font-semibold">
             <span className="inline-block w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
             <span>// 05. TERMINAL DE ACESSO DIRETO</span>
           </div>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black uppercase text-zinc-950 font-['Space_Grotesk'] tracking-tight">
-            Console Interativo
+            Console Interativo Retrô 3D
           </h2>
           <p className="text-zinc-600 text-sm sm:text-base max-w-2xl mt-2 font-normal">
-            Estação de linha de comando com emulação interativa, comandos customizados e acesso direto à base do sistema.
+            Estação vintage com monitor CRT de caixa e teclado mecânico físico. Digite no seu teclado para ver as teclas 3D contraírem e o texto surgir diretamente no vidro de fósforo.
           </p>
         </div>
 
-        {/* View Mode & Theme Controls Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        {/* Centered Controls Bar (View Mode & CRT Phosphor) */}
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-8">
           <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-zinc-200/80 border border-zinc-300/80 shadow-2xs">
             <button
               type="button"
@@ -230,7 +230,7 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
                 sound.playClick();
                 setViewMode('3d');
               }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
                 viewMode === '3d'
                   ? 'bg-zinc-900 text-white shadow-md'
                   : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/60'
@@ -246,7 +246,7 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
                 sound.playClick();
                 setViewMode('classic');
               }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
                 viewMode === 'classic'
                   ? 'bg-zinc-900 text-white shadow-md'
                   : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/60'
@@ -264,7 +264,7 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
                 sound.playClick();
                 setMatrixMode(!matrixMode);
               }}
-              className={`px-3.5 py-2 rounded-xl text-xs font-mono font-semibold border transition-all ${
+              className={`px-4 py-2 rounded-xl text-xs font-mono font-semibold border transition-all cursor-pointer ${
                 matrixMode
                   ? 'bg-emerald-500/20 text-emerald-800 border-emerald-500/50'
                   : 'bg-white text-zinc-700 border-zinc-300 hover:bg-zinc-50'
@@ -275,159 +275,131 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
           </div>
         </div>
 
-        {/* Bento Workstation Layout: 12 Columns */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Main Console Window / 3D Workstation (8 Columns) */}
-          <div className="lg:col-span-8">
-            {viewMode === '3d' ? (
-              <RetroTerminalCanvas3D
-                history={history}
-                input={input}
-                setInput={setInput}
-                onExecuteCommand={executeCommand}
-                matrixMode={matrixMode}
-              />
-            ) : (
-              <div className={`rounded-3xl border ${matrixMode ? 'border-emerald-500/60 shadow-[0_0_50px_rgba(16,185,129,0.25)]' : 'border-zinc-300/90 shadow-2xl'} bg-[#0c0e14] overflow-hidden transition-all duration-300`}>
-                {/* Terminal Title Bar */}
-                <div className="flex items-center justify-between px-5 py-3.5 bg-[#161922] border-b border-zinc-800">
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-rose-500/90"></span>
-                    <span className="w-3 h-3 rounded-full bg-amber-400/90"></span>
-                    <span className="w-3 h-3 rounded-full bg-emerald-500/90"></span>
-                    <span className="ml-2.5 text-xs font-mono text-zinc-400 hidden sm:inline">
-                      steve@neo-tokyo-ifac:~ (zsh)
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2.5 text-[10px] font-mono text-zinc-400">
-                    <span className="text-zinc-500">UTF-8</span>
-                  </div>
-                </div>
-
-                {/* Terminal Screen & Logs */}
-                <div 
-                  ref={terminalBodyRef}
-                  onClick={() => inputRef.current?.focus()}
-                  className="p-6 font-mono text-xs sm:text-sm min-h-[350px] max-h-[460px] overflow-y-auto space-y-3 cursor-text text-zinc-200"
-                >
-                  {history.map((line, idx) => (
-                    <div key={idx} className="leading-relaxed">
-                      {line.type === 'sys' && (
-                        <span className="text-zinc-500">// {line.text}</span>
-                      )}
-                      {line.type === 'info' && (
-                        <span className="text-rose-400 font-medium">{line.text}</span>
-                      )}
-                      {line.type === 'cmd' && (
-                        <span className="text-zinc-100 font-semibold">{line.text}</span>
-                      )}
-                      {line.type === 'res' && (
-                        <pre className={`whitespace-pre-wrap ${matrixMode ? 'text-emerald-400' : 'text-zinc-200'}`}>
-                          {line.text}
-                        </pre>
-                      )}
-                      {line.type === 'err' && (
-                        <span className="text-red-400">{line.text}</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Terminal Prompt Input */}
-                <div className="px-5 py-3.5 bg-[#11141c] border-t border-zinc-800 flex items-center gap-2.5 font-mono text-xs sm:text-sm">
-                  <span className={matrixMode ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
-                    steve@ifac:~$
-                  </span>
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="digite um comando (ex: help)..."
-                    className="flex-1 bg-transparent text-white outline-none placeholder-zinc-500 font-mono text-xs sm:text-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => executeCommand(input)}
-                    className="p-1.5 rounded-xl bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
-                    title="Executar comando"
-                  >
-                    <CornerDownLeft className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Telemetry & Command Palette Sidebar (4 Columns) */}
-          <div className="lg:col-span-4 space-y-6">
-            {/* Live Node Telemetry Card */}
-            <div className="p-6 rounded-3xl glass-panel bg-white/95 border border-zinc-200/80 shadow-xs space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
+        {/* Center Stage: 3D Workstation (No Delimiting Cards) OR Classic Window */}
+        <div className="w-full max-w-5xl mx-auto flex flex-col items-center">
+          {viewMode === '3d' ? (
+            <RetroTerminalCanvas3D
+              history={history}
+              input={input}
+              setInput={setInput}
+              onExecuteCommand={executeCommand}
+              matrixMode={matrixMode}
+            />
+          ) : (
+            <div className={`w-full max-w-3xl mx-auto rounded-3xl border ${matrixMode ? 'border-emerald-500/60 shadow-[0_0_50px_rgba(16,185,129,0.25)]' : 'border-zinc-300/90 shadow-2xl'} bg-[#0c0e14] overflow-hidden transition-all duration-300`}>
+              {/* Terminal Title Bar */}
+              <div className="flex items-center justify-between px-5 py-3.5 bg-[#161922] border-b border-zinc-800">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                  <span className="text-xs font-mono font-bold text-zinc-900 uppercase tracking-wider">
-                    Telemetria do Nó
+                  <span className="w-3 h-3 rounded-full bg-rose-500/90"></span>
+                  <span className="w-3 h-3 rounded-full bg-amber-400/90"></span>
+                  <span className="w-3 h-3 rounded-full bg-emerald-500/90"></span>
+                  <span className="ml-2.5 text-xs font-mono text-zinc-400 hidden sm:inline">
+                    steve@neo-tokyo-ifac:~ (zsh)
                   </span>
                 </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
-                  ESTÁVEL
-                </span>
+
+                <div className="flex items-center gap-2.5 text-[10px] font-mono text-zinc-400">
+                  <span className="text-zinc-500">UTF-8</span>
+                </div>
               </div>
 
-              <div className="space-y-2.5 font-mono text-xs">
-                <div className="flex justify-between py-1 border-b border-zinc-50">
-                  <span className="text-zinc-500">Servidor:</span>
-                  <span className="text-zinc-800 font-semibold">IFAC Campus Rio Branco</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-zinc-50">
-                  <span className="text-zinc-500">Fuso Horário:</span>
-                  <span className="text-zinc-800">UTC-5 (Acre)</span>
-                </div>
-                <div className="flex justify-between py-1 border-b border-zinc-50">
-                  <span className="text-zinc-500">Núcleo:</span>
-                  <span className="text-rose-600 font-semibold">v4.19-Zen (C++ / JS)</span>
-                </div>
-                <div className="flex justify-between py-1">
-                  <span className="text-zinc-500">Sessão:</span>
-                  <span className="text-zinc-800">Visitante Anônimo</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Command Palette Card */}
-            <div className="p-6 rounded-3xl glass-panel bg-white/95 border border-zinc-200/80 shadow-xs space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-                <span className="text-xs font-mono font-bold text-zinc-900 uppercase tracking-wider">
-                  Paleta de Comandos
-                </span>
-                <span className="text-[10px] font-mono text-zinc-400">
-                  CLIQUE P/ EXECUTAR
-                </span>
-              </div>
-
-              <div className="space-y-2">
-                {commandList.map((item) => (
-                  <button
-                    key={item.cmd}
-                    type="button"
-                    onClick={() => executeCommand(item.cmd)}
-                    onMouseEnter={() => sound.playHover()}
-                    className="w-full p-2.5 rounded-xl bg-zinc-50 hover:bg-rose-50/60 border border-zinc-200/70 hover:border-rose-300 flex items-center justify-between text-left transition-all group shadow-2xs"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono font-bold text-rose-600 group-hover:text-rose-700">
-                        ${item.cmd}
-                      </span>
-                    </div>
-                    <span className="text-[11px] font-mono text-zinc-500 group-hover:text-zinc-700">
-                      {item.desc}
-                    </span>
-                  </button>
+              {/* Terminal Screen & Logs */}
+              <div 
+                ref={terminalBodyRef}
+                onClick={() => inputRef.current?.focus()}
+                className="p-6 font-mono text-xs sm:text-sm min-h-[350px] max-h-[460px] overflow-y-auto space-y-3 cursor-text text-zinc-200"
+              >
+                {history.map((line, idx) => (
+                  <div key={idx} className="leading-relaxed">
+                    {line.type === 'sys' && (
+                      <span className="text-zinc-500">// {line.text}</span>
+                    )}
+                    {line.type === 'info' && (
+                      <span className="text-rose-400 font-medium">{line.text}</span>
+                    )}
+                    {line.type === 'cmd' && (
+                      <span className="text-zinc-100 font-semibold">{line.text}</span>
+                    )}
+                    {line.type === 'res' && (
+                      <pre className={`whitespace-pre-wrap ${matrixMode ? 'text-emerald-400' : 'text-zinc-200'}`}>
+                        {line.text}
+                      </pre>
+                    )}
+                    {line.type === 'err' && (
+                      <span className="text-red-400">{line.text}</span>
+                    )}
+                  </div>
                 ))}
               </div>
+
+              {/* Terminal Prompt Input */}
+              <div className="px-5 py-3.5 bg-[#11141c] border-t border-zinc-800 flex items-center gap-2.5 font-mono text-xs sm:text-sm">
+                <span className={matrixMode ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                  steve@ifac:~$
+                </span>
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="digite um comando (ex: help)..."
+                  className="flex-1 bg-transparent text-white outline-none placeholder-zinc-500 font-mono text-xs sm:text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => executeCommand(input)}
+                  className="p-1.5 rounded-xl bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors cursor-pointer"
+                  title="Executar comando"
+                >
+                  <CornerDownLeft className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Quick Command Chips Palette (Centered) */}
+          <div className="w-full max-w-4xl mx-auto mt-6 flex flex-wrap items-center justify-center gap-2 px-4">
+            <span className="text-[11px] font-mono text-zinc-400 uppercase tracking-wider mr-1">
+              Comandos Rápidos:
+            </span>
+            {commandList.map((item) => (
+              <button
+                key={item.cmd}
+                type="button"
+                onClick={() => executeCommand(item.cmd)}
+                onMouseEnter={() => sound.playHover()}
+                className="px-3 py-1.5 rounded-xl bg-white/90 hover:bg-rose-50 border border-zinc-200/80 hover:border-rose-300 text-xs font-mono font-medium transition-all shadow-2xs group flex items-center gap-1.5 cursor-pointer"
+                title={item.desc}
+              >
+                <span className="font-bold text-rose-600 group-hover:text-rose-700">${item.cmd}</span>
+                <span className="text-[10px] text-zinc-400 group-hover:text-zinc-600 hidden sm:inline">
+                  // {item.desc}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* Live Node Telemetry Strip (Centered Horizontal Bar) */}
+          <div className="w-full max-w-3xl mx-auto mt-6 p-3 px-5 rounded-2xl bg-white/85 backdrop-blur-md border border-zinc-200/80 shadow-2xs flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+              <span className="text-zinc-500">Nó:</span>
+              <span className="font-semibold text-zinc-800">IFAC Campus Rio Branco</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-zinc-500">Fuso:</span>
+              <span className="text-zinc-800">UTC-5 (Acre)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-zinc-500">Núcleo:</span>
+              <span className="font-semibold text-rose-600">v4.19-Zen (C++ / JS)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-zinc-500">Status:</span>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[10px]">
+                ONLINE
+              </span>
             </div>
           </div>
         </div>
