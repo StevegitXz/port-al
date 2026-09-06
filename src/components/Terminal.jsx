@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Terminal as TerminalIcon, Sparkles, Send, CornerDownLeft, RefreshCw } from 'lucide-react';
+import { Terminal as TerminalIcon, Sparkles, Send, CornerDownLeft, RefreshCw, Box, Monitor } from 'lucide-react';
 import { PERSONAL_INFO, PROJECTS } from '../utils/data';
 import { sound } from '../utils/sound';
 import { achievementManager } from '../utils/achievements';
+import RetroTerminalCanvas3D from './3d/RetroTerminalCanvas3D';
 
 export default function Terminal() {
   const [input, setInput] = useState('');
+  const [viewMode, setViewMode] = useState('3d'); // '3d' | 'classic'
   const [history, setHistory] = useState([
     { type: 'sys', text: 'SYSTEM KERNEL v4.19-ZEN INITIALIZED // STEVEGITXZ' },
     { type: 'sys', text: 'Conectado ao nó Rio Branco, AC (UTC-5).' },
@@ -219,96 +221,144 @@ Citação: ${PERSONAL_INFO.cnpqCitation}
           </p>
         </div>
 
+        {/* View Mode & Theme Controls Bar */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-zinc-200/80 border border-zinc-300/80 shadow-2xs">
+            <button
+              type="button"
+              onClick={() => {
+                sound.playClick();
+                setViewMode('3d');
+              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all ${
+                viewMode === '3d'
+                  ? 'bg-zinc-900 text-white shadow-md'
+                  : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/60'
+              }`}
+            >
+              <Box className="w-3.5 h-3.5 text-rose-500" />
+              <span>ESTAÇÃO 3D RETRÔ CRT</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                sound.playClick();
+                setViewMode('classic');
+              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-mono font-bold transition-all ${
+                viewMode === 'classic'
+                  ? 'bg-zinc-900 text-white shadow-md'
+                  : 'text-zinc-600 hover:text-zinc-950 hover:bg-white/60'
+              }`}
+            >
+              <Monitor className="w-3.5 h-3.5 text-emerald-500" />
+              <span>CONSOLE PLANO</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                sound.playClick();
+                setMatrixMode(!matrixMode);
+              }}
+              className={`px-3.5 py-2 rounded-xl text-xs font-mono font-semibold border transition-all ${
+                matrixMode
+                  ? 'bg-emerald-500/20 text-emerald-800 border-emerald-500/50'
+                  : 'bg-white text-zinc-700 border-zinc-300 hover:bg-zinc-50'
+              }`}
+            >
+              FÓSFORO: {matrixMode ? 'VERDE MATRIX' : 'CYBER-ZEN'}
+            </button>
+          </div>
+        </div>
+
         {/* Bento Workstation Layout: 12 Columns */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Main Console Window (8 Columns) - Razor Sharp & Crisp */}
+          {/* Main Console Window / 3D Workstation (8 Columns) */}
           <div className="lg:col-span-8">
-            <div className={`rounded-3xl border ${matrixMode ? 'border-emerald-500/60 shadow-[0_0_50px_rgba(16,185,129,0.25)]' : 'border-zinc-300/90 shadow-2xl'} bg-[#0c0e14] overflow-hidden transition-all duration-300`}>
-              {/* Terminal Title Bar */}
-              <div className="flex items-center justify-between px-5 py-3.5 bg-[#161922] border-b border-zinc-800">
-                <div className="flex items-center gap-2">
-                  <span className="w-3 h-3 rounded-full bg-rose-500/90"></span>
-                  <span className="w-3 h-3 rounded-full bg-amber-400/90"></span>
-                  <span className="w-3 h-3 rounded-full bg-emerald-500/90"></span>
-                  <span className="ml-2.5 text-xs font-mono text-zinc-400 hidden sm:inline">
-                    steve@neo-tokyo-ifac:~ (zsh)
-                  </span>
+            {viewMode === '3d' ? (
+              <RetroTerminalCanvas3D
+                history={history}
+                input={input}
+                setInput={setInput}
+                onExecuteCommand={executeCommand}
+                matrixMode={matrixMode}
+              />
+            ) : (
+              <div className={`rounded-3xl border ${matrixMode ? 'border-emerald-500/60 shadow-[0_0_50px_rgba(16,185,129,0.25)]' : 'border-zinc-300/90 shadow-2xl'} bg-[#0c0e14] overflow-hidden transition-all duration-300`}>
+                {/* Terminal Title Bar */}
+                <div className="flex items-center justify-between px-5 py-3.5 bg-[#161922] border-b border-zinc-800">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-rose-500/90"></span>
+                    <span className="w-3 h-3 rounded-full bg-amber-400/90"></span>
+                    <span className="w-3 h-3 rounded-full bg-emerald-500/90"></span>
+                    <span className="ml-2.5 text-xs font-mono text-zinc-400 hidden sm:inline">
+                      steve@neo-tokyo-ifac:~ (zsh)
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 text-[10px] font-mono text-zinc-400">
+                    <span className="text-zinc-500">UTF-8</span>
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-2.5 text-[10px] font-mono text-zinc-400">
+                {/* Terminal Screen & Logs */}
+                <div 
+                  ref={terminalBodyRef}
+                  onClick={() => inputRef.current?.focus()}
+                  className="p-6 font-mono text-xs sm:text-sm min-h-[350px] max-h-[460px] overflow-y-auto space-y-3 cursor-text text-zinc-200"
+                >
+                  {history.map((line, idx) => (
+                    <div key={idx} className="leading-relaxed">
+                      {line.type === 'sys' && (
+                        <span className="text-zinc-500">// {line.text}</span>
+                      )}
+                      {line.type === 'info' && (
+                        <span className="text-rose-400 font-medium">{line.text}</span>
+                      )}
+                      {line.type === 'cmd' && (
+                        <span className="text-zinc-100 font-semibold">{line.text}</span>
+                      )}
+                      {line.type === 'res' && (
+                        <pre className={`whitespace-pre-wrap ${matrixMode ? 'text-emerald-400' : 'text-zinc-200'}`}>
+                          {line.text}
+                        </pre>
+                      )}
+                      {line.type === 'err' && (
+                        <span className="text-red-400">{line.text}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Terminal Prompt Input */}
+                <div className="px-5 py-3.5 bg-[#11141c] border-t border-zinc-800 flex items-center gap-2.5 font-mono text-xs sm:text-sm">
+                  <span className={matrixMode ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
+                    steve@ifac:~$
+                  </span>
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="digite um comando (ex: help)..."
+                    className="flex-1 bg-transparent text-white outline-none placeholder-zinc-500 font-mono text-xs sm:text-sm"
+                  />
                   <button
                     type="button"
-                    onClick={() => {
-                      sound.playClick();
-                      setMatrixMode(!matrixMode);
-                    }}
-                    className={`px-2.5 py-0.5 rounded-lg text-[10px] font-mono border transition-all ${
-                      matrixMode 
-                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50' 
-                        : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:text-white'
-                    }`}
-                    title="Alternar tema Matrix"
+                    onClick={() => executeCommand(input)}
+                    className="p-1.5 rounded-xl bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
+                    title="Executar comando"
                   >
-                    TEMA: {matrixMode ? 'MATRIX' : 'CYBER-ZEN'}
+                    <CornerDownLeft className="w-3.5 h-3.5" />
                   </button>
-                  <span>•</span>
-                  <span className="text-zinc-500">UTF-8</span>
                 </div>
               </div>
-
-              {/* Terminal Screen & Logs */}
-              <div 
-                ref={terminalBodyRef}
-                onClick={() => inputRef.current?.focus()}
-                className="p-6 font-mono text-xs sm:text-sm min-h-[350px] max-h-[460px] overflow-y-auto space-y-3 cursor-text text-zinc-200"
-              >
-                {history.map((line, idx) => (
-                  <div key={idx} className="leading-relaxed">
-                    {line.type === 'sys' && (
-                      <span className="text-zinc-500">// {line.text}</span>
-                    )}
-                    {line.type === 'info' && (
-                      <span className="text-rose-400 font-medium">{line.text}</span>
-                    )}
-                    {line.type === 'cmd' && (
-                      <span className="text-zinc-100 font-semibold">{line.text}</span>
-                    )}
-                    {line.type === 'res' && (
-                      <pre className={`whitespace-pre-wrap ${matrixMode ? 'text-emerald-400' : 'text-zinc-200'}`}>
-                        {line.text}
-                      </pre>
-                    )}
-                    {line.type === 'err' && (
-                      <span className="text-red-400">{line.text}</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Terminal Prompt Input */}
-              <div className="px-5 py-3.5 bg-[#11141c] border-t border-zinc-800 flex items-center gap-2.5 font-mono text-xs sm:text-sm">
-                <span className={matrixMode ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}>
-                  steve@ifac:~$
-                </span>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="digite um comando (ex: help)..."
-                  className="flex-1 bg-transparent text-white outline-none placeholder-zinc-500 font-mono text-xs sm:text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={() => executeCommand(input)}
-                  className="p-1.5 rounded-xl bg-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-700 transition-colors"
-                  title="Executar comando"
-                >
-                  <CornerDownLeft className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Telemetry & Command Palette Sidebar (4 Columns) */}
