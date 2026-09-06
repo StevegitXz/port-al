@@ -141,41 +141,45 @@ body {
   background-size: 32px 32px;
 }
 
-/* Katana Slash Light Beam */
+/* Katana Slash Luminous Blade Light Sheen */
 .katana-slash-beam {
   position: absolute;
-  top: -50%;
-  left: -120%;
-  width: 65%;
-  height: 200%;
+  top: -20%;
+  left: -80%;
+  width: 14%;
+  height: 140%;
   background: linear-gradient(
     90deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.3) 30%,
+    rgba(255, 255, 255, 0.2) 30%,
     rgba(255, 255, 255, 0.95) 50%,
-    rgba(244, 63, 94, 0.8) 65%,
+    rgba(255, 255, 255, 0.2) 70%,
     transparent 100%
   );
-  transform: skewX(-35deg);
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.9));
+  transform: skewX(-28deg);
   pointer-events: none;
   opacity: 0;
 }
 
 .katana-slashed .katana-slash-beam {
   opacity: 1;
-  animation: katana-cut 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: katana-cut 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes katana-cut {
   0% {
-    left: -120%;
+    left: -80%;
     opacity: 0;
   }
-  30% {
-    opacity: 1;
+  20% {
+    opacity: 0.95;
+  }
+  80% {
+    opacity: 0.95;
   }
   100% {
-    left: 180%;
+    left: 170%;
     opacity: 0;
   }
 }

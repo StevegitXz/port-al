@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Terminal, Copy, Check, ArrowDown, ExternalLink, Sparkles, Code2 } from 'lucide-react';
 import SakuraCanvas from './SakuraCanvas';
 import ScrambleText from './ScrambleText';
@@ -9,6 +9,7 @@ import { achievementManager } from '../utils/achievements';
 export default function Hero() {
   const [copied, setCopied] = useState(false);
   const [slashed, setSlashed] = useState(false);
+  const lastSlashRef = useRef(0);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -18,10 +19,12 @@ export default function Hero() {
   }, []);
 
   const handleKatanaSlash = () => {
-    if (slashed) return;
+    const now = Date.now();
+    if (slashed || now - lastSlashRef.current < 1200) return;
+    lastSlashRef.current = now;
     setSlashed(true);
     sound.playKatanaSlash();
-    setTimeout(() => setSlashed(false), 500);
+    setTimeout(() => setSlashed(false), 700);
   };
 
   const handleCopyEmail = async () => {
@@ -101,8 +104,8 @@ export default function Hero() {
         <div className="relative inline-block my-2">
           <h1 
             onMouseEnter={handleKatanaSlash}
-            className={`relative inline-block cursor-pointer select-none text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight uppercase text-zinc-950 font-['Space_Grotesk'] leading-[1.05] overflow-hidden p-2 rounded-2xl transition-transform duration-200 ${
-              slashed ? 'katana-slashed scale-[1.01]' : 'hover:scale-[1.005]'
+            className={`relative inline-block cursor-pointer select-none text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight uppercase text-zinc-950 font-['Space_Grotesk'] leading-[1.05] overflow-hidden p-2 rounded-2xl ${
+              slashed ? 'katana-slashed' : ''
             }`}
             title="Passe o cursor para ativar o corte de luz Katana"
           >
