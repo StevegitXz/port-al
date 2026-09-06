@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useEffect, useRef, useCallback, useState } from 'react';
 import * as THREE from 'three';
+import { sound } from '../../utils/sound';
+import { Maximize2, Monitor } from 'lucide-react';
 
 /**
  * Creates a canvas texture for a vintage computer badge
@@ -91,6 +93,35 @@ export default function RetroCrtMonitor3D({
   const powerLedMatRef = useRef(null);
   const diskLedMatRef = useRef(null);
 
+  const [zoomMode, setZoomMode] = useState('overview'); // 'overview' | 'screen'
+
+  // Smooth Camera Zoom & Target Center Ref
+  const zoomStateRef = useRef({
+    currentZ: 6.6,
+    targetZ: 6.6,
+    currentLookY: 0.15,
+    targetLookY: 0.15,
+  });
+
+  const setZoom = (mode) => {
+    setZoomMode(mode);
+    if (mode === 'screen') {
+      zoomStateRef.current.targetZ = 4.3;
+      zoomStateRef.current.targetLookY = 0.78;
+    } else {
+      zoomStateRef.current.targetZ = 6.6;
+      zoomStateRef.current.targetLookY = 0.15;
+    }
+  };
+
+  const zoomStep = (delta) => {
+    const nextZ = Math.max(3.8, Math.min(8.5, zoomStateRef.current.targetZ + delta));
+    zoomStateRef.current.targetZ = nextZ;
+    const t = THREE.MathUtils.clamp((6.6 - nextZ) / (6.6 - 3.8), 0, 1);
+    zoomStateRef.current.targetLookY = 0.15 + t * 0.63;
+    setZoomMode(nextZ < 5.2 ? 'screen' : 'overview');
+  };
+
   // Always keep latest props in refs to avoid stale closures in animate() loop
   const historyRef = useRef(history);
   const inputRef = useRef(input);
@@ -131,8 +162,8 @@ export default function RetroCrtMonitor3D({
     const curInput = inputRef.current || '';
     const isMatrix = matrixModeRef.current;
 
-    const bgBase = isMatrix ? '#040e06' : '#070a12';
-    const fgColor = isMatrix ? '#22c55e' : '#38bdf8';
+    const bgBase = isMatrix ? '#030d05' : '#070a14';
+    const fgColor = isMatrix ? '#34d399' : '#38bdf8';
     const fgDim = isMatrix ? '#15803d' : '#0284c7';
     const fgWhite = isMatrix ? '#86efac' : '#f8fafc';
     const fgAmber = '#fbbf24';
@@ -142,52 +173,52 @@ export default function RetroCrtMonitor3D({
     ctx.fillStyle = bgBase;
     ctx.fillRect(0, 0, width, height);
 
-    // Vignette CRT glass curve shading
+    // Vignette CRT glass curve shading (Gentle, keeping center and edges luminous)
     const radialGrad = ctx.createRadialGradient(
-      width * 0.5, height * 0.5, width * 0.15,
-      width * 0.5, height * 0.5, width * 0.7
+      width * 0.5, height * 0.5, width * 0.18,
+      width * 0.5, height * 0.5, width * 0.72
     );
-    radialGrad.addColorStop(0, 'rgba(255, 255, 255, 0.04)');
-    radialGrad.addColorStop(0.7, 'rgba(0, 0, 0, 0.25)');
-    radialGrad.addColorStop(1, 'rgba(0, 0, 0, 0.85)');
+    radialGrad.addColorStop(0, 'rgba(255, 255, 255, 0.03)');
+    radialGrad.addColorStop(0.75, 'rgba(0, 0, 0, 0.12)');
+    radialGrad.addColorStop(1, 'rgba(0, 0, 0, 0.40)');
     ctx.fillStyle = radialGrad;
     ctx.fillRect(0, 0, width, height);
 
-    // CRT Scanlines
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+    // Subtle CRT Scanlines (Very light raster so text is 100% sharp and readable)
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
     for (let y = 0; y < height; y += 4) {
-      ctx.fillRect(0, y, width, 2);
+      ctx.fillRect(0, y, width, 1.5);
     }
 
-    // Top Header Banner
-    ctx.font = 'bold 18px "Consolas", "Courier New", monospace';
+    // Top Header Banner (Bold, High Contrast)
+    ctx.font = 'bold 24px "Consolas", "Courier New", monospace';
     ctx.fillStyle = fgDim;
-    ctx.fillText('╔' + '═'.repeat(54) + '╗', 42, 42);
-    ctx.fillText('║ IFAC VT-100 CRT // KERNEL v4.19-ZEN // ONLINE       ║', 42, 64);
-    ctx.fillText('╚' + '═'.repeat(54) + '╝', 42, 86);
+    ctx.fillText('╔' + '═'.repeat(42) + '╗', 44, 44);
+    ctx.fillText('║ IFAC VT-100 CRT // KERNEL v4.19 // ONLINE ║', 44, 70);
+    ctx.fillText('╚' + '═'.repeat(42) + '╝', 44, 96);
 
-    // Terminal History Text lines (Larger, crisp, bold retro CRT font)
-    ctx.font = 'bold 22px "Consolas", "Monaco", "Courier New", monospace';
-    const lineHeight = 32;
-    const maxLines = 18;
-    const startY = 124;
+    // Terminal History Text lines (ENLARGED CRISP RETRO CRT FONT)
+    ctx.font = 'bold 32px "Consolas", "Monaco", "Courier New", monospace';
+    const lineHeight = 46;
+    const maxLines = 11;
+    const startY = 142;
 
     const formattedLines = [];
     curHistory.forEach((item) => {
       let color = fgWhite;
       if (item.type === 'sys') color = fgDim;
       else if (item.type === 'info') color = fgAmber;
-      else if (item.type === 'cmd') color = fgColor;
+      else if (item.type === 'cmd') color = isMatrix ? '#4ade80' : '#38bdf8';
       else if (item.type === 'err') color = fgRed;
-      else if (item.type === 'res') color = isMatrix ? '#86efac' : '#e2e8f0';
+      else if (item.type === 'res') color = isMatrix ? '#86efac' : '#f8fafc';
 
       const rawLines = String(item.text).split('\n');
       rawLines.forEach((l) => {
-        if (l.length <= 54) {
+        if (l.length <= 42) {
           formattedLines.push({ text: l, color });
         } else {
-          for (let c = 0; c < l.length; c += 54) {
-            formattedLines.push({ text: l.slice(c, c + 54), color });
+          for (let c = 0; c < l.length; c += 42) {
+            formattedLines.push({ text: l.slice(c, c + 42), color });
           }
         }
       });
@@ -200,8 +231,8 @@ export default function RetroCrtMonitor3D({
     });
 
     // Active Prompt Line at the bottom
-    const promptY = Math.min(height - 45, startY + visibleLines.length * lineHeight + 10);
-    ctx.font = 'bold 22px "Consolas", "Courier New", monospace';
+    const promptY = Math.min(height - 40, startY + visibleLines.length * lineHeight + 8);
+    ctx.font = 'bold 32px "Consolas", "Courier New", monospace';
     ctx.fillStyle = fgColor;
     ctx.fillText('steve@ifac:~$ ', 48, promptY);
 
@@ -214,7 +245,7 @@ export default function RetroCrtMonitor3D({
     if (isBlinking) {
       const inputWidth = ctx.measureText(curInput).width;
       ctx.fillStyle = fgColor;
-      ctx.fillRect(48 + promptWidth + inputWidth + 2, promptY - 20, 14, 24);
+      ctx.fillRect(48 + promptWidth + inputWidth + 3, promptY - 26, 18, 30);
     }
 
     if (screenTextureRef.current) {
@@ -260,9 +291,9 @@ export default function RetroCrtMonitor3D({
       0.1,
       100
     );
-    // Zoomed-out comfortable perspective showing the full retro computer with breathing room
-    camera.position.set(0, 0.35, 9.4);
-    camera.lookAt(0, -0.05, 0);
+    // Well-balanced default distance with ample screen size and no cropping
+    camera.position.set(0, 0.18, zoomStateRef.current.targetZ);
+    camera.lookAt(0, zoomStateRef.current.targetLookY, 0);
 
     // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -363,14 +394,14 @@ export default function RetroCrtMonitor3D({
       pcGroup.add(ventMesh);
     }
 
-    // 5. Inset Screen Bezel Frame
-    const screenWellGeo = new THREE.BoxGeometry(3.25, 2.35, 0.15);
+    // 5. Inset Screen Bezel Frame (Larger screen ratio within upper housing)
+    const screenWellGeo = new THREE.BoxGeometry(3.52, 2.48, 0.15);
     const screenWellMesh = new THREE.Mesh(screenWellGeo, darkBezelMat);
     screenWellMesh.position.set(0, 0.82, 1.48);
     pcGroup.add(screenWellMesh);
 
-    // 6. Curved CRT Glass Face (Convex Cathode Bulb)
-    const crtScreenGeo = createCrtCurvedScreenGeometry(3.08, 2.2, 36, 36, 0.22);
+    // 6. Curved CRT Glass Face (Flatter curvature 0.12 for crisp edge-to-edge readability)
+    const crtScreenGeo = createCrtCurvedScreenGeometry(3.36, 2.34, 36, 36, 0.12);
     const crtScreenMesh = new THREE.Mesh(crtScreenGeo, crtScreenMat);
     crtScreenMesh.position.set(0, 0.82, 1.52);
     pcGroup.add(crtScreenMesh);
@@ -484,6 +515,17 @@ export default function RetroCrtMonitor3D({
     window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('pointerup', handlePointerUp);
 
+    const handleWheel = (e) => {
+      e.preventDefault();
+      const delta = e.deltaY * 0.0035;
+      const nextZ = Math.max(3.8, Math.min(8.5, zoomStateRef.current.targetZ + delta));
+      zoomStateRef.current.targetZ = nextZ;
+      const t = THREE.MathUtils.clamp((6.6 - nextZ) / (6.6 - 3.8), 0, 1);
+      zoomStateRef.current.targetLookY = 0.15 + t * 0.63;
+      setZoomMode(nextZ < 5.2 ? 'screen' : 'overview');
+    };
+    domEl.addEventListener('wheel', handleWheel, { passive: false });
+
     // Animation Loop
     let animId;
     let lastBlink = 0;
@@ -502,6 +544,12 @@ export default function RetroCrtMonitor3D({
       rot.currentY += (rot.targetY - rot.currentY) * 0.12;
       pcGroup.rotation.x = rot.currentX;
       pcGroup.rotation.y = rot.currentY;
+
+      // Smooth Camera Zoom & Target Center Lerp
+      const zState = zoomStateRef.current;
+      camera.position.z += (zState.targetZ - camera.position.z) * 0.1;
+      zState.currentLookY += (zState.targetLookY - zState.currentLookY) * 0.1;
+      camera.lookAt(0, zState.currentLookY, 0);
 
       // Pulse power LED
       if (powerLedMatRef.current) {
@@ -538,6 +586,7 @@ export default function RetroCrtMonitor3D({
     return () => {
       cancelAnimationFrame(animId);
       resizeObserver.disconnect();
+      domEl.removeEventListener('wheel', handleWheel);
       domEl.removeEventListener('pointerdown', handlePointerDown);
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerUp);
@@ -549,12 +598,77 @@ export default function RetroCrtMonitor3D({
   }, [drawScreenCanvas]);
 
   return (
-    <div className={`relative w-full h-[420px] sm:h-[480px] lg:h-[520px] select-none ${className}`}>
+    <div className={`relative w-full h-[450px] sm:h-[510px] lg:h-[560px] select-none ${className}`}>
+      {/* Floating HUD Controls for Monitor Zoom & Inspection */}
+      <div className="absolute top-3 right-4 z-10 flex items-center gap-1.5 p-1.5 rounded-2xl bg-white/90 backdrop-blur-md border border-zinc-200/90 shadow-md">
+        <button
+          type="button"
+          onClick={() => {
+            sound.playClick();
+            setZoom('screen');
+          }}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+            zoomMode === 'screen'
+              ? 'bg-zinc-950 text-white shadow-xs'
+              : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100'
+          }`}
+          title="Zoom focado diretamente na tela CRT para leitura ampla"
+        >
+          <Maximize2 className="w-3.5 h-3.5 text-rose-500" />
+          <span>Focar Tela</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            sound.playClick();
+            setZoom('overview');
+          }}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+            zoomMode === 'overview'
+              ? 'bg-zinc-950 text-white shadow-xs'
+              : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100'
+          }`}
+          title="Visão geral do computador de caixa"
+        >
+          <Monitor className="w-3.5 h-3.5 text-emerald-500" />
+          <span>Visão Geral</span>
+        </button>
+        <div className="h-4 w-px bg-zinc-300 mx-0.5" />
+        <button
+          type="button"
+          onClick={() => {
+            sound.playClick();
+            zoomStep(-0.6);
+          }}
+          className="w-7 h-7 flex items-center justify-center rounded-lg text-sm font-mono text-zinc-700 hover:bg-zinc-100 font-bold transition-colors cursor-pointer"
+          title="Aproximar zoom (+)"
+        >
+          +
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            sound.playClick();
+            zoomStep(0.6);
+          }}
+          className="w-7 h-7 flex items-center justify-center rounded-lg text-sm font-mono text-zinc-700 hover:bg-zinc-100 font-bold transition-colors cursor-pointer"
+          title="Afastar zoom (-)"
+        >
+          -
+        </button>
+      </div>
+
+      {/* Subtle Hint Badge at Bottom Left */}
+      <div className="pointer-events-none absolute bottom-3 left-4 z-10 hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-black/40 backdrop-blur-sm border border-white/10 text-[11px] font-mono text-white/70">
+        <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+        <span>Scroll para Zoom • Arraste para Girar 360°</span>
+      </div>
+
       {/* 3D WebGL Canvas Viewport */}
       <div
         ref={mountRef}
         className="w-full h-full cursor-grab active:cursor-grabbing"
-        title="Clique e arraste para girar em 360°"
+        title="Clique e arraste para girar em 360° • Use o scroll para zoom"
       />
     </div>
   );
