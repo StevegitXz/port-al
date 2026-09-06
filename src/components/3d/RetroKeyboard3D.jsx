@@ -154,6 +154,9 @@ export default function RetroKeyboard3D({
   onExecuteCommand = () => {},
   matrixMode = false,
   className = '',
+  showInternalInput = true,
+  defaultRotationY = 0.48,
+  keyboardRef = null,
 }) {
   const mountRef = useRef(null);
   const promptInputRef = useRef(null);
@@ -256,6 +259,12 @@ export default function RetroKeyboard3D({
     }
   }, [findKeyMesh]);
 
+  useEffect(() => {
+    if (keyboardRef) {
+      keyboardRef.current = { pressKey, releaseKey };
+    }
+  }, [keyboardRef, pressKey, releaseKey]);
+
   // Setup Three.js Scene for the Keyboard (RUNS ONLY ONCE ON MOUNT)
   useEffect(() => {
     const container = mountRef.current;
@@ -296,6 +305,7 @@ export default function RetroKeyboard3D({
 
     const kbGroup = new THREE.Group();
     kbGroup.position.set(0, 0, 0);
+    kbGroup.rotation.y = defaultRotationY; // Angled ~30 degrees matching the CRT monitor
     scene.add(kbGroup);
 
     // Desk Shadow
@@ -565,51 +575,53 @@ export default function RetroKeyboard3D({
   return (
     <div className={`w-full flex flex-col items-center select-none ${className}`}>
       {/* 3D Mechanical Keyboard Canvas (All 5 rows 100% visible) */}
-      <div className="relative w-full h-[240px] sm:h-[270px] lg:h-[300px] cursor-pointer">
+      <div className="relative w-full h-[220px] sm:h-[250px] lg:h-[270px] cursor-pointer">
         <div ref={mountRef} className="w-full h-full" />
       </div>
 
-      {/* Integrated Prompt Input Bar Directly Below Keyboard */}
-      <div className="w-full max-w-2xl mx-auto px-4 mt-1">
-        <div className="flex items-center gap-2.5 p-2.5 px-4 rounded-2xl bg-white/95 backdrop-blur-xl border border-zinc-300/80 shadow-xl transition-all focus-within:border-rose-400 focus-within:ring-2 focus-within:ring-rose-200/50">
-          <span className={`text-xs sm:text-sm font-mono font-bold ${matrixMode ? 'text-emerald-600' : 'text-rose-600'}`}>
-            steve@ifac:~$
-          </span>
-          <input
-            ref={promptInputRef}
-            type="text"
-            value={input}
-            onChange={(e) => {
-              setInput(e.target.value);
-            }}
-            onKeyDown={(e) => {
-              pressKey(e.code, e.key);
-              sound.playMechanicalKey();
-              if (e.key === 'Enter') {
-                e.preventDefault();
+      {/* Integrated Prompt Input Bar Directly Below Keyboard (Only if showInternalInput is true) */}
+      {showInternalInput && (
+        <div className="w-full max-w-2xl mx-auto px-4 mt-1">
+          <div className="flex items-center gap-2.5 p-2.5 px-4 rounded-2xl bg-white/95 backdrop-blur-xl border border-zinc-300/80 shadow-xl transition-all focus-within:border-rose-400 focus-within:ring-2 focus-within:ring-rose-200/50">
+            <span className={`text-xs sm:text-sm font-mono font-bold ${matrixMode ? 'text-emerald-600' : 'text-rose-600'}`}>
+              steve@ifac:~$
+            </span>
+            <input
+              ref={promptInputRef}
+              type="text"
+              value={input}
+              onChange={(e) => {
+                setInput(e.target.value);
+              }}
+              onKeyDown={(e) => {
+                pressKey(e.code, e.key);
+                sound.playMechanicalKey();
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  onExecuteCommand(input);
+                  pressKey('Enter', 'Enter');
+                  setTimeout(() => releaseKey('Enter', 'Enter'), 180);
+                }
+              }}
+              onKeyUp={(e) => releaseKey(e.code, e.key)}
+              placeholder="digite aqui ou no teclado 3D (ex: help, projects)..."
+              className="flex-1 bg-transparent text-zinc-900 placeholder-zinc-400 outline-none font-mono text-xs sm:text-sm font-medium"
+            />
+            <button
+              type="button"
+              onClick={() => {
                 onExecuteCommand(input);
                 pressKey('Enter', 'Enter');
                 setTimeout(() => releaseKey('Enter', 'Enter'), 180);
-              }
-            }}
-            onKeyUp={(e) => releaseKey(e.code, e.key)}
-            placeholder="digite aqui ou no teclado 3D (ex: help, projects)..."
-            className="flex-1 bg-transparent text-zinc-900 placeholder-zinc-400 outline-none font-mono text-xs sm:text-sm font-medium"
-          />
-          <button
-            type="button"
-            onClick={() => {
-              onExecuteCommand(input);
-              pressKey('Enter', 'Enter');
-              setTimeout(() => releaseKey('Enter', 'Enter'), 180);
-            }}
-            className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-rose-600 text-white font-mono text-xs font-bold transition-all shadow-sm cursor-pointer flex items-center gap-1.5"
-          >
-            <span>ENTER</span>
-            <span className="text-[10px] text-zinc-400 font-normal">↵</span>
-          </button>
+              }}
+              className="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-rose-600 text-white font-mono text-xs font-bold transition-all shadow-sm cursor-pointer flex items-center gap-1.5"
+            >
+              <span>ENTER</span>
+              <span className="text-[10px] text-zinc-400 font-normal">↵</span>
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

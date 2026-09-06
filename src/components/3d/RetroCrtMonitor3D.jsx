@@ -86,6 +86,7 @@ export default function RetroCrtMonitor3D({
   input = '',
   matrixMode = false,
   className = '',
+  defaultRotationY = 0.48,
 }) {
   const mountRef = useRef(null);
   const screenCanvasRef = useRef(null);
@@ -134,14 +135,14 @@ export default function RetroCrtMonitor3D({
     drawScreenCanvas();
   });
 
-  // Rotation & spring-back state
+  // Rotation & spring-back state (Defaults to ~30° angle toward the user)
   const rotationState = useRef({
     currentX: 0.08,
-    currentY: -0.05,
+    currentY: defaultRotationY,
     targetX: 0.08,
-    targetY: -0.05,
+    targetY: defaultRotationY,
     defaultX: 0.08,
-    defaultY: -0.05,
+    defaultY: defaultRotationY,
     isDragging: false,
     prevMouseX: 0,
     prevMouseY: 0,
@@ -498,7 +499,7 @@ export default function RetroCrtMonitor3D({
       rot.targetX += deltaY * 0.007;
 
       rot.targetX = Math.max(-0.25, Math.min(0.45, rot.targetX));
-      rot.targetY = Math.max(-0.85, Math.min(0.85, rot.targetY));
+      rot.targetY = Math.max(-0.4, Math.min(1.3, rot.targetY));
 
       rot.prevMouseX = e.clientX;
       rot.prevMouseY = e.clientY;
