@@ -62,7 +62,7 @@ function createShadowTexture() {
 /**
  * Creates curved geometry for cathode ray tube glass face
  */
-function createCrtCurvedScreenGeometry(width, height, segX = 32, segY = 32, curvature = 0.22) {
+function createCrtCurvedScreenGeometry(width, height, segX = 32, segY = 32, curvature = 0.045) {
   const geo = new THREE.PlaneGeometry(width, height, segX, segY);
   const pos = geo.attributes.position;
   const halfW = width * 0.5;
@@ -86,7 +86,7 @@ export default function RetroCrtMonitor3D({
   input = '',
   matrixMode = false,
   className = '',
-  defaultRotationY = 0.48,
+  defaultRotationY = 0.48, // ~27.5° towards user and command panel
 }) {
   const mountRef = useRef(null);
   const screenCanvasRef = useRef(null);
@@ -96,22 +96,22 @@ export default function RetroCrtMonitor3D({
 
   const [zoomMode, setZoomMode] = useState('overview'); // 'overview' | 'screen'
 
-  // Smooth Camera Zoom & Target Center Ref
+  // Smooth Camera Zoom State (Centered on screen vs overview)
   const zoomStateRef = useRef({
     currentZ: 6.6,
     targetZ: 6.6,
-    currentLookY: 0.15,
-    targetLookY: 0.15,
+    currentLookY: 0.45,
+    targetLookY: 0.45,
   });
 
   const setZoom = (mode) => {
     setZoomMode(mode);
     if (mode === 'screen') {
       zoomStateRef.current.targetZ = 4.3;
-      zoomStateRef.current.targetLookY = 0.78;
+      zoomStateRef.current.targetLookY = 0.82;
     } else {
       zoomStateRef.current.targetZ = 6.6;
-      zoomStateRef.current.targetLookY = 0.15;
+      zoomStateRef.current.targetLookY = 0.45;
     }
   };
 
@@ -119,7 +119,7 @@ export default function RetroCrtMonitor3D({
     const nextZ = Math.max(3.8, Math.min(8.5, zoomStateRef.current.targetZ + delta));
     zoomStateRef.current.targetZ = nextZ;
     const t = THREE.MathUtils.clamp((6.6 - nextZ) / (6.6 - 3.8), 0, 1);
-    zoomStateRef.current.targetLookY = 0.15 + t * 0.63;
+    zoomStateRef.current.targetLookY = 0.45 + t * 0.37;
     setZoomMode(nextZ < 5.2 ? 'screen' : 'overview');
   };
 
@@ -174,35 +174,37 @@ export default function RetroCrtMonitor3D({
     ctx.fillStyle = bgBase;
     ctx.fillRect(0, 0, width, height);
 
-    // Vignette CRT glass curve shading (Gentle, keeping center and edges luminous)
+    // Subtle CRT glass curve vignette (gentle, no swallowed text)
     const radialGrad = ctx.createRadialGradient(
-      width * 0.5, height * 0.5, width * 0.18,
-      width * 0.5, height * 0.5, width * 0.72
+      width * 0.5, height * 0.5, width * 0.35,
+      width * 0.5, height * 0.5, width * 0.85
     );
-    radialGrad.addColorStop(0, 'rgba(255, 255, 255, 0.03)');
-    radialGrad.addColorStop(0.75, 'rgba(0, 0, 0, 0.12)');
-    radialGrad.addColorStop(1, 'rgba(0, 0, 0, 0.40)');
+    radialGrad.addColorStop(0, 'rgba(255, 255, 255, 0.02)');
+    radialGrad.addColorStop(0.85, 'rgba(0, 0, 0, 0.03)');
+    radialGrad.addColorStop(1, 'rgba(0, 0, 0, 0.08)');
     ctx.fillStyle = radialGrad;
     ctx.fillRect(0, 0, width, height);
 
-    // Subtle CRT Scanlines (Very light raster so text is 100% sharp and readable)
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+    // Subtle CRT Scanlines
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';
     for (let y = 0; y < height; y += 4) {
-      ctx.fillRect(0, y, width, 1.5);
+      ctx.fillRect(0, y, width, 1.2);
     }
 
-    // Top Header Banner (Bold, High Contrast)
-    ctx.font = 'bold 24px "Consolas", "Courier New", monospace';
-    ctx.fillStyle = fgDim;
-    ctx.fillText('╔' + '═'.repeat(42) + '╗', 44, 44);
-    ctx.fillText('║ IFAC VT-100 CRT // KERNEL v4.19 // ONLINE ║', 44, 70);
-    ctx.fillText('╚' + '═'.repeat(42) + '╝', 44, 96);
+    const startX = 64;
 
-    // Terminal History Text lines (ENLARGED CRISP RETRO CRT FONT)
-    ctx.font = 'bold 32px "Consolas", "Monaco", "Courier New", monospace';
-    const lineHeight = 46;
+    // Top Header Banner (Bold, High Contrast)
+    ctx.font = 'bold 22px "Consolas", "Courier New", monospace';
+    ctx.fillStyle = fgDim;
+    ctx.fillText('╔' + '═'.repeat(38) + '╗', startX, 42);
+    ctx.fillText('║   IFAC VT-100 CRT // KERNEL v4.19    ║', startX, 68);
+    ctx.fillText('╚' + '═'.repeat(38) + '╝', startX, 94);
+
+    // Terminal History Text lines
+    ctx.font = 'bold 29px "Consolas", "Monaco", "Courier New", monospace';
+    const lineHeight = 44;
     const maxLines = 11;
-    const startY = 142;
+    const startY = 140;
 
     const formattedLines = [];
     curHistory.forEach((item) => {
@@ -215,11 +217,11 @@ export default function RetroCrtMonitor3D({
 
       const rawLines = String(item.text).split('\n');
       rawLines.forEach((l) => {
-        if (l.length <= 42) {
+        if (l.length <= 40) {
           formattedLines.push({ text: l, color });
         } else {
-          for (let c = 0; c < l.length; c += 42) {
-            formattedLines.push({ text: l.slice(c, c + 42), color });
+          for (let c = 0; c < l.length; c += 40) {
+            formattedLines.push({ text: l.slice(c, c + 40), color });
           }
         }
       });
@@ -228,25 +230,25 @@ export default function RetroCrtMonitor3D({
     const visibleLines = formattedLines.slice(-maxLines);
     visibleLines.forEach((line, idx) => {
       ctx.fillStyle = line.color;
-      ctx.fillText(line.text, 48, startY + idx * lineHeight);
+      ctx.fillText(line.text, startX, startY + idx * lineHeight);
     });
 
     // Active Prompt Line at the bottom
     const promptY = Math.min(height - 40, startY + visibleLines.length * lineHeight + 8);
-    ctx.font = 'bold 32px "Consolas", "Courier New", monospace';
+    ctx.font = 'bold 29px "Consolas", "Courier New", monospace';
     ctx.fillStyle = fgColor;
-    ctx.fillText('steve@ifac:~$ ', 48, promptY);
+    ctx.fillText('steve@ifac:~$ ', startX, promptY);
 
     const promptWidth = ctx.measureText('steve@ifac:~$ ').width;
     ctx.fillStyle = fgWhite;
-    ctx.fillText(curInput, 48 + promptWidth, promptY);
+    ctx.fillText(curInput, startX + promptWidth, promptY);
 
     // Blinking Block Cursor
     const isBlinking = Math.floor(performance.now() / 450) % 2 === 0;
     if (isBlinking) {
       const inputWidth = ctx.measureText(curInput).width;
       ctx.fillStyle = fgColor;
-      ctx.fillRect(48 + promptWidth + inputWidth + 3, promptY - 26, 18, 30);
+      ctx.fillRect(startX + promptWidth + inputWidth + 3, promptY - 24, 16, 28);
     }
 
     if (screenTextureRef.current) {
@@ -395,16 +397,16 @@ export default function RetroCrtMonitor3D({
       pcGroup.add(ventMesh);
     }
 
-    // 5. Inset Screen Bezel Frame (Larger screen ratio within upper housing)
-    const screenWellGeo = new THREE.BoxGeometry(3.52, 2.48, 0.15);
+    // 5. Inset Screen Bezel Frame (Slim, minimal bezel behind screen)
+    const screenWellGeo = new THREE.BoxGeometry(3.70, 2.54, 0.06);
     const screenWellMesh = new THREE.Mesh(screenWellGeo, darkBezelMat);
-    screenWellMesh.position.set(0, 0.82, 1.48);
+    screenWellMesh.position.set(0, 0.82, 1.49);
     pcGroup.add(screenWellMesh);
 
-    // 6. Curved CRT Glass Face (Flatter curvature 0.12 for crisp edge-to-edge readability)
-    const crtScreenGeo = createCrtCurvedScreenGeometry(3.36, 2.34, 36, 36, 0.12);
+    // 6. Curved CRT Glass Face (Expanded to 3.60 x 2.44, sitting proudly in front)
+    const crtScreenGeo = createCrtCurvedScreenGeometry(3.60, 2.44, 36, 36, 0.045);
     const crtScreenMesh = new THREE.Mesh(crtScreenGeo, crtScreenMat);
-    crtScreenMesh.position.set(0, 0.82, 1.52);
+    crtScreenMesh.position.set(0, 0.82, 1.535);
     pcGroup.add(crtScreenMesh);
 
     // 7. Lower Chin Details: Floppy Drive, Badge, Dials & Power LED
